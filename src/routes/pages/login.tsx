@@ -10,7 +10,12 @@ export default function Login() {
     };
 
     return (
-        <div style={{ display: 'grid', placeItems: 'center', height: '100vh', backgroundColor: 'lightgray' }}>
+        <div style={{
+            display: 'grid',
+            placeItems: 'center',
+            width: '100vw',
+            height: '100vh',
+        }}>
             <div style={{
                 padding: '20px',
                 borderRadius: '10px',
