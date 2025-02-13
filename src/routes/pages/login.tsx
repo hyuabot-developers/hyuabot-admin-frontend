@@ -2,11 +2,11 @@ import { Button, TextField } from "@mui/material";
 import { useState } from "react";
 
 export default function Login() {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
     const handleLogin = () => {
-        console.log("Logging in with", email, password);
+        console.log("Logging in with", username, password);
     };
 
     return (
@@ -29,14 +29,16 @@ export default function Login() {
                 <img src="images/hanyangCharacter.png" alt="logo" style={{ width: '100px' }} />
                 <h3 style={{ textAlign: 'center', marginBottom: '4px' }}>휴아봇 서비스 관리자 페이지</h3>
                 <TextField
-                    id="email"
-                    label="이메일"
+                    id="username"
+                    label="아이디"
                     variant="outlined"
                     fullWidth
                     size="small"
                     margin="dense"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={username}
+                    onChange={(e) => {
+                        setUsername(e.target.value)
+                    }}
                 />
                 <TextField
                     id="password"
@@ -49,7 +51,13 @@ export default function Login() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <Button variant="contained" color="primary" fullWidth onClick={handleLogin} style={{ marginTop: '12px' }}>
+                <Button
+                    disabled={!username || !password}
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={handleLogin}
+                    style={{ marginTop: '12px' }}>
                     로그인
                 </Button>
             </div>
