@@ -11,3 +11,14 @@ export const getUserInfo = async () => {
         }
     }
 }
+
+export const login = async (data: { username: string, password: string }) => {
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('password', data.password);
+    return await client.post('/api/auth/users/token', formData, {
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
+}

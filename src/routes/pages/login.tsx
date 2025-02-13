@@ -1,12 +1,28 @@
-import { Button, TextField } from "@mui/material";
+import { Alert, Button, Snackbar, TextField } from "@mui/material";
 import { useState } from "react";
+import { login } from "../../service/network/auth.ts";
+import { AxiosError } from "axios";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [snackbarOpened, setSnackbarOpened] = useState(false);
 
-    const handleLogin = () => {
-        console.log("Logging in with", username, password);
+    const handleLogin = async () => {
+        try {
+            const response = await login({ username, password });
+            if (response?.status === 200) {
+                const data = response.data;
+                localStorage.setItem('accessToken', data.access_token);
+                localStorage.setItem('refreshToken', data.refresh_token);
+                window.location.href = '/';
+            }
+        } catch (error) {
+            const err = error as AxiosError;
+            if (err.response?.status === 401) {
+                setSnackbarOpened(true);
+            }
+        }
     };
 
     return (
@@ -16,6 +32,15 @@ export default function Login() {
             width: '100vw',
             height: '100vh',
         }}>
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                open={snackbarOpened}
+                autoHideDuration={3000}
+                onClose={() => setSnackbarOpened(false)}>
+                <Alert severity="error" variant="filled" sx={{ width: '100%' }}>
+                    아이디나 비밀번호가 일치하지 않습니다.
+                </Alert>
+            </Snackbar>
             <div style={{
                 padding: '20px',
                 borderRadius: '10px',
