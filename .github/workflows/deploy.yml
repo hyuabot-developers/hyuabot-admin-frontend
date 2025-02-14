@@ -24,7 +24,7 @@ jobs:
           yarn install
       - name: Generate .env file
         run: |
-          echo "VITE_APP_API_URL=VITE_APP_API_URL">>.env
+          echo "VITE_APP_API_URL=$VITE_APP_API_URL">>.env
         env:
           VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL }}
       - name: Build
