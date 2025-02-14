@@ -1,29 +1,29 @@
-import { Alert, Button, Snackbar, TextField } from "@mui/material";
-import { useState } from "react";
-import { login } from "../../service/network/auth.ts";
-import { AxiosError } from "axios";
+import { Alert, Button, Snackbar, TextField } from "@mui/material"
+import { useState } from "react"
+import { login } from "../../service/network/auth.ts"
+import { AxiosError } from "axios"
 
 export default function Login() {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [snackbarOpened, setSnackbarOpened] = useState(false);
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [snackbarOpened, setSnackbarOpened] = useState(false)
 
     const handleLogin = async () => {
         try {
-            const response = await login({ username, password });
+            const response = await login({ username, password })
             if (response?.status === 200) {
-                const data = response.data;
-                localStorage.setItem('accessToken', data.access_token);
-                localStorage.setItem('refreshToken', data.refresh_token);
-                window.location.href = '/';
+                const data = response.data
+                localStorage.setItem('accessToken', data.access_token)
+                localStorage.setItem('refreshToken', data.refresh_token)
+                window.location.href = '/'
             }
         } catch (error) {
-            const err = error as AxiosError;
+            const err = error as AxiosError
             if (err.response?.status === 401) {
-                setSnackbarOpened(true);
+                setSnackbarOpened(true)
             }
         }
-    };
+    }
 
     return (
         <div style={{

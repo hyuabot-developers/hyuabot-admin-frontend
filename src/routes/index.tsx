@@ -1,6 +1,6 @@
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
-import Home from "./pages/home.tsx";
-import Login from "./pages/login.tsx";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
+import Home from "./pages/home.tsx"
+import Login from "./pages/login.tsx"
 
 const router = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },

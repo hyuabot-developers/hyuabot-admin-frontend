@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { getUserInfo } from "../../service/network/auth.ts";
+import { useEffect, useState } from "react"
+import { getUserInfo } from "../../service/network/auth.ts"
 
 export default function Home() {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
