@@ -9,7 +9,7 @@ on:
 jobs:
   lint:
     name: Check code style
-    runs-on: self-hosted
+    runs-on: ['self-hosted', 'X64']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
   test-build:
     if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
     name: Build before deploying
-    runs-on: self-hosted
+    runs-on: ['self-hosted', 'X64']
     steps:
       - name: Checkout
         uses: actions/checkout@v4
