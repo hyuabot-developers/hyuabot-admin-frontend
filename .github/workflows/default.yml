@@ -18,7 +18,9 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: yarn install
+        run: |
+          npm install -g yarn
+          yarn install
       - name: Run lint
         run: yarn lint
   test-build:
@@ -33,6 +35,8 @@ jobs:
         with:
           node-version: '22'
       - name: Install dependencies
-        run: yarn install
+        run: |
+          npm install -g yarn
+          yarn install
       - name: Build
         run: yarn build
