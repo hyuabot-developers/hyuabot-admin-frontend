@@ -14,3 +14,11 @@ export const login = async (data: { username: string, password: string }) => {
         }
     })
 }
+
+export const refreshToken = async () => {
+    return await client.put('/api/auth/users/token', {
+        headers: {
+            'Cookie': `refresh_token=${localStorage.getItem('refreshToken')}`
+        }
+    })
+}

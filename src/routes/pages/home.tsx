@@ -1,6 +1,5 @@
 import { getUserInfo } from "../../service/network/auth.ts"
 import { useAuthenticatedStore, useUserInfoStore } from "../../stores/auth.ts"
-import { AxiosError } from "axios";
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material"
 import MenuIcon from '@mui/icons-material/Menu'
 import LogOutIcon from '@mui/icons-material/Logout'
@@ -13,23 +12,16 @@ export default function Home() {
     const userInfoStore = useUserInfoStore()
     // Fetch user info
     const fetchUserInfo = async () => {
-        try {
-            const response = await getUserInfo()
-            isAuthenticatedStore.setIsAuthenticated(response.status === 200)
-            if (response.status === 200) {
-                const responseData = response.data
-                userInfoStore.setUserInfo(
-                    responseData.username,
-                    responseData.nickname,
-                    responseData.email,
-                    responseData.phone,
-                )
-            }
-        } catch (error) {
-            const err = error as AxiosError
-            if (err.response?.status === 401) {
-                window.location.href = '/login'
-            }
+        const response = await getUserInfo()
+        isAuthenticatedStore.setIsAuthenticated(response.status === 200)
+        if (response.status === 200) {
+            const responseData = response.data
+            userInfoStore.setUserInfo(
+                responseData.username,
+                responseData.nickname,
+                responseData.email,
+                responseData.phone,
+            )
         }
     }
     // Log out button clicked
