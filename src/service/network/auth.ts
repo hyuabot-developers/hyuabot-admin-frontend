@@ -1,15 +1,7 @@
 import client from "./client.ts"
-import { AxiosError } from "axios"
 
 export const getUserInfo = async () => {
-    try {
-        return await client.get('/api/auth/users/me')
-    } catch (error) {
-        const err = error as AxiosError
-        if (err.response?.status === 401) {
-            window.location.href = '/login'
-        }
-    }
+    return await client.get('/api/auth/users/me')
 }
 
 export const login = async (data: { username: string, password: string }) => {
@@ -19,6 +11,14 @@ export const login = async (data: { username: string, password: string }) => {
     return await client.post('/api/auth/users/token', formData, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    })
+}
+
+export const refreshToken = async () => {
+    return await client.put('/api/auth/users/token', {
+        headers: {
+            'Cookie': `refresh_token=${localStorage.getItem('refreshToken')}`
         }
     })
 }

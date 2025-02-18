@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import Router from "./routes"
 import { ThemeProvider } from "@mui/material"
@@ -7,10 +6,8 @@ import { Global } from "@emotion/react"
 import { globalStyle } from "./styles/globalStyle.ts"
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <ThemeProvider theme={globalTheme}>
-            <Global styles={globalStyle} />
-            <Router />
-        </ThemeProvider>
-    </StrictMode>
+    <ThemeProvider theme={globalTheme}>
+        <Global styles={globalStyle} />
+        <Router />
+    </ThemeProvider>
 )
