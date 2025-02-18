@@ -24,6 +24,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import { useDrawerOpenedStore } from "../../stores/home.ts"
 import { getUserInfo } from "../../service/network/auth.ts"
 import { useAuthenticatedStore, useUserInfoStore } from "../../stores/auth.ts"
+import { Outlet, useNavigate } from "react-router-dom"
 
 
 export default function Home() {
@@ -87,6 +88,7 @@ export default function Home() {
         </AppBar>
     )
     // Drawer
+    const navigate = useNavigate()
     const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정', '사용자']
     const menuIcons = [
         DepartureBoardIcon,
@@ -99,10 +101,20 @@ export default function Home() {
         AccountBoxIcon,
     ]
     const menuItemClicked = (text: string) => {
-        console.log(text)
+        switch (text) {
+        case '셔틀버스': navigate('/shuttle'); break
+        case '노선버스': navigate('/bus'); break
+        case '전철': navigate('/subway'); break
+        case '학식': navigate('/cafeteria'); break
+        case '열람실': navigate('/readingRoom'); break
+        case '연락처': navigate('/contact'); break
+        case '학사일정': navigate('/calendar'); break
+        case '사용자': navigate('/user'); break
+        }
+        drawerOpenedStore.setDrawerOpened(false)
     }
     if (isAuthenticatedStore.isAuthenticated === null) {
-        return <h1>Loading</h1>
+        return
     } else if (isAuthenticatedStore.isAuthenticated) {
         return (
             <div>
@@ -135,7 +147,10 @@ export default function Home() {
                         </List>
                     </Box>
                 </Drawer>
-                <h1>Home</h1>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Toolbar />
+                    <Outlet />
+                </Box>
             </div>
         )
     }
