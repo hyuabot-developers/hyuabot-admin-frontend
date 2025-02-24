@@ -49,7 +49,7 @@ export default function Login() {
                 justifyContent: 'center',
                 flexDirection: 'column',
                 alignItems: 'center',
-                width: '40vw',
+                width: '80vw',
             }}>
                 <img src="images/hanyangCharacter.png" alt="logo" style={{ width: '100px' }} />
                 <h3 style={{ textAlign: 'center', marginBottom: '4px' }}>휴아봇 서비스 관리자 페이지</h3>
