@@ -60,7 +60,14 @@ export default function Home() {
     useEffect(() => {
         fetchUserInfo().then()
     }, [])
-
+    useEffect(() => {
+        if (isAuthenticatedStore.isAuthenticated === null) {
+            fetchUserInfo().then()
+        }
+        else if (!isAuthenticatedStore.isAuthenticated) {
+            window.location.href = '/login'
+        }
+    }, [isAuthenticatedStore.isAuthenticated])
     // Component
     // App bar
     const appBar = (
