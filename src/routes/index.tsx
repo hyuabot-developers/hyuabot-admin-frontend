@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import Home from "./pages/home.tsx"
 import Login from "./pages/login.tsx"
+import Shuttle from "./pages/shuttle"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -8,7 +9,15 @@ const appRouter = createBrowserRouter([
         path: '/',
         element: <Home />,
         children: [
-            { path: 'shuttle', element: <div>Shuttle</div> },
+            { path: 'shuttle', element: <Shuttle />, children: [
+                { path: 'period', element: <div>Period</div> },
+                { path: 'holiday', element: <div>Holiday</div> },
+                { path: 'route', element: <div>Route</div> },
+                { path: 'stop', element: <div>Stop</div> },
+                { path: 'routeStop', element: <div>RouteStop</div> },
+                { path: 'timetable', element: <div>Timetable</div> },
+                { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
+            ]},
             { path: 'bus', element: <div>Bus</div> },
             { path: 'subway', element: <div>Subway</div> },
             { path: 'cafeteria', element: <div>Cafeteria</div> },
@@ -16,8 +25,8 @@ const appRouter = createBrowserRouter([
             { path: 'contact', element: <div>Contact</div> },
             { path: 'calendar', element: <div>Calendar</div> },
             { path: 'user', element: <div>User</div> },
-            { path: '/', element: <Navigate replace to={'/shuttle'} /> },
-            { path: '*', element: <Navigate replace to={'/shuttle'} /> },
+            { path: '/', element: <Navigate replace to={'/shuttle/period'} /> },
+            { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
         ]
     },
     { path: '/login', element: <Login /> },
