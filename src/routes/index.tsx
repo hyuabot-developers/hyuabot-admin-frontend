@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import Home from "./pages/home.tsx"
 import Login from "./pages/login.tsx"
 import Shuttle from "./pages/shuttle"
+import Period from "./pages/shuttle/period.tsx"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -10,7 +11,7 @@ const appRouter = createBrowserRouter([
         element: <Home />,
         children: [
             { path: 'shuttle', element: <Shuttle />, children: [
-                { path: 'period', element: <div>Period</div> },
+                { path: 'period', element: <Period /> },
                 { path: 'holiday', element: <div>Holiday</div> },
                 { path: 'route', element: <div>Route</div> },
                 { path: 'stop', element: <div>Stop</div> },
