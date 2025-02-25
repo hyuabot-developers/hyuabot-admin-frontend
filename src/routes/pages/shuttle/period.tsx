@@ -1,8 +1,10 @@
-import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../service/network/shuttle.ts"
-import { useEffect } from "react"
-import { useShuttlePeriodStore } from "../../../stores/shuttle.ts"
-import { DataGrid, GridColDef } from "@mui/x-data-grid"
 import dayjs from "dayjs"
+import { useEffect } from "react"
+import { Button } from "@mui/material"
+import RefreshIcon from '@mui/icons-material/Refresh'
+import { DataGrid, GridColDef } from "@mui/x-data-grid"
+import { useShuttlePeriodStore } from "../../../stores/shuttle.ts"
+import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../service/network/shuttle.ts"
 
 export default function Period() {
     // Get the store
@@ -41,6 +43,11 @@ export default function Period() {
 
     return (
         <div style={{ height: '100vh', width: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px' }}>
+                <Button size="small" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttlePeriod}>
+                    새로고침
+                </Button>
+            </div>
             <DataGrid columns={columns} rows={shuttlePeriodStore.periods} />
         </div>
     )
