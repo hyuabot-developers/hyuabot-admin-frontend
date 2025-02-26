@@ -1,4 +1,4 @@
-import { Box } from "@mui/material"
+import { Alert, Box, Snackbar } from "@mui/material"
 import {
     DataGrid,
     GridActionsCellItem,
@@ -14,6 +14,7 @@ import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
 import { Toolbar } from "./toolbar.tsx"
 import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
+import { useState } from "react"
 
 interface GridProps {
     columns: GridColDef[]
@@ -22,6 +23,8 @@ interface GridProps {
 export function ShuttlePeriodGrid(props: GridProps) {
     const rowStore = useShuttlePeriodStore()
     const rowModesModelStore = useShuttlePeriodGridModelStore()
+    const [openInvalidDataSnackbar, setOpenInvalidDataSnackbar] = useState(false)
+    const [openInvlideDateRangeSnackbar, setOpenInvalidDateRangeSnackbar] = useState(false)
     const rowEditStopped: GridEventListener<"rowEditStop"> = (params, event) => {
         if (event.defaultMuiPrevented) {
             return
@@ -55,9 +58,11 @@ export function ShuttlePeriodGrid(props: GridProps) {
     }
     const updateRowProcess = (newRow: ShuttlePeriod) => {
         if (newRow.type === "" || newRow.start === "" || newRow.end === "") {
+            setOpenInvalidDataSnackbar(true)
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         } else if (newRow.start > newRow.end) {
+            setOpenInvalidDateRangeSnackbar(true)
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         }
@@ -98,6 +103,24 @@ export function ShuttlePeriodGrid(props: GridProps) {
     // Render
     return (
         <Box sx={{height: "100vh", width: "100%"}}>
+            <Snackbar
+                anchorOrigin={{vertical: "bottom", horizontal: "right"}}
+                open={openInvalidDataSnackbar}
+                autoHideDuration={3000}
+                onClose={() => setOpenInvalidDataSnackbar(false)}>
+                <Alert onClose={() => setOpenInvalidDataSnackbar(false)} severity="error" sx={{width: "100%"}}>
+                    올바른 데이터가 아닙니다.
+                </Alert>
+            </Snackbar>
+            <Snackbar
+                anchorOrigin={{vertical: "bottom", horizontal: "right"}}
+                open={openInvlideDateRangeSnackbar}
+                autoHideDuration={3000}
+                onClose={() => setOpenInvalidDateRangeSnackbar(false)}>
+                <Alert onClose={() => setOpenInvalidDateRangeSnackbar(false)} severity="error" sx={{width: "100%"}}>
+                    날짜 범위가 올바르지 않습니다.
+                </Alert>
+            </Snackbar>
             <DataGrid
                 columns={props.columns}
                 rows={rowStore.rows}
