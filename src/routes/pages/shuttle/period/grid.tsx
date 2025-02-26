@@ -84,7 +84,13 @@ export function ShuttlePeriodGrid(props: GridProps) {
                 ]
             }
             return [
-                <GridActionsCellItem label="edit" key="edit" icon={<EditIcon />} onClick={() => editRowButtonClicked(id)} />,
+                <GridActionsCellItem
+                    label="edit"
+                    key="edit"
+                    icon={<EditIcon />}
+                    onClick={() => editRowButtonClicked(id)}
+                    disabled={!rowStore.rows.find(row => row.id === id)!.isNew}
+                />,
                 <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
             ]
         }
@@ -101,6 +107,7 @@ export function ShuttlePeriodGrid(props: GridProps) {
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
                 slots={{toolbar: Toolbar}}
+                isCellEditable={(params) => params.row.isNew}
             />
         </Box>
     )
