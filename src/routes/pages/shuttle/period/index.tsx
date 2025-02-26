@@ -2,9 +2,9 @@ import dayjs from "dayjs"
 import { useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { GridColDef } from "@mui/x-data-grid"
-import { useShuttlePeriodStore } from "../../../stores/shuttle.ts"
-import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../service/network/shuttle.ts"
-import { Grid } from "../../../components/grid/Grid.tsx"
+import { ShuttlePeriodGrid } from "./grid.tsx"
+import { useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
+import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
 
 export default function Period() {
     // Get the store
@@ -14,7 +14,7 @@ export default function Period() {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            shuttlePeriodStore.setPeriods(responseData.data.map((period: ShuttlePeriodResponse) => {
+            shuttlePeriodStore.setRows(responseData.data.map((period: ShuttlePeriodResponse) => {
                 return {
                     id: uuidv4(),
                     type: period.type,
@@ -75,6 +75,6 @@ export default function Period() {
     ]
 
     return (
-        <Grid columns={columns} />
+        <ShuttlePeriodGrid columns={columns} />
     )
 }

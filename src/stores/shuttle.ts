@@ -1,4 +1,5 @@
 import { create } from "zustand/index"
+import { GridRowModesModel } from "@mui/x-data-grid"
 
 type ShuttleTabStore = {
     route: string,
@@ -14,8 +15,13 @@ export type ShuttlePeriod = {
 }
 
 type ShuttlePeriodStore = {
-    periods: Array<ShuttlePeriod>,
-    setPeriods: (periods: Array<ShuttlePeriod>) => void,
+    rows: Array<ShuttlePeriod>,
+    setRows: (periods: Array<ShuttlePeriod>) => void,
+}
+
+type ShuttlePeriodGridModelStore = {
+    rowModesModel: GridRowModesModel
+    setRowModesModel: (rowModesModel: GridRowModesModel) => void
 }
 
 export const useShuttleTabStore = create<ShuttleTabStore>((set) => ({
@@ -24,11 +30,16 @@ export const useShuttleTabStore = create<ShuttleTabStore>((set) => ({
 }))
 
 export const useShuttlePeriodStore = create<ShuttlePeriodStore>((set) => ({
-    periods: [],
-    setPeriods: (periods: Array<ShuttlePeriod>) => {
-        periods.sort(function (a: ShuttlePeriod, b: ShuttlePeriod) {
+    rows: [],
+    setRows: (rows: Array<ShuttlePeriod>) => {
+        rows.sort(function (a: ShuttlePeriod, b: ShuttlePeriod) {
             return a.start < b.start ? -1 : a.start > b.start ? 1 : 0
         })
-        set({ periods })
+        set({ rows })
     },
+}))
+
+export const useShuttlePeriodGridModelStore = create<ShuttlePeriodGridModelStore>((set) => ({
+    rowModesModel: {},
+    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
 }))

@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Box } from "@mui/material"
 import {
     DataGrid,
@@ -13,24 +12,23 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/DeleteOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
-
-import { Toolbar } from "./Toolbar.tsx"
-import { ShuttlePeriod } from "../../stores/shuttle.ts"
+import { Toolbar } from "./toolbar.tsx"
+import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 
 interface GridProps {
     columns: GridColDef[]
 }
 
-export function Grid(props: GridProps) {
-    const [rows, setRows] = useState<ShuttlePeriod[]>([])
-    const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({})
+export function ShuttlePeriodGrid(props: GridProps) {
+    const rowStore = useShuttlePeriodStore()
+    const rowModesModelStore = useShuttlePeriodGridModelStore()
     const rowEditStopped: GridEventListener<"rowEditStop"> = (params, event) => {
         if (event.defaultMuiPrevented) {
             return
         }
-        const editedRow = rows.find(row => row.id === params.id)
+        const editedRow = rowStore.rows.find(row => row.id === params.id)
         if (editedRow!.isNew) {
-            setRows(rows.map(row => {
+            rowStore.setRows(rowStore.rows.map(row => {
                 if (row.id === params.id) {
                     return {...row, isNew: false}
                 }
@@ -40,28 +38,28 @@ export function Grid(props: GridProps) {
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
-        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.Edit}})
+        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.Edit}})
     }
     const saveRowButtonClicked = (id: GridRowId) => {
-        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View}})
+        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View}})
     }
     const deleteRowButtonClicked = (id: GridRowId) => {
-        setRows(rows.filter(row => row.id !== id))
+        rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
     }
     const cancelRowButtonClicked = (id: GridRowId) => {
-        setRowModesModel({...rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}})
-        const editedRow = rows.find(row => row.id === id)
+        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}})
+        const editedRow = rowStore.rows.find(row => row.id === id)
         if (editedRow!.isNew) {
-            setRows(rows.filter(row => row.id !== id))
+            rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
         }
     }
     const updateRowProcess = (newRow: ShuttlePeriod) => {
         const updatedRow = {...newRow, isNew: false}
-        setRows(rows.map(row => row.id === newRow.id ? updatedRow : row))
+        rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
         return updatedRow
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
-        setRowModesModel(newRowModesModel)
+        rowModesModelStore.setRowModesModel(newRowModesModel)
     }
     // Add action column
     props.columns.push({
@@ -71,7 +69,7 @@ export function Grid(props: GridProps) {
         width: 100,
         cellClassName: "actions",
         getActions: ({ id }) => {
-            const isEditing = rowModesModel[id]?.mode === GridRowModes.Edit
+            const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
             if (isEditing) {
                 return [
                     <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
@@ -89,14 +87,13 @@ export function Grid(props: GridProps) {
         <Box sx={{height: "100vh", width: "100%"}}>
             <DataGrid
                 columns={props.columns}
-                rows={rows}
-                rowModesModel={rowModesModel}
+                rows={rowStore.rows}
+                rowModesModel={rowModesModelStore.rowModesModel}
                 editMode="row"
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
                 slots={{toolbar: Toolbar}}
-                slotProps={{toolbar: {setRows, setRowModesModel}}}
             />
         </Box>
     )

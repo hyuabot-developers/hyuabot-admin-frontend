@@ -1,14 +1,16 @@
 import { v4 as uuidv4 } from "uuid"
 import { Button } from "@mui/material"
-import { GridRowModes, GridSlotProps, GridToolbarContainer } from "@mui/x-data-grid"
+import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
 import AddIcon from "@mui/icons-material/Add"
+import { useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 
-export function Toolbar(props: GridSlotProps["toolbar"]) {
-    const { setRows, setRowModesModel } = props
+export function Toolbar() {
+    const rowStore = useShuttlePeriodStore()
+    const rowModesModelStore = useShuttlePeriodGridModelStore()
     const addRowButtonClicked = () => {
         const id = uuidv4()
-        setRows((oldRows) => [
-            ...oldRows,
+        rowStore.setRows([
+            ...rowStore.rows,
             {
                 id,
                 type: "",
@@ -17,9 +19,9 @@ export function Toolbar(props: GridSlotProps["toolbar"]) {
                 isNew: true,
             },
         ])
-        setRowModesModel((oldRowModesModel) => ({
-            ...oldRowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+        rowModesModelStore.setRowModesModel(({
+            ...rowModesModelStore.rowModesModel,
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: "type" },
         }))
     }
 

@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import Home from "./pages/home.tsx"
 import Login from "./pages/login.tsx"
 import Shuttle from "./pages/shuttle"
-import Period from "./pages/shuttle/period.tsx"
+import Period from "./pages/shuttle/period"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
