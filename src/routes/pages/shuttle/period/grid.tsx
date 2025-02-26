@@ -54,6 +54,13 @@ export function ShuttlePeriodGrid(props: GridProps) {
         }
     }
     const updateRowProcess = (newRow: ShuttlePeriod) => {
+        if (newRow.type === "" || newRow.start === "" || newRow.end === "") {
+            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+            return { ...newRow, _action: "delete" }
+        } else if (newRow.start > newRow.end) {
+            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+            return { ...newRow, _action: "delete" }
+        }
         const updatedRow = {...newRow, isNew: false}
         rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
         return updatedRow
