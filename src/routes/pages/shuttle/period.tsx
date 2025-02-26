@@ -1,10 +1,10 @@
 import dayjs from "dayjs"
 import { useEffect } from "react"
-import { Button } from "@mui/material"
-import RefreshIcon from '@mui/icons-material/Refresh'
-import { DataGrid, GridColDef } from "@mui/x-data-grid"
+import { v4 as uuidv4 } from "uuid"
+import { GridColDef } from "@mui/x-data-grid"
 import { useShuttlePeriodStore } from "../../../stores/shuttle.ts"
 import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../service/network/shuttle.ts"
+import { Grid } from "../../../components/grid/Grid.tsx"
 
 export default function Period() {
     // Get the store
@@ -14,9 +14,9 @@ export default function Period() {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            shuttlePeriodStore.setPeriods(responseData.data.map((period: ShuttlePeriodResponse, index: number) => {
+            shuttlePeriodStore.setPeriods(responseData.data.map((period: ShuttlePeriodResponse) => {
                 return {
-                    id: index,
+                    id: uuidv4(),
                     type: period.type,
                     start: period.start,
                     end: period.end,
@@ -26,7 +26,12 @@ export default function Period() {
     }
     useEffect(() => { fetchShuttlePeriod().then() }, [])
     // Configure DataGrid
-    const dateValueFormatter = (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm:ss Z')
+    const startDateValueFormatter = (value: string) => {
+        return dayjs(value).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).format('YYYY-MM-DD HH:mm:ss Z')
+    }
+    const endDateValueFormatter = (value: string) => {
+        return dayjs(value).set('hour', 23).set('minute', 59).set('second', 59).set('millisecond', 0).format('YYYY-MM-DD HH:mm:ss Z')
+    }
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
         case "semester": return "학기"
@@ -36,19 +41,40 @@ export default function Period() {
         }
     }
     const columns: GridColDef[] = [
-        { field: 'type', headerName: '운행 종류', width: 200, valueFormatter: periodTypeValueFormatter },
-        { field: 'start', headerName: '시작 날짜', width: 250, valueFormatter: dateValueFormatter },
-        { field: 'end', headerName: '종료 날짜', width: 250, valueFormatter: dateValueFormatter },
+        {
+            field: 'type',
+            headerName: '운행 종류',
+            width: 200,
+            valueFormatter: periodTypeValueFormatter,
+            type: 'singleSelect',
+            valueOptions: ['semester', 'vacation', 'vacation_session'],
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'start',
+            headerName: '시작 날짜',
+            width: 250,
+            valueFormatter: startDateValueFormatter,
+            type: 'date',
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'end',
+            headerName: '종료 날짜',
+            width: 250,
+            valueFormatter: endDateValueFormatter,
+            type: 'date',
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
     ]
 
     return (
-        <div style={{ height: '100vh', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px' }}>
-                <Button size="small" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttlePeriod}>
-                    새로고침
-                </Button>
-            </div>
-            <DataGrid columns={columns} rows={shuttlePeriodStore.periods} />
-        </div>
+        <Grid columns={columns} />
     )
 }

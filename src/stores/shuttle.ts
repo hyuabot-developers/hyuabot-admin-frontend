@@ -5,11 +5,12 @@ type ShuttleTabStore = {
     setRoute: (route: string) => void,
 }
 
-type ShuttlePeriod = {
-    id: number,
+export type ShuttlePeriod = {
+    id: string,
     type: string,
     start: string,
-    end: string
+    end: string,
+    isNew: boolean,
 }
 
 type ShuttlePeriodStore = {
