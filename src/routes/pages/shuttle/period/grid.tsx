@@ -15,7 +15,7 @@ import CancelIcon from "@mui/icons-material/Close"
 import { Toolbar } from "./toolbar.tsx"
 import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 import { useState } from "react"
-import { createShuttlePeriod } from "../../../../service/network/shuttle.ts"
+import { createShuttlePeriod, deleteShuttlePeriod } from "../../../../service/network/shuttle.ts"
 import dayjs from "dayjs"
 
 interface GridProps {
@@ -49,7 +49,19 @@ export function ShuttlePeriodGrid(props: GridProps) {
     const saveRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View}})
     }
-    const deleteRowButtonClicked = (id: GridRowId) => {
+    const deleteRowButtonClicked = async (id: GridRowId) => {
+        const rowToDelete = rowStore.rows.find(row => row.id === id)
+        if (rowToDelete === undefined) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
+        const response = await deleteShuttlePeriod({
+            type: rowToDelete.type,
+            start: dayjs(rowToDelete.start).format("YYYY-MM-DD"),
+            end: dayjs(rowToDelete.end).format("YYYY-MM-DD"),
+        })
+        if (response.status !== 204) {
+            setErrorSnackbarContent("데이터 삭제에 실패했습니다.")
+            return
+        }
+        setSuccessSnackbarContent("데이터 삭제에 성공했습니다.")
         rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
     }
     const cancelRowButtonClicked = (id: GridRowId) => {
