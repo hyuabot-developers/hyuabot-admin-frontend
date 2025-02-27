@@ -3,6 +3,7 @@ import Home from "./pages/home.tsx"
 import Login from "./pages/login.tsx"
 import Shuttle from "./pages/shuttle"
 import Period from "./pages/shuttle/period"
+import Holiday from "./pages/shuttle/holiday"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -12,7 +13,7 @@ const appRouter = createBrowserRouter([
         children: [
             { path: 'shuttle', element: <Shuttle />, children: [
                 { path: 'period', element: <Period /> },
-                { path: 'holiday', element: <div>Holiday</div> },
+                { path: 'holiday', element: <Holiday /> },
                 { path: 'route', element: <div>Route</div> },
                 { path: 'stop', element: <div>Stop</div> },
                 { path: 'routeStop', element: <div>RouteStop</div> },

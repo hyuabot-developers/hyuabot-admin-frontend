@@ -1,5 +1,6 @@
 import { create } from "zustand/index"
 import { GridRowModesModel } from "@mui/x-data-grid"
+import { GridModelStore } from "./index.ts"
 
 type ShuttleTabStore = {
     route: string,
@@ -19,9 +20,17 @@ type ShuttlePeriodStore = {
     setRows: (periods: Array<ShuttlePeriod>) => void,
 }
 
-type ShuttlePeriodGridModelStore = {
-    rowModesModel: GridRowModesModel
-    setRowModesModel: (rowModesModel: GridRowModesModel) => void
+export type ShuttleHoliday = {
+    id: string,
+    type: string,
+    calendar: string,
+    date: string,
+    isNew: boolean,
+}
+
+type ShuttleHolidayStore = {
+    rows: Array<ShuttleHoliday>,
+    setRows: (holidays: Array<ShuttleHoliday>) => void,
 }
 
 export const useShuttleTabStore = create<ShuttleTabStore>((set) => ({
@@ -39,7 +48,22 @@ export const useShuttlePeriodStore = create<ShuttlePeriodStore>((set) => ({
     },
 }))
 
-export const useShuttlePeriodGridModelStore = create<ShuttlePeriodGridModelStore>((set) => ({
+export const useShuttlePeriodGridModelStore = create<GridModelStore>((set) => ({
+    rowModesModel: {},
+    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+}))
+
+export const useShuttleHolidayStore = create<ShuttleHolidayStore>((set) => ({
+    rows: [],
+    setRows: (rows: Array<ShuttleHoliday>) => {
+        rows.sort(function (a: ShuttleHoliday, b: ShuttleHoliday) {
+            return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
+        })
+        set({ rows })
+    },
+}))
+
+export const useShuttleHolidayGridModelStore = create<GridModelStore>((set) => ({
     rowModesModel: {},
     setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
 }))
