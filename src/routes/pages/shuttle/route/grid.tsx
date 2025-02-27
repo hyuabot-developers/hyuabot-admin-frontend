@@ -40,14 +40,7 @@ export function ShuttleRouteGrid(props: GridProps) {
             return
         }
         const editedRow = rowStore.rows.find(row => row.id === params.id)
-        if (editedRow!.isNew) {
-            rowStore.setRows(rowStore.rows.map(row => {
-                if (row.id === params.id) {
-                    return {...row, isNew: false}
-                }
-                return row
-            }))
-        }
+        return editedRow!
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -80,20 +73,35 @@ export function ShuttleRouteGrid(props: GridProps) {
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         }
-        const response = await createShuttleRoute({
-            name: newRow.name,
-            tag: newRow.tag,
-            korean: newRow.korean,
-            english: newRow.english,
-            start: newRow.start,
-            end: newRow.end,
-        })
-        if (response.status !== 201) {
-            setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-            return { ...newRow, _action: "delete" }
+        if (newRow.isNew) {
+            const response = await createShuttleRoute({
+                name: newRow.name,
+                tag: newRow.tag,
+                korean: newRow.korean,
+                english: newRow.english,
+                start: newRow.start,
+                end: newRow.end,
+            })
+            if (response.status !== 201) {
+                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+                rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+                return { ...newRow, _action: "delete" }
+            }
+            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+        } else {
+            const response = await updateShuttleRoute(newRow.name, {
+                tag: newRow.tag,
+                korean: newRow.korean,
+                english: newRow.english,
+                start: newRow.start,
+                end: newRow.end,
+            })
+            if (response.status !== 200) {
+                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+                return { ...newRow, _action: "delete" }
+            }
+            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
         }
-        setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
         const updatedRow = {...newRow, isNew: false}
         rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
         return updatedRow
@@ -122,7 +130,6 @@ export function ShuttleRouteGrid(props: GridProps) {
                     key="edit"
                     icon={<EditIcon />}
                     onClick={() => editRowButtonClicked(id)}
-                    disabled={!rowStore.rows.find(row => row.id === id)!.isNew}
                 />,
                 <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
             ]
@@ -158,7 +165,7 @@ export function ShuttleRouteGrid(props: GridProps) {
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
                 slots={{toolbar: Toolbar}}
-                isCellEditable={(params) => params.row.isNew}
+                isCellEditable={(params) => params.colDef.field !== "actions" && (params.colDef.field !== "name" || params.row.isNew)}
             />
         </Box>
     )
