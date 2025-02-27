@@ -15,6 +15,8 @@ import CancelIcon from "@mui/icons-material/Close"
 import { Toolbar } from "./toolbar.tsx"
 import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 import { useState } from "react"
+import { createShuttlePeriod } from "../../../../service/network/shuttle.ts"
+import dayjs from "dayjs"
 
 interface GridProps {
     columns: GridColDef[]
@@ -23,8 +25,9 @@ interface GridProps {
 export function ShuttlePeriodGrid(props: GridProps) {
     const rowStore = useShuttlePeriodStore()
     const rowModesModelStore = useShuttlePeriodGridModelStore()
-    const [openInvalidDataSnackbar, setOpenInvalidDataSnackbar] = useState(false)
-    const [openInvlideDateRangeSnackbar, setOpenInvalidDateRangeSnackbar] = useState(false)
+    const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>("")
+    const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>("")
+
     const rowEditStopped: GridEventListener<"rowEditStop"> = (params, event) => {
         if (event.defaultMuiPrevented) {
             return
@@ -56,16 +59,27 @@ export function ShuttlePeriodGrid(props: GridProps) {
             rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
         }
     }
-    const updateRowProcess = (newRow: ShuttlePeriod) => {
+    const updateRowProcess = async (newRow: ShuttlePeriod) => {
         if (newRow.type === "" || newRow.start === "" || newRow.end === "") {
-            setOpenInvalidDataSnackbar(true)
+            setErrorSnackbarContent("올바른 데이터가 아닙니다.")
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         } else if (newRow.start > newRow.end) {
-            setOpenInvalidDateRangeSnackbar(true)
+            setErrorSnackbarContent("날짜 범위가 올바르지 않습니다.")
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         }
+        const response = await createShuttlePeriod({
+            type: newRow.type,
+            start: dayjs(newRow.start).format("YYYY-MM-DD"),
+            end: dayjs(newRow.end).format("YYYY-MM-DD"),
+        })
+        if (response.status !== 201) {
+            setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+            return { ...newRow, _action: "delete" }
+        }
+        setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
         const updatedRow = {...newRow, isNew: false}
         rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
         return updatedRow
@@ -105,20 +119,20 @@ export function ShuttlePeriodGrid(props: GridProps) {
         <Box sx={{height: "100vh", width: "100%"}}>
             <Snackbar
                 anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                open={openInvalidDataSnackbar}
+                open={errorSnackbarContent !== ""}
                 autoHideDuration={3000}
-                onClose={() => setOpenInvalidDataSnackbar(false)}>
-                <Alert onClose={() => setOpenInvalidDataSnackbar(false)} severity="error" sx={{width: "100%"}}>
-                    올바른 데이터가 아닙니다.
+                onClose={() => setErrorSnackbarContent("")}>
+                <Alert onClose={() => setErrorSnackbarContent("")} severity="error" sx={{width: "100%"}}>
+                    {errorSnackbarContent}
                 </Alert>
             </Snackbar>
             <Snackbar
                 anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                open={openInvlideDateRangeSnackbar}
+                open={successSnackbarContent !== ""}
                 autoHideDuration={3000}
-                onClose={() => setOpenInvalidDateRangeSnackbar(false)}>
-                <Alert onClose={() => setOpenInvalidDateRangeSnackbar(false)} severity="error" sx={{width: "100%"}}>
-                    날짜 범위가 올바르지 않습니다.
+                onClose={() => setSuccessSnackbarContent("")}>
+                <Alert onClose={() => setSuccessSnackbarContent("")} severity="success" sx={{width: "100%"}}>
+                    {successSnackbarContent}
                 </Alert>
             </Snackbar>
             <DataGrid

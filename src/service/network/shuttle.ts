@@ -9,3 +9,7 @@ export type ShuttlePeriodResponse = {
 export const getShuttlePeriod = async () => {
     return await client.get('/api/shuttle/period')
 }
+
+export const createShuttlePeriod = async (data: ShuttlePeriodResponse) => {
+    return await client.post('/api/shuttle/period', data)
+}
