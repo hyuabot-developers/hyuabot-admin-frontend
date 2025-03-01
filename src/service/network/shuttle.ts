@@ -43,7 +43,7 @@ export type UpdateShuttleStopRequest = {
 export type ShuttleRouteStopResponse = {
     stop: string,
     sequence: number,
-    cumulativeTime: string,
+    cumulativeTime: number,
 }
 
 export type UpdateShuttleRouteStopRequest = {

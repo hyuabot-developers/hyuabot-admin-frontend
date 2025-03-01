@@ -67,7 +67,7 @@ export type ShuttleRouteStop = {
     route: string,
     stop: string,
     sequence: number,
-    cumulativeTime: string,
+    cumulativeTime: number,
     isNew: boolean,
 }
 
@@ -160,7 +160,7 @@ export const useShuttleRouteStopStore = create<ShuttleRouteStopStore>((set) => (
     rows: [],
     setRows: (rows: Array<ShuttleRouteStop>) => {
         rows.sort(function (a: ShuttleRouteStop, b: ShuttleRouteStop) {
-            return a.route < b.route ? -1 : a.route > b.route ? 1 : 0
+            return a.route < b.route ? -1 : a.route > b.route ? 1 : (a.sequence < b.sequence ? -1 : a.sequence > b.sequence ? 1 : 0)
         })
         set({ rows })
     },
