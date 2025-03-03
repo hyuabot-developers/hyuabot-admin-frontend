@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid"
 import { GridColDef } from "@mui/x-data-grid"
 import { ShuttleRouteStopGrid } from "./grid.tsx"
 import { useShuttleRouteStopStore, useShuttleRouteStore, useShuttleStopStore } from "../../../../stores/shuttle.ts"
-import type { ShuttleRouteStop } from "../../../../stores/shuttle.ts"
 import {
     getShuttleRoute,
     getShuttleRouteStop, getShuttleStop,
@@ -48,36 +47,26 @@ export default function ShuttleRouteStop() {
             }))
         }
     }
-    const fetchShuttleRouteStop = async (routeName: string) => {
-        const response = await getShuttleRouteStop(routeName)
+    const fetchShuttleRouteStop = async () => {
+        const response = await getShuttleRouteStop()
         if (response.status === 200) {
             const responseData = response.data
-            return responseData.data.map((item: ShuttleRouteStopResponse) => {
+            shuttleRouteStopStore.setRows(responseData.data.map((item: ShuttleRouteStopResponse) => {
                 return {
                     id: uuidv4(),
-                    route: routeName,
+                    route: item.route,
                     stop: item.stop,
                     sequence: item.sequence,
                     cumulativeTime: item.cumulativeTime,
                 }
-            })
+            }))
         }
     }
     useEffect(() => {
-        fetchShuttleStop().then()
         fetchShuttleRoute().then()
+        fetchShuttleStop().then()
+        fetchShuttleRouteStop().then()
     }, [])
-    useEffect(() => {
-        async function fetchData() {
-            let stops: ShuttleRouteStop[] = []
-            for (const route of shuttleRouteStore.rows) {
-                const response = await fetchShuttleRouteStop(route.name)
-                stops = stops.concat(response)
-            }
-            shuttleRouteStopStore.setRows(stops)
-        }
-        fetchData().then()
-    }, [shuttleRouteStore.rows])
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
