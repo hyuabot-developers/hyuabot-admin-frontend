@@ -8,6 +8,7 @@ import ShuttleRoute from "./pages/shuttle/route"
 import ShuttleStop from "./pages/shuttle/stop"
 import ShuttleRouteStop from "./pages/shuttle/routeStop"
 import ShuttleTimetable from "./pages/shuttle/timetable"
+import Bus from "./pages/bus"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -24,7 +25,14 @@ const appRouter = createBrowserRouter([
                 { path: 'timetable', element: <ShuttleTimetable /> },
                 { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
             ]},
-            { path: 'bus', element: <div>Bus</div> },
+            { path: 'bus', element: <Bus />, children: [
+                { path: 'route', element: <div>Route</div> },
+                { path: 'stop', element: <div>Stop</div> },
+                { path: 'routeStop', element: <div>RouteStop</div> },
+                { path: 'timetable', element: <div>Timetable</div> },
+                { path: 'realtime', element: <div>Realtime</div> },
+                { path: '*', element: <Navigate replace to={'/bus/route'} /> },
+            ]},
             { path: 'subway', element: <div>Subway</div> },
             { path: 'cafeteria', element: <div>Cafeteria</div> },
             { path: 'readingRoom', element: <div>Reading Room</div> },
