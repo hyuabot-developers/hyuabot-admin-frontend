@@ -3,13 +3,10 @@ import { Button } from "@mui/material"
 import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
 import {
     useShuttleRouteStopStore,
-    useShuttleRouteStopGridModelStore,
-    ShuttleRouteStop
+    useShuttleRouteStopGridModelStore
 } from "../../../../stores/shuttle.ts"
 import {
-    getShuttleRoute,
     getShuttleRouteStop,
-    ShuttleRouteResponse,
     ShuttleRouteStopResponse
 } from "../../../../service/network/shuttle.ts"
 
@@ -19,49 +16,19 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 export function Toolbar() {
     const rowStore = useShuttleRouteStopStore()
     const rowModesModelStore = useShuttleRouteStopGridModelStore()
-    const fetchShuttleRoute = async () => {
-        const response = await getShuttleRoute()
-        if (response.status === 200) {
-            const responseData = response.data
-            return responseData.data.map((item: ShuttleRouteResponse) => {
-                return {
-                    id: uuidv4(),
-                    name: item.name,
-                    tag: item.tag,
-                    korean: item.korean,
-                    english: item.english,
-                    start: item.start,
-                    end: item.end,
-                }
-            })
-        }
-    }
-    const fetchShuttleStop = async (routeName: string) => {
-        const response = await getShuttleRouteStop(routeName)
+    const fetchShuttleStop = async () => {
+        const response = await getShuttleRouteStop()
         if (response.status === 200) {
             const responseData = response.data
             return responseData.data.map((item: ShuttleRouteStopResponse) => {
                 return {
                     id: uuidv4(),
-                    route: routeName,
+                    route: item.route,
                     stop: item.stop,
                     sequence: item.sequence,
                     cumulativeTime: item.cumulativeTime,
                 }
             })
-        }
-    }
-    const fetchShuttleRouteStop = async () => {
-        const shuttleRoute = await fetchShuttleRoute()
-        if (shuttleRoute) {
-            const rows: ShuttleRouteStop[] = []
-            for (const route of shuttleRoute) {
-                const response = await fetchShuttleStop(route.name)
-                if (response) {
-                    rows.push(...response)
-                }
-            }
-            rowStore.setRows(rows)
         }
     }
     // Add record button click event
@@ -86,7 +53,7 @@ export function Toolbar() {
 
     return (
         <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttleRouteStop}>
+            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttleStop}>
                 새로고침
             </Button>
             <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
