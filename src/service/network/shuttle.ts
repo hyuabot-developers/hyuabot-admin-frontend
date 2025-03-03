@@ -47,6 +47,12 @@ export type ShuttleRouteStopResponse = {
     cumulativeTime: number,
 }
 
+export type CreateRouteStopRequest = {
+    stop: string,
+    sequence: number,
+    cumulativeTime: number,
+}
+
 export type UpdateShuttleRouteStopRequest = {
     sequence: number,
     cumulativeTime: number,
@@ -134,7 +140,7 @@ export const getShuttleRouteStop = async () => {
     return await client.get(`/api/shuttle/route-stop`)
 }
 
-export const createShuttleRouteStop = async (routeName: string, data: ShuttleRouteStopResponse) => {
+export const createShuttleRouteStop = async (routeName: string, data: CreateRouteStopRequest) => {
     return await client.post(`/api/shuttle/route/${routeName}/stop`, data)
 }
 
