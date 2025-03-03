@@ -7,6 +7,7 @@ import Holiday from "./pages/shuttle/holiday"
 import ShuttleRoute from "./pages/shuttle/route"
 import ShuttleStop from "./pages/shuttle/stop"
 import ShuttleRouteStop from "./pages/shuttle/routeStop"
+import ShuttleTimetable from "./pages/shuttle/timetable"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -20,7 +21,7 @@ const appRouter = createBrowserRouter([
                 { path: 'route', element: <ShuttleRoute /> },
                 { path: 'stop', element: <ShuttleStop /> },
                 { path: 'routeStop', element: <ShuttleRouteStop /> },
-                { path: 'timetable', element: <div>Timetable</div> },
+                { path: 'timetable', element: <ShuttleTimetable /> },
                 { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
             ]},
             { path: 'bus', element: <div>Bus</div> },

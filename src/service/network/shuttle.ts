@@ -59,6 +59,13 @@ export type ShuttleTimetableResponse = {
     time: string,
 }
 
+export type CreateTimetableResponse = {
+    period: string,
+    weekdays: boolean,
+    route: string,
+    time: string,
+}
+
 export type UpdateShuttleTimetableRequest = {
     period: string,
     weekdays: boolean,
@@ -142,7 +149,7 @@ export const getShuttleTimetable = async () => {
     return await client.get('/api/shuttle/timetable')
 }
 
-export const createShuttleTimetable = async (data: ShuttleTimetableResponse) => {
+export const createShuttleTimetable = async (data: CreateTimetableResponse) => {
     return await client.post('/api/shuttle/timetable', data)
 }
 
