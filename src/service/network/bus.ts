@@ -139,7 +139,7 @@ export const createBusRoute = async (data: CreateBusRouteRequest) => {
 }
 
 export const updateBusRoute = async (routeID: number, data: UpdateBusRouteRequest) => {
-    return await client.put(`/api/bus/route/${routeID}`, data)
+    return await client.patch(`/api/bus/route/${routeID}`, data)
 }
 
 export const deleteBusRoute = async (routeID: number) => {
