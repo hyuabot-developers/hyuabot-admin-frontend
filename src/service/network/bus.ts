@@ -155,7 +155,7 @@ export const createBusStop = async (data: CreateBusStopRequest) => {
 }
 
 export const updateBusStop = async (stopID: number, data: UpdateBusStopRequest) => {
-    return await client.put(`/api/bus/stop/${stopID}`, data)
+    return await client.patch(`/api/bus/stop/${stopID}`, data)
 }
 
 export const deleteBusStop = async (stopID: number) => {
