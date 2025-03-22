@@ -69,8 +69,8 @@ export function BusRouteGrid(props: GridProps) {
     }
     const updateRowProcess = async (newRow: BusRoute) => {
         if (
-            newRow.name === "" || newRow.routeID <= 0 || newRow.type === "" || newRow.startStopID <= 0 ||
-            newRow.endStopID <= 0 || newRow.companyID <= 0 || newRow.companyName === "" || newRow.companyTelephone === "" ||
+            newRow.name === "" || newRow.routeID <= 0 || newRow.type === "" ||
+            newRow.companyID <= 0 || newRow.companyName === "" || newRow.companyTelephone === "" ||
             newRow.upFirstTime === "" || newRow.upLastTime === "" || newRow.downFirstTime === "" || newRow.downLastTime === ""
         ) {
             setErrorSnackbarContent("올바른 데이터가 아닙니다.")
@@ -83,8 +83,8 @@ export function BusRouteGrid(props: GridProps) {
                 name: newRow.name,
                 typeCode: routeTypeCode(newRow.type).toString(),
                 typeName: newRow.type,
-                start: newRow.startStopID,
-                end: newRow.endStopID,
+                start: parseInt(newRow.startStop.split("(")[1].split(")")[0]),
+                end: parseInt(newRow.endStop.split("(")[1].split(")")[0]),
                 upFirstTime: newRow.upFirstTime,
                 upLastTime: newRow.upLastTime,
                 downFirstTime: newRow.downFirstTime,
@@ -105,8 +105,8 @@ export function BusRouteGrid(props: GridProps) {
                 name: newRow.name,
                 typeCode: routeTypeCode(newRow.type).toString(),
                 typeName: newRow.type,
-                start: newRow.startStopID,
-                end: newRow.endStopID,
+                start: parseInt(newRow.startStop.split("(")[1].split(")")[0]),
+                end: parseInt(newRow.endStop.split("(")[1].split(")")[0]),
                 upFirstTime: newRow.upFirstTime,
                 upLastTime: newRow.upLastTime,
                 downFirstTime: newRow.downFirstTime,
