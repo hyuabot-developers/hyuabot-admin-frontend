@@ -93,6 +93,7 @@ export type BusRouteStopResponse = {
 }
 
 export type CreateBusRouteStopRequest = {
+    routeID: number,
     stopID: number,
     sequence: number,
     start: number,
@@ -171,7 +172,7 @@ export const createBusRouteStop = async (routeID: number, data: CreateBusRouteSt
 }
 
 export const updateBusRouteStop = async (routeID: number, stopID: number, data: UpdateBusRouteStopRequest) => {
-    return await client.put(`/api/bus/route/${routeID}/stop/${stopID}`, data)
+    return await client.patch(`/api/bus/route/${routeID}/stop/${stopID}`, data)
 }
 
 export const deleteBusRouteStop = async (routeID: number, stopID: number) => {

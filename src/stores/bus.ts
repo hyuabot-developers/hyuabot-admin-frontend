@@ -37,10 +37,10 @@ export type BusStop = {
 
 export type BusRouteStop = {
     id: string,
-    routeID: string,
-    stopID: string,
+    route: string,
+    stop: string,
     sequence: number,
-    startStopID: number,
+    startStop: string,
     minuteFromStart: number,
     isNew: boolean,
 }
