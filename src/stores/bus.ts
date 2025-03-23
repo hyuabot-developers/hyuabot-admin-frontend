@@ -56,8 +56,8 @@ export type BusTimetable = {
 
 export type BusRealtime = {
     id: string,
-    routeID: number,
-    stopID: number,
+    routeName: string,
+    stopName: string,
     sequence: number,
     remainingStop: number,
     remainingTime: number,
