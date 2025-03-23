@@ -47,10 +47,10 @@ export type BusRouteStop = {
 
 export type BusTimetable = {
     id: string,
-    routeID: number,
-    startStopID: number,
+    route: string,
+    startStop: string,
     weekdays: string,
-    time: string,
+    departureTime: string,
     isNew: boolean,
 }
 
