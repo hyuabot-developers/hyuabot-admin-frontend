@@ -16,7 +16,7 @@ import BusRouteStop from "./pages/bus/routeStop"
 import BusTimetable from "./pages/bus/timetable"
 import Subway from "./pages/subway"
 import SubwayRealtimePage from "./pages/subway/realtime"
-import SubwayStationNamePage from "./pages/subway/station"
+import SubwayStationNamePage from "./pages/subway/stationName"
 import SubwayRoutePage from "./pages/subway/route"
 
 const appRouter = createBrowserRouter([

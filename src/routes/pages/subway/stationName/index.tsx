@@ -28,7 +28,8 @@ export default function SubwayStationNamePage() {
         {
             field: 'name',
             headerName: '역 이름',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
