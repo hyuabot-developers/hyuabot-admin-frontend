@@ -23,6 +23,7 @@ export type GridSubwayRoute = {
 export type GridSubwayStation = {
     id: string,
     stationID: string,
+    routeID: number,
     name: string,
     sequence: number,
     cumulativeTime: string,
@@ -42,7 +43,8 @@ export type GridSubwayTimetable = {
 
 export type GridSubwayRealtime = {
     id: string
-    stationID: string,
+    sortID: string,
+    stationName: string,
     sequence: number,
     current: string,
     heading: string,
@@ -51,7 +53,7 @@ export type GridSubwayRealtime = {
     trainNumber: string,
     express: string,
     last: string,
-    terminalStationID: string,
+    terminalStationName: string,
     status: string,
     isNew: boolean,
 }
