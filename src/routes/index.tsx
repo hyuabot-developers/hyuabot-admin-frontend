@@ -14,6 +14,12 @@ import BusStop from "./pages/bus/stop"
 import BusRealtime from "./pages/bus/realtime"
 import BusRouteStop from "./pages/bus/routeStop"
 import BusTimetable from "./pages/bus/timetable"
+import Subway from "./pages/subway"
+import SubwayRealtimePage from "./pages/subway/realtime"
+import SubwayStationNamePage from "./pages/subway/stationName"
+import SubwayRoutePage from "./pages/subway/route"
+import SubwayStationPage from "./pages/subway/station"
+import SubwayTimetablePage from "./pages/subway/timetable"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -38,7 +44,13 @@ const appRouter = createBrowserRouter([
                 { path: 'realtime', element: <BusRealtime /> },
                 { path: '*', element: <Navigate replace to={'/bus/route'} /> },
             ]},
-            { path: 'subway', element: <div>Subway</div> },
+            { path: 'subway', element: <Subway />, children: [
+                { path: 'station-name', element: <SubwayStationNamePage /> },
+                { path: 'station', element: <SubwayStationPage /> },
+                { path: 'route', element: <SubwayRoutePage /> },
+                { path: 'timetable', element: <SubwayTimetablePage /> },
+                { path: 'realtime', element: <SubwayRealtimePage /> },
+            ]},
             { path: 'cafeteria', element: <div>Cafeteria</div> },
             { path: 'readingRoom', element: <div>Reading Room</div> },
             { path: 'contact', element: <div>Contact</div> },
