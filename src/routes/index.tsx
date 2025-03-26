@@ -19,6 +19,7 @@ import SubwayRealtimePage from "./pages/subway/realtime"
 import SubwayStationNamePage from "./pages/subway/stationName"
 import SubwayRoutePage from "./pages/subway/route"
 import SubwayStationPage from "./pages/subway/station"
+import SubwayTimetablePage from "./pages/subway/timetable"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -47,7 +48,7 @@ const appRouter = createBrowserRouter([
                 { path: 'station-name', element: <SubwayStationNamePage /> },
                 { path: 'station', element: <SubwayStationPage /> },
                 { path: 'route', element: <SubwayRoutePage /> },
-                { path: 'timetable', element: <div>Timetable</div> },
+                { path: 'timetable', element: <SubwayTimetablePage /> },
                 { path: 'realtime', element: <SubwayRealtimePage /> },
             ]},
             { path: 'cafeteria', element: <div>Cafeteria</div> },

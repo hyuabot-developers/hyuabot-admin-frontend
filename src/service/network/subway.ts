@@ -33,7 +33,7 @@ export type SubwayTimetable = {
     startStationID: string,
     terminalStationID: string,
     departureTime: string,
-    weekdays: string,
+    weekday: string,
     heading: string,
 }
 
