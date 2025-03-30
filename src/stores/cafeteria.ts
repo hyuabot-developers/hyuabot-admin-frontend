@@ -1,4 +1,6 @@
 import { create } from "zustand"
+import { GridModelStore } from "./index.ts"
+import { GridRowModesModel } from "@mui/x-data-grid"
 
 type CafeteriaTabStore = {
     route: string,
@@ -7,7 +9,7 @@ type CafeteriaTabStore = {
 
 export type GridCafeteriaItem = {
     id: string
-    cafeteriaID: string
+    cafeteriaID: number
     name: string
     campus: string
     latitude: number
@@ -29,7 +31,7 @@ export type GridCafeteriaMenu = {
 
 type CafeteriaItemStore = {
     rows: Array<GridCafeteriaItem>,
-    setRows: (nameList: Array<GridCafeteriaItem>) => void,
+    setRows: (cafeteriaList: Array<GridCafeteriaItem>) => void,
 }
 
 type CafeteriaMenuStore = {
@@ -42,9 +44,19 @@ export const useCafeteriaTabStore = create<CafeteriaTabStore>((set) => ({
     setRoute: (route) => set({ route }),
 }))
 
+export const useCafeteriaItemGridModelStore = create<GridModelStore>((set) => ({
+    rowModesModel: {},
+    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+}))
+
 export const useCafeteriaItemStore = create<CafeteriaItemStore>((set) => ({
     rows: [],
-    setRows: (nameList) => set({ rows: nameList }),
+    setRows: (cafeteriaList) => set({ rows: cafeteriaList }),
+}))
+
+export const useCafeteriaMenuGridModelStore = create<GridModelStore>((set) => ({
+    rowModesModel: {},
+    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
 }))
 
 export const useCafeteriaMenuStore = create<CafeteriaMenuStore>((set) => ({

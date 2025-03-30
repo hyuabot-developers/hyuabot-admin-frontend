@@ -62,11 +62,11 @@ export const createCafeteria = async (data: CreateCafeteriaRequest) => {
     return await client.post('/api/cafeteria', data)
 }
 
-export const updateCafeteria = async (id: string, data: UpdateCafeteriaRequest) => {
-    return await client.put(`/api/cafeteria/${id}`, data)
+export const updateCafeteria = async (id: number, data: UpdateCafeteriaRequest) => {
+    return await client.patch(`/api/cafeteria/${id}`, data)
 }
 
-export const deleteCafeteria = async (id: string) => {
+export const deleteCafeteria = async (id: number) => {
     return await client.delete(`/api/cafeteria/${id}`)
 }
 
