@@ -1,4 +1,4 @@
-import { Alert, Button, Snackbar, TextField } from "@mui/material"
+import { Alert, Box, Button, Snackbar, TextField } from "@mui/material"
 import { useState } from "react"
 import { login } from "../../service/network/auth.ts"
 import { AxiosError } from "axios"
@@ -41,16 +41,20 @@ export default function Login() {
                     아이디나 비밀번호가 일치하지 않습니다.
                 </Alert>
             </Snackbar>
-            <div style={{
-                padding: '20px',
-                borderRadius: '10px',
-                backgroundColor: 'white',
-                display: 'flex',
-                justifyContent: 'center',
-                flexDirection: 'column',
-                alignItems: 'center',
-                width: '80vw',
-            }}>
+            <Box
+                sx={{
+                    width: { xs: '80vw', sm: '400px' },
+                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                }}
+                style={{
+                    padding: '20px',
+                    borderRadius: '10px',
+                    backgroundColor: 'white',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}>
                 <img src="images/hanyangCharacter.png" alt="logo" style={{ width: '100px' }} />
                 <h3 style={{ textAlign: 'center', marginBottom: '4px' }}>휴아봇 서비스 관리자 페이지</h3>
                 <TextField
@@ -85,7 +89,7 @@ export default function Login() {
                     style={{ marginTop: '12px' }}>
                     로그인
                 </Button>
-            </div>
+            </Box>
         </div>
     )
 }

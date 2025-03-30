@@ -82,11 +82,18 @@ export default function Home() {
                     onClick={() => drawerOpenedStore.setDrawerOpened(!drawerOpenedStore.isDrawerOpened)}>
                     <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
                     휴아봇 서비스 관리자 페이지
                 </Typography>
-                <Typography variant="h6" component="div" style={{ textAlign: "end" }} sx={{ flexGrow: 1 }}>
-                    {userInfoStore.nickname}
+                <Typography
+                    variant="h6"
+                    component="div"
+                    style={{ textAlign: "end" }}
+                    sx={{ flexGrow: 1}}>
+                    {window.innerWidth > 600 ? userInfoStore.nickname : ''}
                 </Typography>
                 <IconButton size="large" color="inherit" onClick={logOutButtonClicked}>
                     <LogOutIcon />
