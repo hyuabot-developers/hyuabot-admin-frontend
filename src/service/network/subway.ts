@@ -80,7 +80,7 @@ export const createSubwayRoute = async (data: SubwayRoute) => {
 }
 
 export const updateSubwayRoute = async (routeID: number, data: UpdateSubwayRouteRequest) => {
-    return await client.patch(`/api/subway/route/${routeID}`, data)
+    return await client.put(`/api/subway/route/${routeID}`, data)
 }
 
 export const deleteSubwayRoute = async (routeID: number) => {
@@ -96,7 +96,7 @@ export const createSubwayStation = async (data: SubwayStation) => {
 }
 
 export const updateSubwayStation = async (stationID: string, data: UpdateSubwayStationRequest) => {
-    return await client.patch(`/api/subway/station/${stationID}`, data)
+    return await client.put(`/api/subway/station/${stationID}`, data)
 }
 
 export const deleteSubwayStation = async (stationID: string) => {

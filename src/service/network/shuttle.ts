@@ -113,7 +113,7 @@ export const createShuttleRoute = async (data: ShuttleRouteResponse) => {
 }
 
 export const updateShuttleRoute = async (name: string, data: UpdateShuttleRouteRequest) => {
-    return await client.patch(`/api/shuttle/route/${name}`, data)
+    return await client.put(`/api/shuttle/route/${name}`, data)
 }
 
 export const deleteShuttleRoute = async (name: string) => {
@@ -129,7 +129,7 @@ export const createShuttleStop = async (data: ShuttleStopResponse) => {
 }
 
 export const updateShuttleStop = async (name: string, data: UpdateShuttleStopRequest) => {
-    return await client.patch(`/api/shuttle/stop/${name}`, data)
+    return await client.put(`/api/shuttle/stop/${name}`, data)
 }
 
 export const deleteShuttleStop = async (name: string) => {
@@ -145,7 +145,7 @@ export const createShuttleRouteStop = async (routeName: string, data: CreateRout
 }
 
 export const updateShuttleRouteStop = async (routeName: string, stopName: string, data: UpdateShuttleRouteStopRequest) => {
-    return await client.patch(`/api/shuttle/route/${routeName}/stop/${stopName}`, data)
+    return await client.put(`/api/shuttle/route/${routeName}/stop/${stopName}`, data)
 }
 
 export const deleteShuttleRouteStop = async (routeName: string, stopName: string) => {
@@ -161,7 +161,7 @@ export const createShuttleTimetable = async (data: CreateTimetableResponse) => {
 }
 
 export const updateShuttleTimetable = async (sequence: number, data: UpdateShuttleTimetableRequest) => {
-    return await client.patch(`/api/shuttle/timetable/${sequence}`, data)
+    return await client.put(`/api/shuttle/timetable/${sequence}`, data)
 }
 
 export const deleteShuttleTimetable = async (sequence: number) => {
