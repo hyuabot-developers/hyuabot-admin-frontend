@@ -65,7 +65,6 @@ const appRouter = createBrowserRouter([
             ]},
             { path: 'contact', element: <div>Contact</div> },
             { path: 'calendar', element: <div>Calendar</div> },
-            { path: 'user', element: <div>User</div> },
             { path: '/', element: <Navigate replace to={'/shuttle/period'} /> },
             { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
         ]
