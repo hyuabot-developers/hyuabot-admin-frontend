@@ -26,6 +26,7 @@ import CafeteriaMenuPage from "./pages/cafeteria/menu"
 import ReadingRoom from "./pages/readingRoom"
 import ReadingRoomPage from "./pages/readingRoom/room"
 import Contact from "./pages/contact"
+import ContactCategoryPage from "./pages/contact/category"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -65,7 +66,7 @@ const appRouter = createBrowserRouter([
                 { path: 'room', element: <ReadingRoomPage /> },
             ]},
             { path: 'contact', element: <Contact />, children: [
-                { path: 'category', element: <div>Category</div> },
+                { path: 'category', element: <ContactCategoryPage /> },
                 { path: 'seoul', element: <div>Seoul</div> },
                 { path: 'erica', element: <div>ERICA</div> },
             ]},
