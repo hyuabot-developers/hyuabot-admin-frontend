@@ -81,7 +81,8 @@ export default function CafeteriaPage() {
         {
             field: 'breakfastTime',
             headerName: '조식 시간',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
@@ -90,7 +91,8 @@ export default function CafeteriaPage() {
         {
             field: 'lunchTime',
             headerName: '중식 시간',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
@@ -99,7 +101,8 @@ export default function CafeteriaPage() {
         {
             field: 'dinnerTime',
             headerName: '석식 시간',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
