@@ -22,6 +22,8 @@ export type GridCafeteriaItem = {
 
 export type GridCafeteriaMenu = {
     id: string
+    date: string
+    time: string
     cafeteria: string
     name: string
     price: number
