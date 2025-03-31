@@ -25,6 +25,7 @@ import CafeteriaPage from "./pages/cafeteria/cafeteria"
 import CafeteriaMenuPage from "./pages/cafeteria/menu"
 import ReadingRoom from "./pages/readingRoom"
 import ReadingRoomPage from "./pages/readingRoom/room"
+import Contact from "./pages/contact"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -63,7 +64,11 @@ const appRouter = createBrowserRouter([
             { path: 'readingRoom', element: <ReadingRoom />, children: [
                 { path: 'room', element: <ReadingRoomPage /> },
             ]},
-            { path: 'contact', element: <div>Contact</div> },
+            { path: 'contact', element: <Contact />, children: [
+                { path: 'category', element: <div>Category</div> },
+                { path: 'seoul', element: <div>Seoul</div> },
+                { path: 'erica', element: <div>ERICA</div> },
+            ]},
             { path: 'calendar', element: <div>Calendar</div> },
             { path: '/', element: <Navigate replace to={'/shuttle/period'} /> },
             { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
