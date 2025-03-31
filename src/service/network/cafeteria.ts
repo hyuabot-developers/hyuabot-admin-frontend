@@ -63,7 +63,7 @@ export const createCafeteria = async (data: CreateCafeteriaRequest) => {
 }
 
 export const updateCafeteria = async (id: number, data: UpdateCafeteriaRequest) => {
-    return await client.patch(`/api/cafeteria/${id}`, data)
+    return await client.put(`/api/cafeteria/${id}`, data)
 }
 
 export const deleteCafeteria = async (id: number) => {
@@ -79,7 +79,7 @@ export const createCafeteriaMenu = async (id: number, data: CreateCafeteriaMenuR
 }
 
 export const updateCafeteriaMenu = async (id: number, date: string, time: string, menu: string, data: UpdateCafeteriaRequest) => {
-    return await client.patch(`/api/cafeteria/${id}/${date}/${time}/${menu}`, data)
+    return await client.put(`/api/cafeteria/${id}/${date}/${time}/${menu}`, data)
 }
 
 export const deleteCafeteriaMenu = async (id: number, date: string, time: string, menu: string) => {
