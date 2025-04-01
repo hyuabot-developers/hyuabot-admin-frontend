@@ -21,6 +21,7 @@ export type GridContactItem = {
     phone: string
     category: string
     campus: string
+    isNew: boolean
 }
 
 

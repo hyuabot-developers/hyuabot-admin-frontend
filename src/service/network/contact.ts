@@ -49,9 +49,9 @@ export const createContact = async (categoryID: number, contact: CreateContactRe
 }
 
 export const updateContact = async (categoryID: number, contactID: number, contact: UpdateContactRequest) => {
-    return await client.put(`/contact/category/${categoryID}/contacts/${contactID}`, contact)
+    return await client.put(`/api/contact/category/${categoryID}/contacts/${contactID}`, contact)
 }
 
 export const deleteContact = async (categoryID: number, contactID: number) => {
-    return await client.delete(`/contact/category/${categoryID}/contacts/${contactID}`)
+    return await client.delete(`/api/contact/category/${categoryID}/contacts/${contactID}`)
 }
