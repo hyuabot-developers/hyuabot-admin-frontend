@@ -23,6 +23,15 @@ import SubwayTimetablePage from "./pages/subway/timetable"
 import Cafeteria from "./pages/cafeteria"
 import CafeteriaPage from "./pages/cafeteria/cafeteria"
 import CafeteriaMenuPage from "./pages/cafeteria/menu"
+import ReadingRoom from "./pages/readingRoom"
+import ReadingRoomPage from "./pages/readingRoom/room"
+import Contact from "./pages/contact"
+import ContactCategoryPage from "./pages/contact/category"
+import SeoulContactPage from "./pages/contact/seoul"
+import ERICAContactPage from "./pages/contact/erica"
+import Calendar from "./pages/calendar"
+import CalendarCategoryPage from "./pages/calendar/category"
+import CalendarEventPage from "./pages/calendar/event"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -58,10 +67,18 @@ const appRouter = createBrowserRouter([
                 { path: 'cafeteria', element: <CafeteriaPage />  },
                 { path: 'menu', element: <CafeteriaMenuPage />  },
             ]},
-            { path: 'readingRoom', element: <div>Reading Room</div> },
-            { path: 'contact', element: <div>Contact</div> },
-            { path: 'calendar', element: <div>Calendar</div> },
-            { path: 'user', element: <div>User</div> },
+            { path: 'readingRoom', element: <ReadingRoom />, children: [
+                { path: 'room', element: <ReadingRoomPage /> },
+            ]},
+            { path: 'contact', element: <Contact />, children: [
+                { path: 'category', element: <ContactCategoryPage /> },
+                { path: 'seoul', element: <SeoulContactPage /> },
+                { path: 'erica', element: <ERICAContactPage /> },
+            ]},
+            { path: 'calendar', element: <Calendar />, children: [
+                { path: 'category', element: <CalendarCategoryPage /> },
+                { path: 'event', element: <CalendarEventPage /> }
+            ]},
             { path: '/', element: <Navigate replace to={'/shuttle/period'} /> },
             { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
         ]

@@ -11,7 +11,6 @@ import {
     Toolbar,
     Typography
 } from "@mui/material"
-import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import ContactsIcon from '@mui/icons-material/Contacts'
 import DepartureBoardIcon from '@mui/icons-material/DepartureBoard'
@@ -103,7 +102,7 @@ export default function Home() {
     )
     // Drawer
     const navigate = useNavigate()
-    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정', '사용자']
+    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정']
     const menuIcons = [
         DepartureBoardIcon,
         DirectionsBusIcon,
@@ -112,7 +111,6 @@ export default function Home() {
         LibraryBooksIcon,
         ContactsIcon,
         CalendarMonthIcon,
-        AccountBoxIcon,
     ]
     const menuItemClicked = (text: string) => {
         switch (text) {
@@ -123,7 +121,6 @@ export default function Home() {
         case '열람실': navigate('/readingRoom'); break
         case '연락처': navigate('/contact'); break
         case '학사일정': navigate('/calendar'); break
-        case '사용자': navigate('/user'); break
         }
         drawerOpenedStore.setDrawerOpened(false)
     }
