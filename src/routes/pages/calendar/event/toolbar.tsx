@@ -3,45 +3,31 @@ import { Button } from "@mui/material"
 import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
 import AddIcon from "@mui/icons-material/Add"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { useCampusStore } from "../../../../stores/campus.ts"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
 import {
-    GridContactCategoryItem,
-    useContactCategoryStore,
-    useContactGridModelStore,
-    useContactStore
-} from "../../../../stores/contact.ts"
+    GridCalendarCategoryItem,
+    useCalendarCategoryStore,
+    useCalendarGridModelStore,
+    useCalendarStore
+} from "../../../../stores/calendar.ts"
 import {
-    ContactCategoryResponse,
-    ContactResponse,
-    getContactCategoryList,
-    getContactList
-} from "../../../../service/network/contact.ts"
+    CalendarCategoryResponse,
+    CalendarResponse,
+    getCalendarCategoryList,
+    getCalendarList
+} from "../../../../service/network/calendar.ts"
+
 
 export function Toolbar() {
     // Get the store
-    const rowModesModelStore = useContactGridModelStore()
-    const campusStore = useCampusStore()
-    const categoryStore = useContactCategoryStore()
-    const rowStore = useContactStore()
-    let campusList: CampusResponse[] = []
-    let categoryList: GridContactCategoryItem[] = []
-    const fetchContact = async () => {
-        const campusResponse = await getCampusList()
-        if (campusResponse.status === 200) {
-            const campusResponseData = campusResponse.data
-            campusList = campusResponseData.data.map((item: CampusResponse) => {
-                return {
-                    id: item.id,
-                    name: item.name,
-                }
-            })
-            campusStore.setRows(campusList)
-        }
-        const categoryResponse = await getContactCategoryList()
+    const rowModesModelStore = useCalendarGridModelStore()
+    const categoryStore = useCalendarCategoryStore()
+    const rowStore = useCalendarStore()
+    let categoryList: GridCalendarCategoryItem[] = []
+    const fetchCalendar = async () => {
+        const categoryResponse = await getCalendarCategoryList()
         if (categoryResponse.status === 200) {
             const categoryResponseData = categoryResponse.data
-            categoryList = categoryResponseData.data.map((item: ContactCategoryResponse) => {
+            categoryList = categoryResponseData.data.map((item: CalendarCategoryResponse) => {
                 return {
                     id: uuidv4(),
                     categoryID: item.id,
@@ -50,19 +36,19 @@ export function Toolbar() {
             })
             categoryStore.setRows(categoryList)
         }
-        const response = await getContactList(2)
+        const response = await getCalendarList()
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.data.map((item: ContactResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
+            rowStore.setRows(responseData.data.map((item: CalendarResponse) => {
                 const category = categoryList.find(category => category.categoryID === item.categoryID)
                 return {
                     id: uuidv4(),
-                    contactID: item.id,
-                    name: item.name,
-                    phone: item.phone,
+                    eventID: item.id,
                     category: `${category?.name} (${category?.categoryID})`,
-                    campus: `${campus?.name} (${campus?.id})`,
+                    title: item.title,
+                    description: item.description,
+                    start: item.start,
+                    end: item.end,
                 }
             }))
         }
@@ -70,29 +56,29 @@ export function Toolbar() {
     // Add record button click event
     const addRowButtonClicked = () => {
         const id = uuidv4()
-        const campus = campusStore.rows.at(0)
         const category = categoryStore.rows.at(0)
         rowStore.setRows([
-            ...rowStore.rows,
             {
                 id,
-                contactID: 0,
-                name: "",
-                phone: "",
+                eventID: rowStore.rows.length ? rowStore.rows[rowStore.rows.length - 1].eventID + 1 : 1,
                 category: `${category?.name} (${category?.categoryID})`,
-                campus: `${campus?.name} (${campus?.id})`,
+                title: "",
+                description: "",
+                start: "2999-12-31",
+                end: "2999-12-31",
                 isNew: true,
             },
+            ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: "title" },
         }))
     }
 
     return (
         <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchContact}>
+            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCalendar}>
                 새로고침
             </Button>
             <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>

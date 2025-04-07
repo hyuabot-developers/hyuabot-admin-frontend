@@ -19,7 +19,6 @@ export type CreateUpdateCategoryRequest = {
 }
 
 export type CreateCalendarRequest = {
-    categoryID: number,
     title: string,
     description: string,
     start: string,

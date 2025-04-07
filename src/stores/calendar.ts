@@ -17,10 +17,11 @@ export type GridCalendarCategoryItem = {
 export type GridCalendarEventItem = {
     id: string
     eventID: number
-    name: string
-    phone: string
     category: string
-    campus: string
+    title: string
+    description: string
+    start: string
+    end: string
     isNew: boolean
 }
 

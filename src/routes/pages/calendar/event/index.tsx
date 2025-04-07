@@ -1,41 +1,27 @@
 import { useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { GridColDef } from "@mui/x-data-grid"
-import { ContactGrid } from "./grid.tsx"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
-import { useCampusStore } from "../../../../stores/campus.ts"
-import { GridContactCategoryItem, useContactCategoryStore, useContactStore } from "../../../../stores/contact.ts"
+import { CalendarGrid } from "./grid.tsx"
+import { GridCalendarCategoryItem, useCalendarCategoryStore, useCalendarStore } from "../../../../stores/calendar.ts"
 import {
-    ContactCategoryResponse,
-    ContactResponse,
-    getContactCategoryList,
-    getContactList
-} from "../../../../service/network/contact.ts"
+    CalendarCategoryResponse,
+    CalendarResponse,
+    getCalendarCategoryList,
+    getCalendarList
+} from "../../../../service/network/calendar.ts"
+import dayjs from "dayjs"
 
 
 export default function CalendarEventPage() {
     // Get the store
-    const campusStore = useCampusStore()
-    const categoryStore = useContactCategoryStore()
-    const contactStore = useContactStore()
-    let campusList: CampusResponse[] = []
-    let categoryList: GridContactCategoryItem[] = []
-    const fetchContact = async () => {
-        const campusResponse = await getCampusList()
-        if (campusResponse.status === 200) {
-            const campusResponseData = campusResponse.data
-            campusList = campusResponseData.data.map((item: CampusResponse) => {
-                return {
-                    id: item.id,
-                    name: item.name,
-                }
-            })
-            campusStore.setRows(campusList)
-        }
-        const categoryResponse = await getContactCategoryList()
+    const categoryStore = useCalendarCategoryStore()
+    const calendarStore = useCalendarStore()
+    let categoryList: GridCalendarCategoryItem[] = []
+    const fetchCalendar = async () => {
+        const categoryResponse = await getCalendarCategoryList()
         if (categoryResponse.status === 200) {
             const categoryResponseData = categoryResponse.data
-            categoryList = categoryResponseData.data.map((item: ContactCategoryResponse) => {
+            categoryList = categoryResponseData.data.map((item: CalendarCategoryResponse) => {
                 return {
                     id: uuidv4(),
                     categoryID: item.id,
@@ -44,54 +30,37 @@ export default function CalendarEventPage() {
             })
             categoryStore.setRows(categoryList)
         }
-        const response = await getContactList(2)
+        const response = await getCalendarList()
         if (response.status === 200) {
             const responseData = response.data
-            contactStore.setRows(responseData.data.map((item: ContactResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
+            calendarStore.setRows(responseData.data.map((item: CalendarResponse) => {
                 const category = categoryList.find(category => category.categoryID === item.categoryID)
                 return {
                     id: uuidv4(),
-                    contactID: item.id,
-                    name: item.name,
-                    phone: item.phone,
+                    eventID: item.id,
                     category: `${category?.name} (${category?.categoryID})`,
-                    campus: `${campus?.name} (${campus?.id})`,
+                    title: item.title,
+                    description: item.description,
+                    start: item.start,
+                    end: item.end,
                 }
             }))
         }
     }
+    const dateValueFormatter = (value: string) => {
+        return dayjs(value).format('YYYY-MM-DD')
+    }
     useEffect(() => {
-        fetchContact().then()
+        fetchCalendar().then()
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'contactID',
-            headerName: '연락처 ID',
+            field: 'eventID',
+            headerName: '일정 ID',
             width: 150,
             type: 'string',
             editable: false,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        {
-            field: 'name',
-            headerName: '연락처 이름',
-            minWidth: 150,
-            flex: 1,
-            type: 'string',
-            editable: true,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        {
-            field: 'phone',
-            headerName: '전화번호',
-            minWidth: 150,
-            flex: 1,
-            type: 'string',
-            editable: true,
             headerAlign: 'center',
             align: 'center',
         },
@@ -101,7 +70,7 @@ export default function CalendarEventPage() {
             minWidth: 150,
             flex: 1,
             type: 'singleSelect',
-            valueOptions: categoryStore.rows.map((item: GridContactCategoryItem) => {
+            valueOptions: categoryStore.rows.map((item: GridCalendarCategoryItem) => {
                 return `${item.name} (${item.categoryID})`
             }),
             editable: true,
@@ -109,21 +78,50 @@ export default function CalendarEventPage() {
             align: 'center',
         },
         {
-            field: 'campus',
-            headerName: '캠퍼스',
+            field: 'title',
+            headerName: '제목',
             minWidth: 150,
             flex: 1,
-            type: 'singleSelect',
-            valueOptions: campusStore.rows.filter((item) => item.id === 1).map((item) => {
-                return `${item.name} (${item.id})`
-            }),
+            type: 'string',
             editable: true,
             headerAlign: 'center',
             align: 'center',
-        }
+        },
+        {
+            field: 'description',
+            headerName: '설명',
+            minWidth: 150,
+            flex: 1,
+            type: 'string',
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'start',
+            headerName: '시작일',
+            minWidth: 150,
+            flex: 1,
+            type: 'date',
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+            valueFormatter: dateValueFormatter,
+        },
+        {
+            field: 'end',
+            headerName: '종료일',
+            minWidth: 150,
+            flex: 1,
+            type: 'date',
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+            valueFormatter: dateValueFormatter,
+        },
     ]
 
     return (
-        <ContactGrid columns={columns} />
+        <CalendarGrid columns={columns} />
     )
 }
