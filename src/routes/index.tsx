@@ -29,6 +29,9 @@ import Contact from "./pages/contact"
 import ContactCategoryPage from "./pages/contact/category"
 import SeoulContactPage from "./pages/contact/seoul"
 import ERICAContactPage from "./pages/contact/erica"
+import Calendar from "./pages/calendar"
+import CalendarCategoryPage from "./pages/calendar/category"
+import CalendarEventPage from "./pages/calendar/event"
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to={'/'} /> },
@@ -72,7 +75,10 @@ const appRouter = createBrowserRouter([
                 { path: 'seoul', element: <SeoulContactPage /> },
                 { path: 'erica', element: <ERICAContactPage /> },
             ]},
-            { path: 'calendar', element: <div>Calendar</div> },
+            { path: 'calendar', element: <Calendar />, children: [
+                { path: 'category', element: <CalendarCategoryPage /> },
+                { path: 'event', element: <CalendarEventPage /> }
+            ]},
             { path: '/', element: <Navigate replace to={'/shuttle/period'} /> },
             { path: '*', element: <Navigate replace to={'/shuttle/period'} /> },
         ]
