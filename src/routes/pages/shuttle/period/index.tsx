@@ -14,9 +14,10 @@ export default function Period() {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            shuttlePeriodStore.setRows(responseData.data.map((period: ShuttlePeriodResponse) => {
+            shuttlePeriodStore.setRows(responseData.result.map((period: ShuttlePeriodResponse) => {
                 return {
                     id: uuidv4(),
+                    seq: period.seq,
                     type: period.type,
                     start: period.start,
                     end: period.end,
@@ -26,11 +27,11 @@ export default function Period() {
     }
     useEffect(() => { fetchShuttlePeriod().then() }, [])
     // Configure DataGrid
-    const startDateValueFormatter = (value: string) => {
-        return dayjs(value).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).format('YYYY-MM-DD HH:mm:ss Z')
+    const startDateValueFormatter = (value: Date) => {
+        return dayjs(value).format("YYYY-MM-DD HH:mm:ss")
     }
-    const endDateValueFormatter = (value: string) => {
-        return dayjs(value).set('hour', 23).set('minute', 59).set('second', 59).set('millisecond', 0).format('YYYY-MM-DD HH:mm:ss Z')
+    const endDateValueFormatter = (value: Date) => {
+        return dayjs(value).format("YYYY-MM-DD HH:mm:ss")
     }
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
@@ -55,9 +56,10 @@ export default function Period() {
         {
             field: 'start',
             headerName: '시작 날짜',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             valueFormatter: startDateValueFormatter,
-            type: 'date',
+            type: 'dateTime',
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -65,9 +67,10 @@ export default function Period() {
         {
             field: 'end',
             headerName: '종료 날짜',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             valueFormatter: endDateValueFormatter,
-            type: 'date',
+            type: 'dateTime',
             editable: true,
             headerAlign: 'center',
             align: 'center',

@@ -12,10 +12,10 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/DeleteOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
+import { GridToolbar } from "./toolbar.tsx"
 import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 import { useState } from "react"
-import { createShuttlePeriod, deleteShuttlePeriod } from "../../../../service/network/shuttle.ts"
+import { createShuttlePeriod, deleteShuttlePeriod, updateShuttlePeriod } from "../../../../service/network/shuttle.ts"
 import dayjs from "dayjs"
 
 interface GridProps {
@@ -52,11 +52,7 @@ export function ShuttlePeriodGrid(props: GridProps) {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find(row => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
-        const response = await deleteShuttlePeriod({
-            type: rowToDelete.type,
-            start: dayjs(rowToDelete.start).format("YYYY-MM-DD"),
-            end: dayjs(rowToDelete.end).format("YYYY-MM-DD"),
-        })
+        const response = await deleteShuttlePeriod(rowToDelete.seq!)
         if (response.status !== 204) {
             setErrorSnackbarContent("데이터 삭제에 실패했습니다.")
             return
@@ -72,29 +68,48 @@ export function ShuttlePeriodGrid(props: GridProps) {
         }
     }
     const updateRowProcess = async (newRow: ShuttlePeriod) => {
-        if (newRow.type === "" || newRow.start === "" || newRow.end === "") {
+        if (newRow.type === null || newRow.start === null || newRow.end === null) {
             setErrorSnackbarContent("올바른 데이터가 아닙니다.")
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
-        } else if (newRow.start > newRow.end) {
-            setErrorSnackbarContent("날짜 범위가 올바르지 않습니다.")
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-            return { ...newRow, _action: "delete" }
         }
-        const response = await createShuttlePeriod({
-            type: newRow.type,
-            start: dayjs(newRow.start).format("YYYY-MM-DD"),
-            end: dayjs(newRow.end).format("YYYY-MM-DD"),
-        })
-        if (response.status !== 201) {
-            setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-            return { ...newRow, _action: "delete" }
+        if (!newRow.isNew && newRow.seq !== null) {
+            if (newRow.start > newRow.end) {
+                setErrorSnackbarContent("날짜 범위가 올바르지 않습니다.")
+                return { ...newRow, _action: "revert" }
+            }
+            const response = await updateShuttlePeriod(newRow.seq!, {
+                type: newRow.type,
+                start: dayjs(newRow.start).format("YYYY-MM-DD HH:mm:ss"),
+                end: dayjs(newRow.end).format("YYYY-MM-DD HH:mm:ss"),
+            })
+            if (response.status !== 200) {
+                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+                return { ...newRow, _action: "revert" }
+            }
+            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+            return newRow
+        } else {
+            if (newRow.start > newRow.end) {
+                setErrorSnackbarContent("날짜 범위가 올바르지 않습니다.")
+                rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+                return { ...newRow, _action: "delete" }
+            }
+            const response = await createShuttlePeriod({
+                type: newRow.type,
+                start: dayjs(newRow.start).format("YYYY-MM-DD HH:mm:ss"),
+                end: dayjs(newRow.end).format("YYYY-MM-DD HH:mm:ss"),
+            })
+            if (response.status !== 201) {
+                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+                rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+                return { ...newRow, _action: "delete" }
+            }
+            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+            const updatedRow = {...newRow, isNew: false}
+            rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
+            return updatedRow
         }
-        setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
-        const updatedRow = {...newRow, isNew: false}
-        rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
-        return updatedRow
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
@@ -120,7 +135,6 @@ export function ShuttlePeriodGrid(props: GridProps) {
                     key="edit"
                     icon={<EditIcon />}
                     onClick={() => editRowButtonClicked(id)}
-                    disabled={!rowStore.rows.find(row => row.id === id)!.isNew}
                 />,
                 <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
             ]
@@ -148,6 +162,7 @@ export function ShuttlePeriodGrid(props: GridProps) {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -155,8 +170,7 @@ export function ShuttlePeriodGrid(props: GridProps) {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{toolbar: Toolbar}}
-                isCellEditable={(params) => params.row.isNew}
+                slots={{toolbar: GridToolbar}}
             />
         </Box>
     )

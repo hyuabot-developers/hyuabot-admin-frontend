@@ -1,6 +1,13 @@
 import client from "./client.ts"
 
 export type ShuttlePeriodResponse = {
+    seq: number,
+    type: string,
+    start: string,
+    end: string,
+}
+
+export type ShuttlePeriodRequest = {
     type: string,
     start: string,
     end: string,
@@ -81,15 +88,19 @@ export type UpdateShuttleTimetableRequest = {
 }
 
 export const getShuttlePeriod = async () => {
-    return await client.get('/api/shuttle/period')
+    return await client.get('/api/v1/shuttle/period')
 }
 
-export const createShuttlePeriod = async (data: ShuttlePeriodResponse) => {
-    return await client.post('/api/shuttle/period', data)
+export const createShuttlePeriod = async (data: ShuttlePeriodRequest) => {
+    return await client.post('/api/v1/shuttle/period', data)
 }
 
-export const deleteShuttlePeriod = async (data: ShuttlePeriodResponse) => {
-    return await client.delete(`/api/shuttle/period/${data.type}/${data.start}/${data.end}`)
+export const updateShuttlePeriod = async (seq: number, data: ShuttlePeriodRequest) => {
+    return await client.put(`/api/v1/shuttle/period/${seq}`, data)
+}
+
+export const deleteShuttlePeriod = async (seq: number) => {
+    return await client.delete(`/api/v1/shuttle/period/${seq}`)
 }
 
 export const getShuttleHoliday = async () => {

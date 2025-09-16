@@ -1,4 +1,4 @@
-import { create } from "zustand/index"
+import { create } from "zustand"
 import { GridRowModesModel } from "@mui/x-data-grid"
 import { GridModelStore } from "./index.ts"
 
@@ -9,9 +9,10 @@ type ShuttleTabStore = {
 
 export type ShuttlePeriod = {
     id: string,
-    type: string,
-    start: string,
-    end: string,
+    seq: number | null,
+    type: string | null,
+    start: Date | null,
+    end: Date | null,
     isNew: boolean,
 }
 
@@ -100,7 +101,7 @@ export const useShuttlePeriodStore = create<ShuttlePeriodStore>((set) => ({
     rows: [],
     setRows: (rows: Array<ShuttlePeriod>) => {
         rows.sort(function (a: ShuttlePeriod, b: ShuttlePeriod) {
-            return a.start < b.start ? -1 : a.start > b.start ? 1 : 0
+            return a.start! < b.start! ? -1 : a.start! > b.start! ? 1 : 0
         })
         set({ rows })
     },

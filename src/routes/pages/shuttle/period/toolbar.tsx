@@ -1,13 +1,13 @@
 import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
+import { Toolbar, ToolbarButton, GridRowModes } from "@mui/x-data-grid"
 import { useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
 
 import AddIcon from "@mui/icons-material/Add"
 import RefreshIcon from '@mui/icons-material/Refresh'
+import dayjs from "dayjs";
 
-export function Toolbar() {
+export function GridToolbar() {
     const rowStore = useShuttlePeriodStore()
     const rowModesModelStore = useShuttlePeriodGridModelStore()
     // Fetch shuttle period
@@ -15,12 +15,13 @@ export function Toolbar() {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.data.map((period: ShuttlePeriodResponse) => {
+            rowStore.setRows(responseData.result.map((period: ShuttlePeriodResponse) => {
                 return {
                     id: uuidv4(),
+                    seq: period.seq,
                     type: period.type,
-                    start: period.start,
-                    end: period.end,
+                    start: dayjs(period.start),
+                    end: dayjs(period.end),
                 }
             }))
         }
@@ -29,14 +30,15 @@ export function Toolbar() {
     const addRowButtonClicked = () => {
         const id = uuidv4()
         rowStore.setRows([
-            ...rowStore.rows,
             {
                 id,
+                seq: null,
                 type: "",
-                start: "",
-                end: "",
+                start: null,
+                end: null,
                 isNew: true,
             },
+            ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
@@ -45,13 +47,13 @@ export function Toolbar() {
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttlePeriod}>
-                새로고침
-            </Button>
-            <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
-                항목 추가
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar>
+            <ToolbarButton color="primary" onClick={fetchShuttlePeriod}>
+                <RefreshIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }
