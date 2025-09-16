@@ -21,7 +21,7 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import LogOutIcon from '@mui/icons-material/Logout'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useDrawerOpenedStore } from "../../stores/home.ts"
-import { getUserInfo } from "../../service/network/auth.ts"
+import {getUserInfo, logout} from "../../service/network/auth.ts"
 import { useAuthenticatedStore, useUserInfoStore } from "../../stores/auth.ts"
 import { Outlet, useNavigate } from "react-router-dom"
 
@@ -45,11 +45,20 @@ export default function Home() {
             )
         }
     }
-    // Log out button clicked
-    const logOutButtonClicked = () => {
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        window.location.href = '/login'
+    // Logout
+    const logOutButtonClicked = async () => {
+        try {
+            const response = await logout()
+            if (response.status === 200) {
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('refreshToken')
+                window.location.href = '/login'
+            } else {
+                console.error('Logout failed with status:', response.status)
+            }
+        } catch (error) {
+            console.error('Logout error:', error)
+        }
     }
     // Menu button clicked
     const menuButtonClicked = () => {

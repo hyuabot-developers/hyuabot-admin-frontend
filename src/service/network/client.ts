@@ -14,8 +14,6 @@ const client = axios.create({
 
 client.interceptors.request.use(
     (config) => {
-        const accessToken = localStorage.getItem('accessToken')
-        if (accessToken) { config.headers.Authorization = `Bearer ${accessToken}` }
         return config
     },
     (error) => {
@@ -29,17 +27,24 @@ client.interceptors.response.use(
     },
     async (error) => {
         const originalRequest = error.config
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 403 && !originalRequest._retry) {
             originalRequest._retry = true
             // Refresh token
             try {
                 const response = await refreshToken()
                 if (response.status === 200) {
-                    const data = response.data
-                    localStorage.setItem('accessToken', data.access_token)
-                    localStorage.setItem('refreshToken', data.refresh_token)
-                    axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
-                    originalRequest.headers['Authorization'] = `Bearer ${data.access_token}`
+                    const cookies = response.headers['Set-Cookie']
+                    if (cookies) {
+                        cookies.forEach((cookie: string) => {
+                            if (cookie.startsWith('access_token=')) {
+                                const accessToken = cookie.split(';')[0].split('=')[1]
+                                localStorage.setItem('accessToken', accessToken)
+                            } else if (cookie.startsWith('refresh_token=')) {
+                                const refreshToken = cookie.split(';')[0].split('=')[1]
+                                localStorage.setItem('refreshToken', refreshToken)
+                            }
+                        })
+                    }
                     return client(originalRequest)
                 }
             } catch (refreshError) {
