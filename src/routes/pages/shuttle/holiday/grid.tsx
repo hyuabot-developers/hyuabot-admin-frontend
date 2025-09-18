@@ -12,14 +12,14 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/DeleteOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
+import {GridToolbar} from "./toolbar.tsx"
 import {
     ShuttleHoliday,
     useShuttleHolidayStore,
     useShuttleHolidayGridModelStore
 } from "../../../../stores/shuttle.ts"
 import { useState } from "react"
-import { createShuttleHoliday, deleteShuttleHoliday } from "../../../../service/network/shuttle.ts"
+import {createShuttleHoliday, deleteShuttleHoliday, updateShuttleHoliday} from "../../../../service/network/shuttle.ts"
 import dayjs from "dayjs"
 
 interface GridProps {
@@ -56,11 +56,7 @@ export function ShuttleHolidayGrid(props: GridProps) {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find(row => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
-        const response = await deleteShuttleHoliday({
-            type: rowToDelete.type,
-            calendar: rowToDelete.calendar,
-            date: dayjs(rowToDelete.date).format("YYYY-MM-DD"),
-        })
+        const response = await deleteShuttleHoliday(rowToDelete.seq!)
         if (response.status !== 204) {
             setErrorSnackbarContent("데이터 삭제에 실패했습니다.")
             return
@@ -76,25 +72,39 @@ export function ShuttleHolidayGrid(props: GridProps) {
         }
     }
     const updateRowProcess = async (newRow: ShuttleHoliday) => {
-        if (newRow.type === "" || newRow.calendar === "" || newRow.date === "") {
+        if (newRow.type === "" || newRow.calendarType === null || newRow.date === null) {
             setErrorSnackbarContent("올바른 데이터가 아닙니다.")
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         }
-        const response = await createShuttleHoliday({
-            type: newRow.type,
-            calendar: newRow.calendar,
-            date: dayjs(newRow.date).format("YYYY-MM-DD"),
-        })
-        if (response.status !== 201) {
-            setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-            return { ...newRow, _action: "delete" }
+        if (!newRow.isNew && newRow.seq !== null) {
+            const response = await updateShuttleHoliday(newRow.seq, {
+                type: newRow.type!,
+                calendarType: newRow.calendarType!,
+                date: dayjs(newRow.date).format("YYYY-MM-DD"),
+            })
+            if (response.status !== 200) {
+                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+                return { ...newRow, _action: "revert" }
+            }
+            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+            return newRow
+        } else {
+            const response = await createShuttleHoliday({
+                type: newRow.type!,
+                calendarType: newRow.calendarType!,
+                date: dayjs(newRow.date).format("YYYY-MM-DD"),
+            })
+            if (response.status !== 201) {
+                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
+                rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
+                return { ...newRow, _action: "delete" }
+            }
+            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+            const updatedRow = {...newRow, isNew: false, seq: response.data.seq}
+            rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
+            return updatedRow
         }
-        setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
-        const updatedRow = {...newRow, isNew: false}
-        rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
-        return updatedRow
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
@@ -120,7 +130,6 @@ export function ShuttleHolidayGrid(props: GridProps) {
                     key="edit"
                     icon={<EditIcon />}
                     onClick={() => editRowButtonClicked(id)}
-                    disabled={!rowStore.rows.find(row => row.id === id)!.isNew}
                 />,
                 <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
             ]
@@ -148,6 +157,7 @@ export function ShuttleHolidayGrid(props: GridProps) {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -155,8 +165,7 @@ export function ShuttleHolidayGrid(props: GridProps) {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{toolbar: Toolbar}}
-                isCellEditable={(params) => params.row.isNew}
+                slots={{toolbar: GridToolbar}}
             />
         </Box>
     )

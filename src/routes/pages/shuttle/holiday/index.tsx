@@ -14,11 +14,12 @@ export default function Holiday() {
         const response = await getShuttleHoliday()
         if (response.status === 200) {
             const responseData = response.data
-            shuttleHolidayStore.setRows(responseData.data.map((period: ShuttleHolidayResponse) => {
+            shuttleHolidayStore.setRows(responseData.result.map((period: ShuttleHolidayResponse) => {
                 return {
                     id: uuidv4(),
+                    seq: period.seq,
                     type: period.type,
-                    calendar: period.calendar,
+                    calendarType: period.calendarType,
                     date: period.date,
                 }
             }))
@@ -26,7 +27,7 @@ export default function Holiday() {
     }
     useEffect(() => { fetchShuttleHoliday().then() }, [])
     // Configure DataGrid
-    const dateValueFormatter = (value: string) => {
+    const dateValueFormatter = (value: Date) => {
         return dayjs(value).format('YYYY-MM-DD')
     }
     const holidayTypeValueFormatter = (value: string) => {
@@ -47,7 +48,8 @@ export default function Holiday() {
         {
             field: 'date',
             headerName: '날짜',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             valueFormatter: dateValueFormatter,
             type: 'date',
             editable: true,
@@ -55,9 +57,10 @@ export default function Holiday() {
             align: 'center',
         },
         {
-            field: 'calendar',
+            field: 'calendarType',
             headerName: '음력/양력',
-            width: 200,
+            minWidth: 200,
+            flex: 1,
             valueFormatter: calendarTypeValueFormatter,
             type: 'singleSelect',
             valueOptions: ['solar', 'lunar'],
@@ -68,7 +71,8 @@ export default function Holiday() {
         {
             field: 'type',
             headerName: '시간표 종류',
-            width: 200,
+            minWidth: 200,
+            flex: 1,
             valueFormatter: holidayTypeValueFormatter,
             type: 'singleSelect',
             valueOptions: ['weekends', 'halt'],

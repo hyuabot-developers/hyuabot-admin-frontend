@@ -14,8 +14,15 @@ export type ShuttlePeriodRequest = {
 }
 
 export type ShuttleHolidayResponse = {
+    seq: number,
     type: string,
-    calendar: string,
+    calendarType: string,
+    date: string,
+}
+
+export type ShuttleHolidayRequest = {
+    type: string,
+    calendarType: string,
     date: string,
 }
 
@@ -104,15 +111,19 @@ export const deleteShuttlePeriod = async (seq: number) => {
 }
 
 export const getShuttleHoliday = async () => {
-    return await client.get('/api/shuttle/holiday')
+    return await client.get('/api/v1/shuttle/holiday')
 }
 
-export const createShuttleHoliday = async (data: ShuttleHolidayResponse) => {
-    return await client.post('/api/shuttle/holiday', data)
+export const createShuttleHoliday = async (data: ShuttleHolidayRequest) => {
+    return await client.post('/api/v1/shuttle/holiday', data)
 }
 
-export const deleteShuttleHoliday = async (data: ShuttleHolidayResponse) => {
-    return await client.delete(`/api/shuttle/holiday/${data.calendar}/${data.date}`)
+export const updateShuttleHoliday = async (seq: number, data: ShuttleHolidayRequest) => {
+    return await client.put(`/api/v1/shuttle/holiday/${seq}`, data)
+}
+
+export const deleteShuttleHoliday = async (seq: number) => {
+    return await client.delete(`/api/v1/shuttle/holiday/${seq}`)
 }
 
 export const getShuttleRoute = async () => {

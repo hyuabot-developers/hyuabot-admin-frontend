@@ -23,9 +23,10 @@ type ShuttlePeriodStore = {
 
 export type ShuttleHoliday = {
     id: string,
-    type: string,
-    calendar: string,
-    date: string,
+    seq: number | null,
+    type: string | null,
+    calendarType: string | null,
+    date: Date | null,
     isNew: boolean,
 }
 
@@ -116,7 +117,7 @@ export const useShuttleHolidayStore = create<ShuttleHolidayStore>((set) => ({
     rows: [],
     setRows: (rows: Array<ShuttleHoliday>) => {
         rows.sort(function (a: ShuttleHoliday, b: ShuttleHoliday) {
-            return a.date < b.date ? -1 : a.date > b.date ? 1 : 0
+            return a.date! < b.date! ? -1 : a.date! > b.date! ? 1 : 0
         })
         set({ rows })
     },
