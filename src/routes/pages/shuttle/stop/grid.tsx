@@ -12,7 +12,7 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/DeleteOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
+import { GridToolbar } from "./toolbar.tsx"
 import {
     ShuttleStop,
     useShuttleStopStore,
@@ -151,6 +151,7 @@ export function ShuttleStopGrid(props: GridProps) {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -158,7 +159,7 @@ export function ShuttleStopGrid(props: GridProps) {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{toolbar: Toolbar}}
+                slots={{toolbar: GridToolbar}}
                 isCellEditable={(params) => params.colDef.field !== "actions" && (params.colDef.field !== "name" || params.row.isNew)}
             />
         </Box>

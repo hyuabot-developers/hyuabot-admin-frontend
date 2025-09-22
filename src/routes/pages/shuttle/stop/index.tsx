@@ -15,7 +15,7 @@ export default function ShuttleStop() {
         const response = await getShuttleStop()
         if (response.status === 200) {
             const responseData = response.data
-            shuttleStopStore.setRows(responseData.data.map((item: ShuttleStopResponse) => {
+            shuttleStopStore.setRows(responseData.result.map((item: ShuttleStopResponse) => {
                 return {
                     id: uuidv4(),
                     name: item.name,
@@ -42,7 +42,8 @@ export default function ShuttleStop() {
         {
             field: 'latitude',
             headerName: '정류장 위도',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'number',
             editable: true,
             headerAlign: 'center',
@@ -51,7 +52,8 @@ export default function ShuttleStop() {
         {
             field: 'longitude',
             headerName: '정류장 경도',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'number',
             editable: true,
             headerAlign: 'center',
