@@ -12,7 +12,7 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/DeleteOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
+import { GridToolbar } from "./toolbar.tsx"
 import {
     ShuttleRoute,
     useShuttleRouteStore,
@@ -77,10 +77,10 @@ export function ShuttleRouteGrid(props: GridProps) {
             const response = await createShuttleRoute({
                 name: newRow.name,
                 tag: newRow.tag,
-                korean: newRow.korean,
-                english: newRow.english,
-                start: newRow.start,
-                end: newRow.end,
+                descriptionKorean: newRow.korean,
+                descriptionEnglish: newRow.english,
+                startStopID: newRow.start,
+                endStopID: newRow.end,
             })
             if (response.status !== 201) {
                 setErrorSnackbarContent("데이터 저장에 실패했습니다.")
@@ -91,10 +91,10 @@ export function ShuttleRouteGrid(props: GridProps) {
         } else {
             const response = await updateShuttleRoute(newRow.name, {
                 tag: newRow.tag,
-                korean: newRow.korean,
-                english: newRow.english,
-                start: newRow.start,
-                end: newRow.end,
+                descriptionKorean: newRow.korean,
+                descriptionEnglish: newRow.english,
+                startStopID: newRow.start,
+                endStopID: newRow.end,
             })
             if (response.status !== 200) {
                 setErrorSnackbarContent("데이터 저장에 실패했습니다.")
@@ -157,6 +157,7 @@ export function ShuttleRouteGrid(props: GridProps) {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -164,7 +165,7 @@ export function ShuttleRouteGrid(props: GridProps) {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{toolbar: Toolbar}}
+                slots={{toolbar: GridToolbar}}
                 isCellEditable={(params) => params.colDef.field !== "actions" && (params.colDef.field !== "name" || params.row.isNew)}
             />
         </Box>

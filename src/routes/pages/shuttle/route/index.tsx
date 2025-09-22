@@ -19,15 +19,15 @@ export default function ShuttleRoute() {
         const response = await getShuttleRoute()
         if (response.status === 200) {
             const responseData = response.data
-            shuttleRouteStore.setRows(responseData.data.map((item: ShuttleRouteResponse) => {
+            shuttleRouteStore.setRows(responseData.result.map((item: ShuttleRouteResponse) => {
                 return {
                     id: uuidv4(),
                     name: item.name,
                     tag: item.tag,
-                    korean: item.korean,
-                    english: item.english,
-                    start: item.start,
-                    end: item.end,
+                    korean: item.descriptionKorean,
+                    english: item.descriptionEnglish,
+                    start: item.startStopID,
+                    end: item.endStopID,
                 }
             }))
         }
@@ -36,7 +36,7 @@ export default function ShuttleRoute() {
         const response = await getShuttleStop()
         if (response.status === 200) {
             const responseData = response.data
-            shuttleStopStore.setRows(responseData.data.map((item: ShuttleStopResponse) => {
+            shuttleStopStore.setRows(responseData.result.map((item: ShuttleStopResponse) => {
                 return {
                     id: uuidv4(),
                     name: item.name,
@@ -57,7 +57,7 @@ export default function ShuttleRoute() {
     const columns: GridColDef[] = [
         {
             field: 'name',
-            headerName: '노선명',
+            headerName: '노선 ID',
             width: 150,
             type: 'string',
             editable: true,
@@ -76,7 +76,8 @@ export default function ShuttleRoute() {
         {
             field: 'korean',
             headerName: '한국어 이름',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
@@ -85,7 +86,8 @@ export default function ShuttleRoute() {
         {
             field: 'english',
             headerName: '영어 이름',
-            width: 500,
+            minWidth: 500,
+            flex: 2,
             type: 'string',
             editable: true,
             headerAlign: 'center',

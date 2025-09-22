@@ -29,21 +29,36 @@ export type ShuttleHolidayRequest = {
 export type ShuttleRouteResponse = {
     name: string,
     tag: string,
-    korean: string,
-    english: string,
-    start: string,
-    end: string,
+    descriptionKorean: string,
+    descriptionEnglish: string,
+    startStopID: string,
+    endStopID: string,
+}
+
+export type CreateShuttleRouteRequest = {
+    name: string,
+    tag: string,
+    descriptionKorean: string,
+    descriptionEnglish: string,
+    startStopID: string,
+    endStopID: string,
 }
 
 export type UpdateShuttleRouteRequest = {
     tag: string,
-    korean: string,
-    english: string,
-    start: string,
-    end: string,
+    descriptionKorean: string,
+    descriptionEnglish: string,
+    startStopID: string,
+    endStopID: string,
 }
 
 export type ShuttleStopResponse = {
+    name: string,
+    latitude: number,
+    longitude: number,
+}
+
+export type CreateShuttleStopRequest = {
     name: string,
     latitude: number,
     longitude: number,
@@ -127,35 +142,35 @@ export const deleteShuttleHoliday = async (seq: number) => {
 }
 
 export const getShuttleRoute = async () => {
-    return await client.get('/api/shuttle/route')
+    return await client.get('/api/v1/shuttle/route')
 }
 
-export const createShuttleRoute = async (data: ShuttleRouteResponse) => {
-    return await client.post('/api/shuttle/route', data)
+export const createShuttleRoute = async (data: CreateShuttleRouteRequest) => {
+    return await client.post('/api/v1/shuttle/route', data)
 }
 
 export const updateShuttleRoute = async (name: string, data: UpdateShuttleRouteRequest) => {
-    return await client.put(`/api/shuttle/route/${name}`, data)
+    return await client.put(`/api/v1/shuttle/route/${name}`, data)
 }
 
 export const deleteShuttleRoute = async (name: string) => {
-    return await client.delete(`/api/shuttle/route/${name}`)
+    return await client.delete(`/api/v1/shuttle/route/${name}`)
 }
 
 export const getShuttleStop = async () => {
-    return await client.get('/api/shuttle/stop')
+    return await client.get('/api/v1/shuttle/stop')
 }
 
-export const createShuttleStop = async (data: ShuttleStopResponse) => {
-    return await client.post('/api/shuttle/stop', data)
+export const createShuttleStop = async (data: CreateShuttleStopRequest) => {
+    return await client.post('/api/v1/shuttle/stop', data)
 }
 
 export const updateShuttleStop = async (name: string, data: UpdateShuttleStopRequest) => {
-    return await client.put(`/api/shuttle/stop/${name}`, data)
+    return await client.put(`/api/v1/shuttle/stop/${name}`, data)
 }
 
 export const deleteShuttleStop = async (name: string) => {
-    return await client.delete(`/api/shuttle/stop/${name}`)
+    return await client.delete(`/api/v1/shuttle/stop/${name}`)
 }
 
 export const getShuttleRouteStop = async () => {
