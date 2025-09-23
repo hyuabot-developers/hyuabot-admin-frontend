@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from "uuid"
-import { Toolbar, ToolbarButton, GridRowModes } from "@mui/x-data-grid"
-import { useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
+import { Toolbar, ToolbarButton, GridRowModes, GridRowModesModel } from "@mui/x-data-grid"
+import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
 
 import AddIcon from "@mui/icons-material/Add"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import dayjs from "dayjs";
+import dayjs from "dayjs"
 
 export function GridToolbar() {
     const rowStore = useShuttlePeriodStore()
@@ -15,7 +15,7 @@ export function GridToolbar() {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.result.map((period: ShuttlePeriodResponse) => {
+            const rows = responseData.result.map((period: ShuttlePeriodResponse) => {
                 return {
                     id: uuidv4(),
                     seq: period.seq,
@@ -23,7 +23,14 @@ export function GridToolbar() {
                     start: dayjs(period.start),
                     end: dayjs(period.end),
                 }
-            }))
+            })
+            rowStore.setRows(rows as ShuttlePeriod[])
+            rowModesModelStore.setRowModesModel(
+                rows.reduce((acc: GridRowModesModel, row: ShuttlePeriod) => {
+                    acc[row.id] = { mode: GridRowModes.View }
+                    return acc
+                }, {} as Record<string, { mode: GridRowModes }>)
+            )
         }
     }
     // Add record button click event

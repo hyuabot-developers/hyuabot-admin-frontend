@@ -1,28 +1,36 @@
 import dayjs from "dayjs"
 import { useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
+import { GridColDef, GridRowModes, GridRowModesModel } from "@mui/x-data-grid"
 import { ShuttlePeriodGrid } from "./grid.tsx"
-import { useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
+import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
 import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
 
 export default function Period() {
     // Get the store
-    const shuttlePeriodStore = useShuttlePeriodStore()
+    const rowStore = useShuttlePeriodStore()
+    const rowModesModelStore = useShuttlePeriodGridModelStore()
     // Fetch shuttle period
     const fetchShuttlePeriod = async () => {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            shuttlePeriodStore.setRows(responseData.result.map((period: ShuttlePeriodResponse) => {
+            const rows = responseData.result.map((period: ShuttlePeriodResponse) => {
                 return {
                     id: uuidv4(),
                     seq: period.seq,
                     type: period.type,
-                    start: period.start,
-                    end: period.end,
+                    start: dayjs(period.start),
+                    end: dayjs(period.end),
                 }
-            }))
+            })
+            rowStore.setRows(rows as ShuttlePeriod[])
+            rowModesModelStore.setRowModesModel(
+                rows.reduce((acc: GridRowModesModel, row: ShuttlePeriod) => {
+                    acc[row.id] = { mode: GridRowModes.View }
+                    return acc
+                }, {} as Record<string, { mode: GridRowModes }>)
+            )
         }
     }
     useEffect(() => { fetchShuttlePeriod().then() }, [])
