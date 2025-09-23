@@ -70,21 +70,21 @@ export type UpdateShuttleStopRequest = {
 }
 
 export type ShuttleRouteStopResponse = {
-    stop: string,
-    route: string,
-    sequence: number,
-    cumulativeTime: number,
+    seq: number,
+    name: string,
+    order: number,
+    cumulativeTime: string,
 }
 
 export type CreateRouteStopRequest = {
-    stop: string,
-    sequence: number,
-    cumulativeTime: number,
+    stopName: string,
+    order: number,
+    cumulativeTime: string,
 }
 
 export type UpdateShuttleRouteStopRequest = {
-    sequence: number,
-    cumulativeTime: number,
+    order: number,
+    cumulativeTime: string,
 }
 
 export type ShuttleTimetableResponse = {
@@ -173,20 +173,20 @@ export const deleteShuttleStop = async (name: string) => {
     return await client.delete(`/api/v1/shuttle/stop/${name}`)
 }
 
-export const getShuttleRouteStop = async () => {
-    return await client.get(`/api/shuttle/route-stop`)
+export const getShuttleRouteStop = async (routeName: string) => {
+    return await client.get(`/api/v1/shuttle/route/${routeName}/stop`)
 }
 
 export const createShuttleRouteStop = async (routeName: string, data: CreateRouteStopRequest) => {
-    return await client.post(`/api/shuttle/route/${routeName}/stop`, data)
+    return await client.post(`/api/v1/shuttle/route/${routeName}/stop`, data)
 }
 
 export const updateShuttleRouteStop = async (routeName: string, stopName: string, data: UpdateShuttleRouteStopRequest) => {
-    return await client.put(`/api/shuttle/route/${routeName}/stop/${stopName}`, data)
+    return await client.put(`/api/v1/shuttle/route/${routeName}/stop/${stopName}`, data)
 }
 
 export const deleteShuttleRouteStop = async (routeName: string, stopName: string) => {
-    return await client.delete(`/api/shuttle/route/${routeName}/stop/${stopName}`)
+    return await client.delete(`/api/v1/shuttle/route/${routeName}/stop/${stopName}`)
 }
 
 export const getShuttleTimetable = async () => {

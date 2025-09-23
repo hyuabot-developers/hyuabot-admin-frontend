@@ -12,11 +12,12 @@ import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/DeleteOutlined"
 import SaveIcon from "@mui/icons-material/Save"
 import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
+import { GridToolbar } from "./toolbar.tsx"
 import {
     ShuttleRouteStop,
     useShuttleRouteStopStore,
     useShuttleRouteStopGridModelStore,
+    useSelectedShuttleRouteStore,
 } from "../../../../stores/shuttle.ts"
 import { useState } from "react"
 import {
@@ -32,6 +33,7 @@ interface GridProps {
 export function ShuttleRouteStopGrid(props: GridProps) {
     const rowStore = useShuttleRouteStopStore()
     const rowModesModelStore = useShuttleRouteStopGridModelStore()
+    const selectedShuttleRouteStore = useSelectedShuttleRouteStore()
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>("")
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>("")
 
@@ -50,15 +52,17 @@ export function ShuttleRouteStopGrid(props: GridProps) {
         rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View}})
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
-        const rowToDelete = rowStore.rows.find(row => row.id === id)
+        const { rows } = useShuttleRouteStopStore.getState()
+        const { selectedRoute } = useSelectedShuttleRouteStore.getState()
+        const rowToDelete = rows.find(row => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
-        const response = await deleteShuttleRouteStop(rowToDelete.route, rowToDelete.stop)
+        const response = await deleteShuttleRouteStop(selectedRoute!, rowToDelete.stop)
         if (response.status !== 204) {
             setErrorSnackbarContent("데이터 삭제에 실패했습니다.")
             return
         }
         setSuccessSnackbarContent("데이터 삭제에 성공했습니다.")
-        rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
+        rowStore.setRows(rows.filter(row => row.id !== id))
     }
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}})
@@ -68,15 +72,15 @@ export function ShuttleRouteStopGrid(props: GridProps) {
         }
     }
     const updateRowProcess = async (newRow: ShuttleRouteStop) => {
-        if (newRow.route === "" || newRow.stop === "" || newRow.sequence < 0) {
+        if (newRow.stop === "" || newRow.order < 0) {
             setErrorSnackbarContent("올바른 데이터가 아닙니다.")
             rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
             return { ...newRow, _action: "delete" }
         }
         if (newRow.isNew) {
-            const response = await createShuttleRouteStop(newRow.route, {
-                stop: newRow.stop,
-                sequence: newRow.sequence,
+            const response = await createShuttleRouteStop(selectedShuttleRouteStore.selectedRoute!, {
+                stopName: newRow.stop,
+                order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
             })
             if (response.status !== 201) {
@@ -86,13 +90,13 @@ export function ShuttleRouteStopGrid(props: GridProps) {
             }
             setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
         } else {
-            const response = await updateShuttleRouteStop(newRow.route, newRow.stop, {
-                sequence: newRow.sequence,
+            const response = await updateShuttleRouteStop(selectedShuttleRouteStore.selectedRoute!, newRow.stop, {
+                order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
             })
             if (response.status !== 200) {
                 setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-                return { ...newRow, _action: "delete" }
+                return { ...newRow, _action: "revert" }
             }
             setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
         }
@@ -125,7 +129,12 @@ export function ShuttleRouteStopGrid(props: GridProps) {
                     icon={<EditIcon />}
                     onClick={() => editRowButtonClicked(id)}
                 />,
-                <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
+                <GridActionsCellItem
+                    label="delete"
+                    key="delete"
+                    icon={<DeleteIcon />}
+                    onClick={() => deleteRowButtonClicked(id)}
+                />,
             ]
         }
     })
@@ -151,6 +160,7 @@ export function ShuttleRouteStopGrid(props: GridProps) {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -158,9 +168,8 @@ export function ShuttleRouteStopGrid(props: GridProps) {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{toolbar: Toolbar}}
-                isCellEditable={(params) => params.colDef.field !== "actions" && (params.colDef.field !== "name" || params.row.isNew)}
-                autoPageSize={true}
+                slots={{toolbar: GridToolbar}}
+                isCellEditable={(params) => params.colDef.field !== "actions" && (params.colDef.field !== "stop" || params.row.isNew)}
             />
         </Box>
     )
