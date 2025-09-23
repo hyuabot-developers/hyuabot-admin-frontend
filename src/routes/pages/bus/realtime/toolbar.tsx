@@ -1,14 +1,8 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    BusRoute,
-    BusStop,
-    useBusRealtimeStore,
-    useBusRouteStore,
-    useBusStopStore
-} from "../../../../stores/bus.ts"
+import { Button } from '@mui/material'
+import { GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     BusRealtimeResponse,
     BusRouteResponse,
@@ -16,9 +10,16 @@ import {
     getBusRealtime,
     getBusRoutes,
     getBusStops
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import {
+    BusRoute,
+    BusStop,
+    useBusRealtimeStore,
+    useBusRouteStore,
+    useBusStopStore
+} from '../../../../stores/bus.ts'
 
-export function Toolbar() {
+export const Toolbar = () => {
     const rowStore = useBusRealtimeStore()
     const busRouteStore = useBusRouteStore()
     const busStopStore = useBusStopStore()
@@ -49,8 +50,8 @@ export function Toolbar() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -76,8 +77,8 @@ export function Toolbar() {
             rowStore.setRows(responseData.data.map((item: BusRealtimeResponse) => {
                 return {
                     id: uuidv4(),
-                    routeName: routeData.find(route => route.routeID === item.routeID)?.name || "",
-                    stopName: stopData.find(stop => stop.stopID === item.stopID)?.name || "",
+                    routeName: routeData.find((route) => route.routeID === item.routeID)?.name || '',
+                    stopName: stopData.find((stop) => stop.stopID === item.stopID)?.name || '',
                     sequence: item.sequence,
                     stop: item.stop,
                     time: item.time,
@@ -90,7 +91,7 @@ export function Toolbar() {
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBusRealtime}>
                 새로고침
             </Button>

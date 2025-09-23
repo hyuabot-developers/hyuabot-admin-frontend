@@ -1,4 +1,8 @@
-import { Alert, Box, Snackbar } from "@mui/material"
+import CancelIcon from '@mui/icons-material/Close'
+import DeleteIcon from '@mui/icons-material/DeleteOutlined'
+import EditIcon from '@mui/icons-material/Edit'
+import SaveIcon from '@mui/icons-material/Save'
+import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
     GridActionsCellItem,
@@ -7,100 +11,97 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel
-} from "@mui/x-data-grid"
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/DeleteOutlined"
-import SaveIcon from "@mui/icons-material/Save"
-import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
-import { useState } from "react"
-import { GridContactItem, useContactGridModelStore, useContactStore } from "../../../../stores/contact.ts"
-import { createContact, deleteContact, updateContact } from "../../../../service/network/contact.ts"
+} from '@mui/x-data-grid'
+import { useState } from 'react'
+
+import { Toolbar } from './toolbar.tsx'
+import { createContact, deleteContact, updateContact } from '../../../../service/network/contact.ts'
+import { GridContactItem, useContactGridModelStore, useContactStore } from '../../../../stores/contact.ts'
 
 interface GridProps {
     columns: GridColDef[]
 }
 
-export function ContactGrid(props: GridProps) {
+export const ContactGrid = (props: GridProps) => {
     const rowStore = useContactStore()
     const rowModesModelStore = useContactGridModelStore()
-    const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>("")
-    const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>("")
+    const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
+    const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
 
-    const rowEditStopped: GridEventListener<"rowEditStop"> = (params, event) => {
+    const rowEditStopped: GridEventListener<'rowEditStop'> = (params, event) => {
         if (event.defaultMuiPrevented) {
             return
         }
-        const editedRow = rowStore.rows.find(row => row.id === params.id)
+        const editedRow = rowStore.rows.find((row) => row.id === params.id)
         return editedRow!
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
-        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.Edit}})
+        rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.Edit } })
     }
     const saveRowButtonClicked = (id: GridRowId) => {
-        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View}})
+        rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View } })
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
-        const rowToDelete = rowStore.rows.find(row => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
+        const rowToDelete = rowStore.rows.find((row) => row.id === id)
+        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
         const response = await deleteContact(
-            parseInt(rowToDelete.category.split("(")[1].split(")")[0]),
+            parseInt(rowToDelete.category.split('(')[1].split(')')[0]),
             rowToDelete.contactID
         )
         if (response.status !== 204) {
-            setErrorSnackbarContent("데이터 삭제에 실패했습니다.")
+            setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
         }
-        setSuccessSnackbarContent("데이터 삭제에 성공했습니다.")
-        rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
+        setSuccessSnackbarContent('데이터 삭제에 성공했습니다.')
+        rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
     }
     const cancelRowButtonClicked = (id: GridRowId) => {
-        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}})
-        const editedRow = rowStore.rows.find(row => row.id === id)
+        rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
+        const editedRow = rowStore.rows.find((row) => row.id === id)
         if (editedRow!.isNew) {
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
+            rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: GridContactItem) => {
-        if (newRow.name === "" || newRow.phone === "") {
-            setErrorSnackbarContent("올바른 데이터가 아닙니다.")
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-            return { ...newRow, _action: "delete" }
+        if (newRow.name === '' || newRow.phone === '') {
+            setErrorSnackbarContent('올바른 데이터가 아닙니다.')
+            rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+            return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
             const response = await createContact(
-                parseInt(newRow.category.split("(")[1].split(")")[0]),
+                parseInt(newRow.category.split('(')[1].split(')')[0]),
                 {
                     name: newRow.name,
                     phone: newRow.phone,
-                    campusID: Number(newRow.campus.split(" ")[1].slice(1, -1)),
+                    campusID: Number(newRow.campus.split(' ')[1].slice(1, -1)),
                 }
             )
             if (response.status !== 201) {
-                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-                rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-                return { ...newRow, _action: "delete" }
+                setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+                rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+                return { ...newRow, _action: 'delete' }
             }
-            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+            setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         } else {
             const response = await updateContact(
-                parseInt(newRow.category.split("(")[1].split(")")[0]),
+                parseInt(newRow.category.split('(')[1].split(')')[0]),
                 newRow.contactID,
                 {
                     name: newRow.name,
                     phone: newRow.phone,
-                    campusID: Number(newRow.campus.split(" ")[1].slice(1, -1)),
+                    campusID: Number(newRow.campus.split(' ')[1].slice(1, -1)),
                 }
             )
             if (response.status !== 200) {
-                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-                return { ...newRow, _action: "delete" }
+                setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+                return { ...newRow, _action: 'delete' }
             }
-            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
+            setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         }
-        const updatedRow = {...newRow, isNew: false}
-        rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
+        const updatedRow = { ...newRow, isNew: false }
+        rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
         return updatedRow
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
@@ -108,11 +109,11 @@ export function ContactGrid(props: GridProps) {
     }
     // Add action column
     props.columns.push({
-        field: "actions",
-        headerName: "동작",
-        type: "actions",
+        field: 'actions',
+        headerName: '동작',
+        type: 'actions',
         width: 100,
-        cellClassName: "actions",
+        cellClassName: 'actions',
         getActions: ({ id }) => {
             const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
             if (isEditing) {
@@ -134,26 +135,26 @@ export function ContactGrid(props: GridProps) {
     })
     // Render
     return (
-        <Box sx={{height: "100vh", width: "100%"}}>
+        <Box sx={{ height: '100vh', width: '100%' }}>
             <Snackbar
-                anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                open={errorSnackbarContent !== ""}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={errorSnackbarContent !== ''}
                 autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent("")}>
-                <Alert onClose={() => setErrorSnackbarContent("")} severity="error" sx={{width: "100%"}}>
+                onClose={() => setErrorSnackbarContent('')}>
+                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
                     {errorSnackbarContent}
                 </Alert>
             </Snackbar>
             <Snackbar
-                anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                open={successSnackbarContent !== ""}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={successSnackbarContent !== ''}
                 autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent("")}>
-                <Alert onClose={() => setSuccessSnackbarContent("")} severity="success" sx={{width: "100%"}}>
+                onClose={() => setSuccessSnackbarContent('')}>
+                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ width: "100%" }}>
+            <div style={{ width: '100%' }}>
                 <DataGrid
                     columns={props.columns}
                     rows={rowStore.rows}
@@ -162,15 +163,15 @@ export function ContactGrid(props: GridProps) {
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
                     processRowUpdate={updateRowProcess}
-                    slots={{toolbar: Toolbar}}
-                    isCellEditable={(params) => params.colDef.field !== "actions" && (params.row.isNew || (params.colDef.field !== "contactID" && params.colDef.field !== "category"))}
+                    slots={{ toolbar: Toolbar }}
+                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.row.isNew || (params.colDef.field !== 'contactID' && params.colDef.field !== 'category'))}
                     pageSizeOptions={[10]}
                     hideFooterPagination={false}
                     initialState={{
                         pagination: { paginationModel: { pageSize: 10 } },
                         sorting: {
                             sortModel: [
-                                { field: "contactID", sort: "asc" },
+                                { field: 'contactID', sort: 'asc' },
                             ]
                         },
                     }}

@@ -1,7 +1,8 @@
-import { Box, Tab, Tabs } from "@mui/material"
-import { Outlet, useNavigate } from "react-router-dom"
-import { SyntheticEvent, useEffect } from "react"
-import { useReadingRoomTabStore } from "../../../stores/readingRoom.ts"
+import { Box, Tab, Tabs } from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+
+import { useReadingRoomTabStore } from '../../../stores/readingRoom.ts'
 
 export default function ReadingRoom() {
     // Get the store

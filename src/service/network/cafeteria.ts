@@ -1,4 +1,4 @@
-import client from "./client.ts"
+import client from './client.ts'
 
 export type CafeteriaRunningTimeResponse = {
     breakfast: string,
@@ -71,7 +71,7 @@ export const deleteCafeteria = async (id: number) => {
 }
 
 export const getCafeteriaMenuList = async ()=> {
-    return await client.get(`/api/cafeteria/menu`)
+    return await client.get('/api/cafeteria/menu')
 }
 
 export const createCafeteriaMenu = async (id: number, data: CreateCafeteriaMenuRequest) => {

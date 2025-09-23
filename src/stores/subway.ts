@@ -1,6 +1,7 @@
-import { create } from "zustand/index"
-import { GridRowModesModel } from "@mui/x-data-grid"
-import { GridModelStore } from "./index.ts"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand/index'
+
+import { GridModelStore } from './index.ts'
 
 type SubwayTabStore = {
     route: string,
@@ -84,7 +85,7 @@ type SubwayRealtimeStore = {
 }
 
 export const useSubwayTabStore = create<SubwayTabStore>((set) => ({
-    route: "station-name",
+    route: 'station-name',
     setRoute: (route) => set({ route }),
 }))
 

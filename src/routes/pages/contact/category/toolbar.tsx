@@ -1,12 +1,13 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { useContactCategoryGridModelStore, useContactCategoryStore } from "../../../../stores/contact.ts"
-import { ContactCategoryResponse, getContactCategoryList } from "../../../../service/network/contact.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { ContactCategoryResponse, getContactCategoryList } from '../../../../service/network/contact.ts'
+import { useContactCategoryGridModelStore, useContactCategoryStore } from '../../../../stores/contact.ts'
+
+export const Toolbar = () => {
     // Get the store
     const rowStore = useContactCategoryStore()
     const rowModesModelStore = useContactCategoryGridModelStore()
@@ -32,18 +33,18 @@ export function Toolbar() {
             {
                 id,
                 categoryID: rowStore.rows.length,
-                name: "",
+                name: '',
                 isNew: true,
             },
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchContactCategory}>
                 새로고침
             </Button>

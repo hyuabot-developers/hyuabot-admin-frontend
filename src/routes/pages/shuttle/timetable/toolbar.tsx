@@ -1,13 +1,14 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-import { useShuttleTimetableStore, useShuttleTimetableGridModelStore } from "../../../../stores/shuttle.ts"
-import { getShuttleTimetable, ShuttleTimetableResponse } from "../../../../service/network/shuttle.ts"
-
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { getShuttleTimetable, ShuttleTimetableResponse } from '../../../../service/network/shuttle.ts'
+import { useShuttleTimetableStore, useShuttleTimetableGridModelStore } from '../../../../stores/shuttle.ts'
+
+
+export const Toolbar = () => {
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
     const fetchShuttleTimetable = async () => {
@@ -34,21 +35,21 @@ export function Toolbar() {
             {
                 id,
                 sequence: null,
-                period: "",
+                period: '',
                 weekdays: true,
-                route: "",
-                time: "00:00:00",
+                route: '',
+                time: '00:00:00',
                 isNew: true,
             },
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "period" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'period' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttleTimetable}>
                 새로고침
             </Button>

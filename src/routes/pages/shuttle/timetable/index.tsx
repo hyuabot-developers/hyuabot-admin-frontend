@@ -1,12 +1,13 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { ShuttleTimetableGrid } from "./grid.tsx"
-import { useShuttleTimetableStore } from "../../../../stores/shuttle.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ShuttleTimetableGrid } from './grid.tsx'
 import {
     getShuttleTimetable,
     ShuttleTimetableResponse
-} from "../../../../service/network/shuttle.ts"
+} from '../../../../service/network/shuttle.ts'
+import { useShuttleTimetableStore } from '../../../../stores/shuttle.ts'
 
 export default function ShuttleTimetable() {
     // Get the store
@@ -33,10 +34,10 @@ export default function ShuttleTimetable() {
     // Configure DataGrid
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
-        case "semester": return "학기"
-        case "vacation": return "방학"
-        case "vacation_session": return "계절학기"
-        default: return "기타"
+        case 'semester': return '학기'
+        case 'vacation': return '방학'
+        case 'vacation_session': return '계절학기'
+        default: return '기타'
         }
     }
     const columns: GridColDef[] = [

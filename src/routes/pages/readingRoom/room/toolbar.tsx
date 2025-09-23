@@ -1,11 +1,12 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { getReadingRoomList, ReadingRoomResponse } from "../../../../service/network/readingRoom.ts"
-import { useReadingRoomItemStore } from "../../../../stores/readingRoom.ts"
+import { Button } from '@mui/material'
+import { GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { getReadingRoomList, ReadingRoomResponse } from '../../../../service/network/readingRoom.ts'
+import { useReadingRoomItemStore } from '../../../../stores/readingRoom.ts'
+
+export const Toolbar = () => {
     const rowStore = useReadingRoomItemStore()
     const fetchReadingRoom = async () => {
         const response = await getReadingRoomList()
@@ -27,7 +28,7 @@ export function Toolbar() {
         }
     }
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchReadingRoom}>
                 새로고침
             </Button>

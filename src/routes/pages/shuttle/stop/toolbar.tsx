@@ -1,12 +1,13 @@
-import { v4 as uuidv4 } from "uuid"
-import { GridRowModes, Toolbar, ToolbarButton } from "@mui/x-data-grid"
-import { useShuttleStopStore, useShuttleStopGridModelStore } from "../../../../stores/shuttle.ts"
-import { getShuttleStop, ShuttleStopResponse } from "../../../../service/network/shuttle.ts"
-
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function GridToolbar() {
+import { getShuttleStop, ShuttleStopResponse } from '../../../../service/network/shuttle.ts'
+import { useShuttleStopStore, useShuttleStopGridModelStore } from '../../../../stores/shuttle.ts'
+
+
+export const GridToolbar = () => {
     const rowStore = useShuttleStopStore()
     const rowModesModelStore = useShuttleStopGridModelStore()
     const fetchShuttleStop = async () => {
@@ -29,7 +30,7 @@ export function GridToolbar() {
         rowStore.setRows([
             {
                 id,
-                name: "",
+                name: '',
                 latitude: 0,
                 longitude: 0,
                 isNew: true,
@@ -38,12 +39,12 @@ export function GridToolbar() {
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <Toolbar style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <ToolbarButton onClick={fetchShuttleStop}>
                 <RefreshIcon />
             </ToolbarButton>

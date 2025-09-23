@@ -1,7 +1,8 @@
-import { Box, Tab, Tabs } from "@mui/material"
-import { Outlet, useNavigate } from "react-router-dom"
-import { SyntheticEvent, useEffect } from "react"
-import { useShuttleTabStore } from "../../../stores/shuttle.ts"
+import { Box, Tab, Tabs } from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+
+import { useShuttleTabStore } from '../../../stores/shuttle.ts'
 
 export default function Shuttle() {
     // Get the store

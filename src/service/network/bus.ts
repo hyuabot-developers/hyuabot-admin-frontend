@@ -1,4 +1,4 @@
-import client from "./client.ts"
+import client from './client.ts'
 
 export type BusCompany = {
     id: string,

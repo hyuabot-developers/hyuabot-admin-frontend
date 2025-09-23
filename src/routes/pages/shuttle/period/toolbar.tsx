@@ -1,13 +1,14 @@
-import { v4 as uuidv4 } from "uuid"
-import { Toolbar, ToolbarButton, GridRowModes, GridRowModesModel } from "@mui/x-data-grid"
-import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
-import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
 
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import dayjs from "dayjs"
+import { Toolbar, ToolbarButton, GridRowModes, GridRowModesModel } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { v4 as uuidv4 } from 'uuid'
 
-export function GridToolbar() {
+import { getShuttlePeriod, ShuttlePeriodResponse } from '../../../../service/network/shuttle.ts'
+import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from '../../../../stores/shuttle.ts'
+
+export const GridToolbar = () => {
     const rowStore = useShuttlePeriodStore()
     const rowModesModelStore = useShuttlePeriodGridModelStore()
     // Fetch shuttle period
@@ -40,7 +41,7 @@ export function GridToolbar() {
             {
                 id,
                 seq: null,
-                type: "",
+                type: '',
                 start: null,
                 end: null,
                 isNew: true,
@@ -49,7 +50,7 @@ export function GridToolbar() {
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "type" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'type' },
         }))
     }
 

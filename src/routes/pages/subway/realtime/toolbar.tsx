@@ -1,14 +1,8 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    GridSubwayRoute,
-    GridSubwayStation,
-    useSubwayRealtimeStore,
-    useSubwayRouteStore,
-    useSubwayStationStore
-} from "../../../../stores/subway.ts"
+import { Button } from '@mui/material'
+import { GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     SubwayRealtime,
     SubwayRoute,
@@ -16,10 +10,17 @@ import {
     getSubwayRealtime,
     getSubwayRoutes,
     getSubwayStations
-} from "../../../../service/network/subway.ts"
+} from '../../../../service/network/subway.ts'
+import {
+    GridSubwayRoute,
+    GridSubwayStation,
+    useSubwayRealtimeStore,
+    useSubwayRouteStore,
+    useSubwayStationStore
+} from '../../../../stores/subway.ts'
 
 
-export function Toolbar() {
+export const Toolbar = () => {
     const rowStore = useSubwayRealtimeStore()
     const subwayRouteStore = useSubwayRouteStore()
     const subwayStationStore = useSubwayStationStore()
@@ -61,9 +62,9 @@ export function Toolbar() {
         if (realtimeResponse.status === 200) {
             const responseData = realtimeResponse.data
             rowStore.setRows(responseData.data.map((item: SubwayRealtime) => {
-                const departureStation = stationData.find(station => station.stationID === item.stationID)
-                const terminalStation = stationData.find(station => station.stationID === item.terminalStationID)
-                const routeName = routeData.find(route => route.routeID === departureStation?.routeID)?.name
+                const departureStation = stationData.find((station) => station.stationID === item.stationID)
+                const terminalStation = stationData.find((station) => station.stationID === item.terminalStationID)
+                const routeName = routeData.find((route) => route.routeID === departureStation?.routeID)?.name
                 return {
                     id: uuidv4(),
                     sortID: `${item.stationID}-${headingSortFormatter(item.heading)}-${item.sequence}`,
@@ -89,7 +90,7 @@ export function Toolbar() {
         else { return -1 }
     }
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchSubwayRealtime}>
                 새로고침
             </Button>

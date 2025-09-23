@@ -1,24 +1,25 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { useCampusStore } from "../../../../stores/campus.ts"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
-import {
-    GridContactCategoryItem,
-    useContactCategoryStore,
-    useContactGridModelStore,
-    useContactStore
-} from "../../../../stores/contact.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
+import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
 import {
     ContactCategoryResponse,
     ContactResponse,
     getContactCategoryList,
     getContactList
-} from "../../../../service/network/contact.ts"
+} from '../../../../service/network/contact.ts'
+import { useCampusStore } from '../../../../stores/campus.ts'
+import {
+    GridContactCategoryItem,
+    useContactCategoryStore,
+    useContactGridModelStore,
+    useContactStore
+} from '../../../../stores/contact.ts'
 
-export function Toolbar() {
+export const Toolbar = () => {
     // Get the store
     const rowModesModelStore = useContactGridModelStore()
     const campusStore = useCampusStore()
@@ -54,8 +55,8 @@ export function Toolbar() {
         if (response.status === 200) {
             const responseData = response.data
             rowStore.setRows(responseData.data.map((item: ContactResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
-                const category = categoryList.find(category => category.categoryID === item.categoryID)
+                const campus = campusList.find((campus) => campus.id === item.campusID)
+                const category = categoryList.find((category) => category.categoryID === item.categoryID)
                 return {
                     id: uuidv4(),
                     contactID: item.id,
@@ -77,8 +78,8 @@ export function Toolbar() {
             {
                 id,
                 contactID: 0,
-                name: "",
-                phone: "",
+                name: '',
+                phone: '',
                 category: `${category?.name} (${category?.categoryID})`,
                 campus: `${campus?.name} (${campus?.id})`,
                 isNew: true,
@@ -86,12 +87,12 @@ export function Toolbar() {
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchContact}>
                 새로고침
             </Button>

@@ -1,10 +1,11 @@
-import dayjs from "dayjs"
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { ShuttleHolidayGrid } from "./grid.tsx"
-import { useShuttleHolidayStore } from "../../../../stores/shuttle.ts"
-import { getShuttleHoliday, ShuttleHolidayResponse } from "../../../../service/network/shuttle.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ShuttleHolidayGrid } from './grid.tsx'
+import { getShuttleHoliday, ShuttleHolidayResponse } from '../../../../service/network/shuttle.ts'
+import { useShuttleHolidayStore } from '../../../../stores/shuttle.ts'
 
 export default function Holiday() {
     // Get the store
@@ -32,16 +33,16 @@ export default function Holiday() {
     }
     const holidayTypeValueFormatter = (value: string) => {
         switch (value) {
-        case "weekends": return "주말/공휴일"
-        case "halt": return "운행 중지"
-        default: return "기타"
+        case 'weekends': return '주말/공휴일'
+        case 'halt': return '운행 중지'
+        default: return '기타'
         }
     }
     const calendarTypeValueFormatter = (value: string) => {
         switch (value) {
-        case "solar": return "양력"
-        case "lunar": return "음력"
-        default: return "기타"
+        case 'solar': return '양력'
+        case 'lunar': return '음력'
+        default: return '기타'
         }
     }
     const columns: GridColDef[] = [

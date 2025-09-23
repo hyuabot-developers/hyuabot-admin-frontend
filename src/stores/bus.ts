@@ -1,6 +1,7 @@
-import { create } from "zustand/index"
-import { GridRowModesModel } from "@mui/x-data-grid"
-import { GridModelStore } from "./index.ts"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand/index'
+
+import { GridModelStore } from './index.ts'
 
 type BusTabStore = {
     route: string,
@@ -93,7 +94,7 @@ type BusRealtimeStore = {
 }
 
 export const useBusTabStore = create<BusTabStore>((set) => ({
-    route: "route",
+    route: 'route',
     setRoute: (route: string) => set({ route }),
 }))
 

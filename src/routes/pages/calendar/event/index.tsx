@@ -1,15 +1,16 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { CalendarGrid } from "./grid.tsx"
-import { GridCalendarCategoryItem, useCalendarCategoryStore, useCalendarStore } from "../../../../stores/calendar.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { CalendarGrid } from './grid.tsx'
 import {
     CalendarCategoryResponse,
     CalendarResponse,
     getCalendarCategoryList,
     getCalendarList
-} from "../../../../service/network/calendar.ts"
-import dayjs from "dayjs"
+} from '../../../../service/network/calendar.ts'
+import { GridCalendarCategoryItem, useCalendarCategoryStore, useCalendarStore } from '../../../../stores/calendar.ts'
 
 
 export default function CalendarEventPage() {
@@ -34,7 +35,7 @@ export default function CalendarEventPage() {
         if (response.status === 200) {
             const responseData = response.data
             calendarStore.setRows(responseData.data.map((item: CalendarResponse) => {
-                const category = categoryList.find(category => category.categoryID === item.categoryID)
+                const category = categoryList.find((category) => category.categoryID === item.categoryID)
                 return {
                     id: uuidv4(),
                     eventID: item.id,

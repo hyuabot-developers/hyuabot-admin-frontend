@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { refreshToken } from "./auth.ts"
+
+import { refreshToken } from './auth.ts'
 
 // Get base url from .env file
 const BASE_URL = import.meta.env.VITE_APP_API_URL

@@ -1,13 +1,14 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, Toolbar, ToolbarButton } from "@mui/x-data-grid"
-import { useShuttleRouteStore, useShuttleRouteGridModelStore } from "../../../../stores/shuttle.ts"
-import { getShuttleRoute, ShuttleRouteResponse } from "../../../../service/network/shuttle.ts"
-
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import { Button } from '@mui/material'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function GridToolbar() {
+import { getShuttleRoute, ShuttleRouteResponse } from '../../../../service/network/shuttle.ts'
+import { useShuttleRouteStore, useShuttleRouteGridModelStore } from '../../../../stores/shuttle.ts'
+
+
+export const GridToolbar = () => {
     const rowStore = useShuttleRouteStore()
     const rowModesModelStore = useShuttleRouteGridModelStore()
     const fetchShuttleRoute = async () => {
@@ -33,24 +34,24 @@ export function GridToolbar() {
         rowStore.setRows([
             {
                 id,
-                name: "",
-                tag: "",
-                korean: "",
-                english: "",
-                start: "",
-                end: "",
+                name: '',
+                tag: '',
+                korean: '',
+                english: '',
+                start: '',
+                end: '',
                 isNew: true,
             },
             ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <Toolbar style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <ToolbarButton onClick={fetchShuttleRoute}>
                 <RefreshIcon />
             </ToolbarButton>

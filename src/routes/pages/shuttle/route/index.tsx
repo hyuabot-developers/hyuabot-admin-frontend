@@ -1,14 +1,15 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { ShuttleRouteGrid } from "./grid.tsx"
-import { useShuttleRouteStore, useShuttleStopStore } from "../../../../stores/shuttle.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ShuttleRouteGrid } from './grid.tsx'
 import {
     getShuttleRoute,
     getShuttleStop,
     ShuttleRouteResponse,
     ShuttleStopResponse
-} from "../../../../service/network/shuttle.ts"
+} from '../../../../service/network/shuttle.ts'
+import { useShuttleRouteStore, useShuttleStopStore } from '../../../../stores/shuttle.ts'
 
 export default function ShuttleRoute() {
     // Get the store
@@ -98,7 +99,7 @@ export default function ShuttleRoute() {
             headerName: '출발지',
             width: 200,
             type: 'singleSelect',
-            valueOptions: shuttleStopStore.rows.map(stop => stop.name),
+            valueOptions: shuttleStopStore.rows.map((stop) => stop.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -108,7 +109,7 @@ export default function ShuttleRoute() {
             headerName: '도착지',
             width: 200,
             type: 'singleSelect',
-            valueOptions: shuttleStopStore.rows.map(stop => stop.name),
+            valueOptions: shuttleStopStore.rows.map((stop) => stop.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',

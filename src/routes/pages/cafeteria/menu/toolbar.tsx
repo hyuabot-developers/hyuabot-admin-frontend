@@ -1,19 +1,20 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    GridCafeteriaItem,
-    useCafeteriaItemStore, useCafeteriaMenuStore
-} from "../../../../stores/cafeteria.ts"
+import { Button } from '@mui/material'
+import { GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     CafeteriaMenuResponse,
     CafeteriaResponse,
     getCafeteriaList,
     getCafeteriaMenuList
-} from "../../../../service/network/cafeteria.ts"
+} from '../../../../service/network/cafeteria.ts'
+import {
+    GridCafeteriaItem,
+    useCafeteriaItemStore, useCafeteriaMenuStore
+} from '../../../../stores/cafeteria.ts'
 
-export function Toolbar() {
+export const Toolbar = () => {
     const cafeteriaStore = useCafeteriaItemStore()
     const rowStore = useCafeteriaMenuStore()
     let cafeteriaList: Array<GridCafeteriaItem> = []
@@ -40,7 +41,7 @@ export function Toolbar() {
         if (response.status === 200) {
             const responseData = response.data
             rowStore.setRows(responseData.data.map((item: CafeteriaMenuResponse) => {
-                const cafeteria = cafeteriaList.find(cafeteria => cafeteria.cafeteriaID === item.cafeteriaID)
+                const cafeteria = cafeteriaList.find((cafeteria) => cafeteria.cafeteriaID === item.cafeteriaID)
                 return {
                     id: uuidv4(),
                     date: item.date,
@@ -54,7 +55,7 @@ export function Toolbar() {
         }
     }
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCafeteriaMenu}>
                 새로고침
             </Button>

@@ -1,12 +1,12 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
-
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { getSubwayTimetables, SubwayTimetable } from "../../../../service/network/subway.ts"
-import { useSubwayTimetableStore } from "../../../../stores/subway.ts"
+import { Button } from '@mui/material'
+import { GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { getSubwayTimetables, SubwayTimetable } from '../../../../service/network/subway.ts'
+import { useSubwayTimetableStore } from '../../../../stores/subway.ts'
+
+export const Toolbar = () => {
     const rowStore = useSubwayTimetableStore()
     const fetchSubwayTimetable = async () => {
         const timetableResponse = await getSubwayTimetables()
@@ -27,7 +27,7 @@ export function Toolbar() {
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchSubwayTimetable}>
                 새로고침
             </Button>

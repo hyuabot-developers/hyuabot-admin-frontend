@@ -1,4 +1,4 @@
-import client from "./client.ts"
+import client from './client.ts'
 
 export const getUserInfo = async () => {
     return await client.get('/api/v1/user/profile')

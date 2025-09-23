@@ -1,11 +1,12 @@
-import { Alert, Box, Button, Snackbar, TextField } from "@mui/material"
-import { useState } from "react"
-import { login } from "../../service/network/auth.ts"
-import { AxiosError } from "axios"
+import { Alert, Box, Button, Snackbar, TextField } from '@mui/material'
+import { AxiosError } from 'axios'
+import { useState } from 'react'
+
+import { login } from '../../service/network/auth.ts'
 
 export default function Login() {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
     const [snackbarOpened, setSnackbarOpened] = useState(false)
 
     const handleLogin = async () => {

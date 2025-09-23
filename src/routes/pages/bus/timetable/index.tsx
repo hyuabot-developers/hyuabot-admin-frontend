@@ -1,14 +1,8 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { BusTimetableGrid } from "./grid.tsx"
-import {
-    BusRoute,
-    BusStop,
-    useBusRouteStore,
-    useBusStopStore,
-    useBusTimetableStore
-} from "../../../../stores/bus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { BusTimetableGrid } from './grid.tsx'
 import {
     BusRouteResponse,
     BusStopResponse,
@@ -16,7 +10,14 @@ import {
     getBusRoutes,
     getBusStops,
     getBusTimetables
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import {
+    BusRoute,
+    BusStop,
+    useBusRouteStore,
+    useBusStopStore,
+    useBusTimetableStore
+} from '../../../../stores/bus.ts'
 
 export default function BusTimetable() {
     // Get the store
@@ -49,8 +50,8 @@ export default function BusTimetable() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -73,8 +74,8 @@ export default function BusTimetable() {
         if (timetableResponse.status === 200) {
             const responseData = timetableResponse.data
             busTimetableStore.setRows(responseData.data.map((item: BusTimetableResponse) => {
-                const route = routeData.find(route => route.routeID === item.routeID)
-                const startStop = stopData.find(stop => stop.stopID === item.start)
+                const route = routeData.find((route) => route.routeID === item.routeID)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
                 return {
                     id: uuidv4(),
                     route: `${route?.name} (${route?.routeID})`,
@@ -89,14 +90,14 @@ export default function BusTimetable() {
         fetchBusTimetable().then()
     }, [])
     const busRouteStopFormatter = (value: string) => {
-        return value.split(" ")[0]
+        return value.split(' ')[0]
     }
     const busWeekdaysFormatter = (value: string) => {
         switch (value) {
-        case "weekdays" : return "평일"
-        case "saturday" : return "토요일"
-        case "sunday" : return "공휴일"
-        default: return ""
+        case 'weekdays' : return '평일'
+        case 'saturday' : return '토요일'
+        case 'sunday' : return '공휴일'
+        default: return ''
         }
     }
     // Configure DataGrid
@@ -106,7 +107,7 @@ export default function BusTimetable() {
             headerName: '노선',
             width: 150,
             type: 'singleSelect',
-            valueOptions: busRouteStore.rows.map(route => `${route.name} (${route.routeID})`),
+            valueOptions: busRouteStore.rows.map((route) => `${route.name} (${route.routeID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',
@@ -117,7 +118,7 @@ export default function BusTimetable() {
             headerName: '출발 정류장',
             width: 250,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',

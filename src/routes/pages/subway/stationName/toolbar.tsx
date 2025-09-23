@@ -1,18 +1,17 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
+import AddIcon from '@mui/icons-material/Add'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import { Button } from '@mui/material'
 import {
     GridRowModes,
     GridToolbarContainer
-} from "@mui/x-data-grid"
+} from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
+import { getSubwayStationNames, SubwayStationName } from '../../../../service/network/subway.ts'
+import { useSubwayStationNameGridModelStore, useSubwayStationNameStore } from '../../../../stores/subway.ts'
 
 
-import AddIcon from "@mui/icons-material/Add"
-import RefreshIcon from '@mui/icons-material/Refresh'
-import { useSubwayStationNameGridModelStore, useSubwayStationNameStore } from "../../../../stores/subway.ts"
-import { getSubwayStationNames, SubwayStationName } from "../../../../service/network/subway.ts"
-
-
-export function Toolbar() {
+export const Toolbar = () => {
     const rowStore = useSubwayStationNameStore()
     const rowModesModelStore = useSubwayStationNameGridModelStore()
     const fetchSubwayStationName = async () => {
@@ -33,18 +32,18 @@ export function Toolbar() {
         rowStore.setRows([
             {
                 id,
-                name: "",
+                name: '',
                 isNew: true,
             },
             ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchSubwayStationName}>
                 새로고침
             </Button>

@@ -1,8 +1,8 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { SubwayRealtimeGrid } from "./grid.tsx"
-import { GridSubwayStation, GridSubwayRoute, useSubwayRealtimeStore, useSubwayRouteStore, useSubwayStationStore } from "../../../../stores/subway.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { SubwayRealtimeGrid } from './grid.tsx'
 import {
     SubwayRealtime,
     SubwayRoute,
@@ -10,7 +10,8 @@ import {
     getSubwayRealtime,
     getSubwayRoutes,
     getSubwayStations
-} from "../../../../service/network/subway.ts"
+} from '../../../../service/network/subway.ts'
+import { GridSubwayStation, GridSubwayRoute, useSubwayRealtimeStore, useSubwayRouteStore, useSubwayStationStore } from '../../../../stores/subway.ts'
 
 export default function SubwayRealtimePage() {
     // Get the store
@@ -55,9 +56,9 @@ export default function SubwayRealtimePage() {
         if (realtimeResponse.status === 200) {
             const responseData = realtimeResponse.data
             subwayRealtimeStore.setRows(responseData.data.map((item: SubwayRealtime) => {
-                const departureStation = stationData.find(station => station.stationID === item.stationID)
-                const terminalStation = stationData.find(station => station.stationID === item.terminalStationID)
-                const routeName = routeData.find(route => route.routeID === departureStation?.routeID)?.name
+                const departureStation = stationData.find((station) => station.stationID === item.stationID)
+                const terminalStation = stationData.find((station) => station.stationID === item.terminalStationID)
+                const routeName = routeData.find((route) => route.routeID === departureStation?.routeID)?.name
                 return {
                     id: uuidv4(),
                     sortID: `${item.stationID}-${headingSortFormatter(item.heading)}-${item.sequence}`,

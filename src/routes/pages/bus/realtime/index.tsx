@@ -1,8 +1,8 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { BusRealtimeGrid } from "./grid.tsx"
-import { BusRoute, BusStop, useBusRealtimeStore, useBusRouteStore, useBusStopStore } from "../../../../stores/bus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { BusRealtimeGrid } from './grid.tsx'
 import {
     BusRealtimeResponse,
     BusRouteResponse,
@@ -10,7 +10,8 @@ import {
     getBusRealtime,
     getBusRoutes,
     getBusStops
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import { BusRoute, BusStop, useBusRealtimeStore, useBusRouteStore, useBusStopStore } from '../../../../stores/bus.ts'
 
 export default function BusRealtime() {
     // Get the store
@@ -43,8 +44,8 @@ export default function BusRealtime() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -70,8 +71,8 @@ export default function BusRealtime() {
             busRealtimeStore.setRows(responseData.data.map((item: BusRealtimeResponse) => {
                 return {
                     id: uuidv4(),
-                    routeName: routeData.find(route => route.routeID === item.routeID)?.name || "",
-                    stopName: stopData.find(stop => stop.stopID === item.stopID)?.name || "",
+                    routeName: routeData.find((route) => route.routeID === item.routeID)?.name || '',
+                    stopName: stopData.find((stop) => stop.stopID === item.stopID)?.name || '',
                     sequence: item.sequence,
                     stop: item.stop,
                     time: item.time,

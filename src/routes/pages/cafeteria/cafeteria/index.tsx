@@ -1,11 +1,12 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { CafeteriaGrid } from "./grid.tsx"
-import { useCafeteriaItemStore } from "../../../../stores/cafeteria.ts"
-import { CafeteriaResponse, getCafeteriaList } from "../../../../service/network/cafeteria.ts"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
-import { useCampusStore } from "../../../../stores/campus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { CafeteriaGrid } from './grid.tsx'
+import { CafeteriaResponse, getCafeteriaList } from '../../../../service/network/cafeteria.ts'
+import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
+import { useCafeteriaItemStore } from '../../../../stores/cafeteria.ts'
+import { useCampusStore } from '../../../../stores/campus.ts'
 
 export default function CafeteriaPage() {
     // Get the store
@@ -28,7 +29,7 @@ export default function CafeteriaPage() {
         if (response.status === 200) {
             const responseData = response.data
             cafeteriaStore.setRows(responseData.data.map((item: CafeteriaResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
+                const campus = campusList.find((campus) => campus.id === item.campusID)
                 return {
                     id: uuidv4(),
                     cafeteriaID: item.id,

@@ -1,9 +1,10 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { SubwayStationNameGrid } from "./grid.tsx"
-import { useSubwayStationNameStore } from "../../../../stores/subway.ts"
-import { SubwayStationName, getSubwayStationNames } from "../../../../service/network/subway.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { SubwayStationNameGrid } from './grid.tsx'
+import { SubwayStationName, getSubwayStationNames } from '../../../../service/network/subway.ts'
+import { useSubwayStationNameStore } from '../../../../stores/subway.ts'
 
 export default function SubwayStationNamePage() {
     // Get the store

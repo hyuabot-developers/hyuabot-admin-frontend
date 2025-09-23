@@ -1,15 +1,16 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { BusRouteStopGrid } from "./grid.tsx"
-import { BusRoute, BusStop, useBusRouteStopStore, useBusRouteStore, useBusStopStore } from "../../../../stores/bus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { BusRouteStopGrid } from './grid.tsx'
 import {
     BusRouteResponse, BusRouteStopResponse,
     BusStopResponse,
     getBusRoutes,
     getBusRouteStops,
     getBusStops
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import { BusRoute, BusStop, useBusRouteStopStore, useBusRouteStore, useBusStopStore } from '../../../../stores/bus.ts'
 
 export default function BusRouteStop() {
     // Get the store
@@ -42,8 +43,8 @@ export default function BusRouteStop() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -66,9 +67,9 @@ export default function BusRouteStop() {
         if (routeStopResponse.status === 200) {
             const responseData = routeStopResponse.data
             busRouteStopStore.setRows(responseData.data.map((item: BusRouteStopResponse) => {
-                const route = routeData.find(route => route.routeID === item.routeID)
-                const stop = stopData.find(stop => stop.stopID === item.stopID)
-                const startStop = stopData.find(stop => stop.stopID === item.startStopID)
+                const route = routeData.find((route) => route.routeID === item.routeID)
+                const stop = stopData.find((stop) => stop.stopID === item.stopID)
+                const startStop = stopData.find((stop) => stop.stopID === item.startStopID)
                 return {
                     id: uuidv4(),
                     route: `${route?.name} (${route?.routeID})`,
@@ -84,7 +85,7 @@ export default function BusRouteStop() {
         fetchBusRouteStop().then()
     }, [])
     const busRouteStopFormatter = (value: string) => {
-        return value.split(" ")[0]
+        return value.split(' ')[0]
     }
     // Configure DataGrid
     const columns: GridColDef[] = [
@@ -93,7 +94,7 @@ export default function BusRouteStop() {
             headerName: '노선',
             width: 150,
             type: 'singleSelect',
-            valueOptions: busRouteStore.rows.map(route => `${route.name} (${route.routeID})`),
+            valueOptions: busRouteStore.rows.map((route) => `${route.name} (${route.routeID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',
@@ -104,7 +105,7 @@ export default function BusRouteStop() {
             headerName: '정류장',
             width: 250,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',
@@ -124,7 +125,7 @@ export default function BusRouteStop() {
             headerName: '출발 정류장',
             width: 250,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',

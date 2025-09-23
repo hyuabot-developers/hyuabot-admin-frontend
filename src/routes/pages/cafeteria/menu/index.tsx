@@ -1,15 +1,16 @@
+import { GridColDef } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { GridColDef } from '@mui/x-data-grid'
+
 import { CafeteriaMenuGrid } from './grid.tsx'
-import { GridCafeteriaItem, useCafeteriaItemStore, useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
 import {
     CafeteriaMenuResponse,
     CafeteriaResponse,
     getCafeteriaList,
     getCafeteriaMenuList
 } from '../../../../service/network/cafeteria.ts'
-import dayjs from "dayjs"
+import { GridCafeteriaItem, useCafeteriaItemStore, useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
 
 
 export default function CafeteriaMenuPage() {
@@ -40,7 +41,7 @@ export default function CafeteriaMenuPage() {
         if (response.status === 200) {
             const responseData = response.data
             menuStore.setRows(responseData.data.map((item: CafeteriaMenuResponse) => {
-                const cafeteria = cafeteriaList.find(cafeteria => cafeteria.cafeteriaID === item.cafeteriaID)
+                const cafeteria = cafeteriaList.find((cafeteria) => cafeteria.cafeteriaID === item.cafeteriaID)
                 return {
                     id: uuidv4(),
                     date: item.date,

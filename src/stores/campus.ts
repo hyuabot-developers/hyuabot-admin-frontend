@@ -1,5 +1,6 @@
-import { create } from "zustand"
-import { CampusResponse } from "../service/network/campus.ts"
+import { create } from 'zustand'
+
+import { CampusResponse } from '../service/network/campus.ts'
 
 type CampusStore = {
     rows: Array<CampusResponse>,

@@ -1,7 +1,8 @@
-import { create } from "zustand"
-import { devtools } from "zustand/middleware"
-import { GridRowModesModel } from "@mui/x-data-grid"
-import { GridModelStore } from "./index.ts"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+
+import { GridModelStore } from './index.ts'
 
 type ShuttleTabStore = {
     route: string,
@@ -98,10 +99,10 @@ type ShuttleTimetableStore = {
 export const useShuttleTabStore = create(
     devtools<ShuttleTabStore>(
         (set) => ({
-            route: "period",
+            route: 'period',
             setRoute: (route: string) => set({ route }),
         }),
-        { name: "ShuttleTabStore" }
+        { name: 'ShuttleTabStore' }
     )
 )
 
@@ -115,7 +116,7 @@ export const useShuttlePeriodStore = create(
                 set({ rows })
             },
         }),
-        { name: "ShuttlePeriodStore" }
+        { name: 'ShuttlePeriodStore' }
     )
 )
 
@@ -125,7 +126,7 @@ export const useShuttlePeriodGridModelStore = create(
             rowModesModel: {},
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
-        { name: "ShuttlePeriodGridModelStore" }
+        { name: 'ShuttlePeriodGridModelStore' }
     )
 )
 
@@ -139,7 +140,7 @@ export const useShuttleHolidayStore = create(
                 set({ rows })
             },
         }),
-        { name: "ShuttleHolidayStore" }
+        { name: 'ShuttleHolidayStore' }
     )
 )
 
@@ -149,7 +150,7 @@ export const useShuttleHolidayGridModelStore = create(
             rowModesModel: {},
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
-        { name: "ShuttleHolidayGridModelStore" }
+        { name: 'ShuttleHolidayGridModelStore' }
     )
 )
 
@@ -163,7 +164,7 @@ export const useShuttleRouteStore = create(
                 set({ rows })
             },
         }),
-        { name: "ShuttleRouteStore" }
+        { name: 'ShuttleRouteStore' }
     )
 )
 
@@ -173,7 +174,7 @@ export const useShuttleRouteGridModelStore = create(
             rowModesModel: {},
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
-        { name: "ShuttleRouteGridModelStore" }
+        { name: 'ShuttleRouteGridModelStore' }
     )
 )
 
@@ -187,7 +188,7 @@ export const useShuttleStopStore = create(
                 set({ rows })
             },
         }),
-        { name: "ShuttleStopStore" }
+        { name: 'ShuttleStopStore' }
     )
 )
 
@@ -197,7 +198,7 @@ export const useShuttleStopGridModelStore = create(
             rowModesModel: {},
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
-        { name: "ShuttleStopGridModelStore" }
+        { name: 'ShuttleStopGridModelStore' }
     )
 )
 
@@ -211,7 +212,7 @@ export const useShuttleRouteStopStore = create(
                 set({ rows })
             },
         }),
-        { name: "ShuttleRouteStopStore" }
+        { name: 'ShuttleRouteStopStore' }
     )
 )
 
@@ -221,7 +222,7 @@ export const useShuttleRouteStopGridModelStore = create(
             rowModesModel: {},
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
-        { name: "ShuttleRouteStopGridModelStore" }
+        { name: 'ShuttleRouteStopGridModelStore' }
     )
 )
 
@@ -231,7 +232,7 @@ export const useSelectedShuttleRouteStore = create(
         (set) => ({
             selectedRoute: null,
             setSelectedRoute: (route: string) => set({ selectedRoute: route }),
-        }), { name: "SelectedShuttleRouteStore" }
+        }), { name: 'SelectedShuttleRouteStore' }
     )
 )
 
@@ -245,7 +246,7 @@ export const useShuttleTimetableStore = create(
                 set({ rows })
             },
         }),
-        { name: "ShuttleTimetableStore" }
+        { name: 'ShuttleTimetableStore' }
     )
 )
 
@@ -255,6 +256,6 @@ export const useShuttleTimetableGridModelStore = create(
             rowModesModel: {},
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
-        { name: "ShuttleTimetableGridModelStore" }
+        { name: 'ShuttleTimetableGridModelStore' }
     )
 )

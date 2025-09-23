@@ -1,9 +1,10 @@
+import { GridColDef } from '@mui/x-data-grid'
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { GridColDef } from '@mui/x-data-grid'
+
 import { ContactCategoryGrid } from './grid.tsx'
-import { useContactCategoryStore } from "../../../../stores/contact.ts"
-import { ContactCategoryResponse, getContactCategoryList } from "../../../../service/network/contact.ts"
+import { ContactCategoryResponse, getContactCategoryList } from '../../../../service/network/contact.ts'
+import { useContactCategoryStore } from '../../../../stores/contact.ts'
 
 
 export default function ContactCategoryPage() {

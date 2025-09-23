@@ -1,13 +1,14 @@
-import { v4 as uuidv4 } from "uuid"
-import {GridRowModes, Toolbar, ToolbarButton} from "@mui/x-data-grid"
-import { useShuttleHolidayGridModelStore, useShuttleHolidayStore } from "../../../../stores/shuttle.ts"
-import { getShuttleHoliday, ShuttleHolidayResponse } from "../../../../service/network/shuttle.ts"
 
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import dayjs from "dayjs"
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { v4 as uuidv4 } from 'uuid'
 
-export function GridToolbar() {
+import { getShuttleHoliday, ShuttleHolidayResponse } from '../../../../service/network/shuttle.ts'
+import { useShuttleHolidayGridModelStore, useShuttleHolidayStore } from '../../../../stores/shuttle.ts'
+
+export const GridToolbar = () => {
     const rowStore = useShuttleHolidayStore()
     const rowModesModelStore = useShuttleHolidayGridModelStore()
     const fetchShuttleHoliday = async () => {
@@ -32,8 +33,8 @@ export function GridToolbar() {
             {
                 id,
                 seq: null,
-                type: "",
-                calendarType: "",
+                type: '',
+                calendarType: '',
                 date: null,
                 isNew: true,
             },
@@ -41,7 +42,7 @@ export function GridToolbar() {
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "type" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'type' },
         }))
     }
 

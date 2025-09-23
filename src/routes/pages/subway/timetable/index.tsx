@@ -1,9 +1,10 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { SubwayTimetableGrid } from "./grid.tsx"
-import { useSubwayTimetableStore } from "../../../../stores/subway.ts"
-import { getSubwayTimetables, SubwayTimetable } from "../../../../service/network/subway.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { SubwayTimetableGrid } from './grid.tsx'
+import { getSubwayTimetables, SubwayTimetable } from '../../../../service/network/subway.ts'
+import { useSubwayTimetableStore } from '../../../../stores/subway.ts'
 
 export default function SubwayTimetablePage() {
     // Get the store

@@ -1,10 +1,11 @@
-import dayjs from "dayjs"
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef, GridRowModes, GridRowModesModel } from "@mui/x-data-grid"
-import { ShuttlePeriodGrid } from "./grid.tsx"
-import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
-import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
+import { GridColDef, GridRowModes, GridRowModesModel } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ShuttlePeriodGrid } from './grid.tsx'
+import { getShuttlePeriod, ShuttlePeriodResponse } from '../../../../service/network/shuttle.ts'
+import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from '../../../../stores/shuttle.ts'
 
 export default function Period() {
     // Get the store
@@ -36,17 +37,17 @@ export default function Period() {
     useEffect(() => { fetchShuttlePeriod().then() }, [])
     // Configure DataGrid
     const startDateValueFormatter = (value: Date) => {
-        return dayjs(value).format("YYYY-MM-DD HH:mm:ss")
+        return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     }
     const endDateValueFormatter = (value: Date) => {
-        return dayjs(value).format("YYYY-MM-DD HH:mm:ss")
+        return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     }
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
-        case "semester": return "학기"
-        case "vacation": return "방학"
-        case "vacation_session": return "계절학기"
-        default: return "기타"
+        case 'semester': return '학기'
+        case 'vacation': return '방학'
+        case 'vacation_session': return '계절학기'
+        default: return '기타'
         }
     }
     const columns: GridColDef[] = [

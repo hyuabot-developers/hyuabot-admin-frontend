@@ -1,12 +1,13 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { useCalendarCategoryGridModelStore, useCalendarCategoryStore } from "../../../../stores/calendar.ts"
-import { CalendarCategoryResponse, getCalendarCategoryList } from "../../../../service/network/calendar.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { CalendarCategoryResponse, getCalendarCategoryList } from '../../../../service/network/calendar.ts'
+import { useCalendarCategoryGridModelStore, useCalendarCategoryStore } from '../../../../stores/calendar.ts'
+
+export const Toolbar = () => {
     // Get the store
     const rowStore = useCalendarCategoryStore()
     const rowModesModelStore = useCalendarCategoryGridModelStore()
@@ -32,18 +33,18 @@ export function Toolbar() {
             {
                 id,
                 categoryID: rowStore.rows.length ? rowStore.rows[rowStore.rows.length - 1].categoryID + 1 : 1,
-                name: "",
+                name: '',
                 isNew: true,
             },
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCalendarCategory}>
                 새로고침
             </Button>

@@ -1,9 +1,10 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { BusRouteGrid } from "./grid.tsx"
-import { BusStop, useBusRouteStore, useBusStopStore } from "../../../../stores/bus.ts"
-import { BusRouteResponse, BusStopResponse, getBusRoutes, getBusStops } from "../../../../service/network/bus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { BusRouteGrid } from './grid.tsx'
+import { BusRouteResponse, BusStopResponse, getBusRoutes, getBusStops } from '../../../../service/network/bus.ts'
+import { BusStop, useBusRouteStore, useBusStopStore } from '../../../../stores/bus.ts'
 
 export default function BusRoute() {
     // Get the store
@@ -34,8 +35,8 @@ export default function BusRoute() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             busRouteStore.setRows(responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -55,10 +56,10 @@ export default function BusRoute() {
         }
     }
     const busTimeFormatter = (value: string) => {
-        return value.split("+")[0]
+        return value.split('+')[0]
     }
     const busStopFormatter = (value: string) => {
-        return value.split(" ")[0]
+        return value.split(' ')[0]
     }
     useEffect(() => {
         async function fetchData() {
@@ -101,7 +102,7 @@ export default function BusRoute() {
             headerName: '출발지',
             width: 200,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busStopFormatter,
             headerAlign: 'center',
@@ -112,7 +113,7 @@ export default function BusRoute() {
             headerName: '도착지',
             width: 200,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busStopFormatter,
             headerAlign: 'center',

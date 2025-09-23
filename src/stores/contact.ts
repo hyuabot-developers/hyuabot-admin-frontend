@@ -1,6 +1,7 @@
-import { create } from "zustand"
-import { GridModelStore } from "./index.ts"
-import { GridRowModesModel } from "@mui/x-data-grid"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand'
+
+import { GridModelStore } from './index.ts'
 
 type ContactTabStore = {
     route: string,
@@ -36,7 +37,7 @@ type ContactStore = {
 }
 
 export const useContactTabStore = create<ContactTabStore>((set) => ({
-    route: "category",
+    route: 'category',
     setRoute: (route) => set({ route }),
 }))
 

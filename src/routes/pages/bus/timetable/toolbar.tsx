@@ -1,16 +1,9 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-
-
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    BusRoute,
-    BusStop,
-    useBusRouteStore,
-    useBusStopStore, useBusTimetableGridModelStore, useBusTimetableStore
-} from "../../../../stores/bus.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     BusRouteResponse,
     BusStopResponse,
@@ -18,9 +11,15 @@ import {
     getBusRoutes,
     getBusStops,
     getBusTimetables
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import {
+    BusRoute,
+    BusStop,
+    useBusRouteStore,
+    useBusStopStore, useBusTimetableGridModelStore, useBusTimetableStore
+} from '../../../../stores/bus.ts'
 
-export function Toolbar() {
+export const Toolbar = () => {
     const rowStore = useBusTimetableStore()
     const rowModesModelStore = useBusTimetableGridModelStore()
     const busRouteStore = useBusRouteStore()
@@ -51,8 +50,8 @@ export function Toolbar() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -75,8 +74,8 @@ export function Toolbar() {
         if (timetableResponse.status === 200) {
             const responseData = timetableResponse.data
             rowStore.setRows(responseData.data.map((item: BusTimetableResponse) => {
-                const route = routeData.find(route => route.routeID === item.routeID)
-                const startStop = stopData.find(stop => stop.stopID === item.start)
+                const route = routeData.find((route) => route.routeID === item.routeID)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
                 return {
                     id: uuidv4(),
                     route: `${route?.name} (${route?.routeID})`,
@@ -95,20 +94,20 @@ export function Toolbar() {
                 id,
                 route: `${busRouteStore.rows[0].name} (${busRouteStore.rows[0].routeID})`,
                 startStop: `${busStopStore.rows[0].name} (${busStopStore.rows[0].stopID})`,
-                weekdays: "weekdays",
-                departureTime: "00:00:00",
+                weekdays: 'weekdays',
+                departureTime: '00:00:00',
                 isNew: true,
             },
             ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBusTimetable}>
                 새로고침
             </Button>

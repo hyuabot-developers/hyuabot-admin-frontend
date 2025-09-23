@@ -1,26 +1,25 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-
-
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    BusRoute,
-    BusStop,
-    useBusRouteStopGridModelStore, useBusRouteStopStore,
-    useBusRouteStore,
-    useBusStopStore
-} from "../../../../stores/bus.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     BusRouteResponse, BusRouteStopResponse,
     BusStopResponse,
     getBusRoutes,
     getBusRouteStops,
     getBusStops
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import {
+    BusRoute,
+    BusStop,
+    useBusRouteStopGridModelStore, useBusRouteStopStore,
+    useBusRouteStore,
+    useBusStopStore
+} from '../../../../stores/bus.ts'
 
-export function Toolbar() {
+export const Toolbar = () => {
     const rowStore = useBusRouteStopStore()
     const rowModesModelStore = useBusRouteStopGridModelStore()
     const busRouteStore = useBusRouteStore()
@@ -51,8 +50,8 @@ export function Toolbar() {
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
             routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+                const startStop = stopData.find((stop) => stop.stopID === item.start)
+                const endStop = stopData.find((stop) => stop.stopID === item.end)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
@@ -75,9 +74,9 @@ export function Toolbar() {
         if (routeStopResponse.status === 200) {
             const responseData = routeStopResponse.data
             rowStore.setRows(responseData.data.map((item: BusRouteStopResponse) => {
-                const route = routeData.find(route => route.routeID === item.routeID)
-                const stop = stopData.find(stop => stop.stopID === item.stopID)
-                const startStop = stopData.find(stop => stop.stopID === item.startStopID)
+                const route = routeData.find((route) => route.routeID === item.routeID)
+                const stop = stopData.find((stop) => stop.stopID === item.stopID)
+                const startStop = stopData.find((stop) => stop.stopID === item.startStopID)
                 return {
                     id: uuidv4(),
                     route: `${route?.name} (${route?.routeID})`,
@@ -106,12 +105,12 @@ export function Toolbar() {
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBusRouteStop}>
                 새로고침
             </Button>

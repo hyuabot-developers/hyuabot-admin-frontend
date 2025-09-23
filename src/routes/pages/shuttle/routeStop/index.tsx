@@ -1,9 +1,10 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { ShuttleRouteStopGrid } from "./grid.tsx"
-import { useShuttleStopStore } from "../../../../stores/shuttle.ts"
-import { getShuttleStop, ShuttleStopResponse } from "../../../../service/network/shuttle.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ShuttleRouteStopGrid } from './grid.tsx'
+import { getShuttleStop, ShuttleStopResponse } from '../../../../service/network/shuttle.ts'
+import { useShuttleStopStore } from '../../../../stores/shuttle.ts'
 
 export default function ShuttleRouteStop() {
     // Get the store
@@ -33,7 +34,7 @@ export default function ShuttleRouteStop() {
             minWidth: 150,
             flex: 1,
             type: 'singleSelect',
-            valueOptions: shuttleStopStore.rows.map(stop => stop.name),
+            valueOptions: shuttleStopStore.rows.map((stop) => stop.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',

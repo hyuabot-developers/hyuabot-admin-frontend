@@ -1,16 +1,17 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { ContactGrid } from "./grid.tsx"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
-import { useCampusStore } from "../../../../stores/campus.ts"
-import { GridContactCategoryItem, useContactCategoryStore, useContactStore } from "../../../../stores/contact.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ContactGrid } from './grid.tsx'
+import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
 import {
     ContactCategoryResponse,
     ContactResponse,
     getContactCategoryList,
     getContactList
-} from "../../../../service/network/contact.ts"
+} from '../../../../service/network/contact.ts'
+import { useCampusStore } from '../../../../stores/campus.ts'
+import { GridContactCategoryItem, useContactCategoryStore, useContactStore } from '../../../../stores/contact.ts'
 
 
 export default function ERICAContactPage() {
@@ -48,8 +49,8 @@ export default function ERICAContactPage() {
         if (response.status === 200) {
             const responseData = response.data
             contactStore.setRows(responseData.data.map((item: ContactResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
-                const category = categoryList.find(category => category.categoryID === item.categoryID)
+                const campus = campusList.find((campus) => campus.id === item.campusID)
+                const category = categoryList.find((category) => category.categoryID === item.categoryID)
                 return {
                     id: uuidv4(),
                     contactID: item.id,

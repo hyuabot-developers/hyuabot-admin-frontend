@@ -1,9 +1,10 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { SubwayRouteGrid } from "./grid.tsx"
-import { useSubwayRouteStore } from "../../../../stores/subway.ts"
-import { SubwayRoute, getSubwayRoutes } from "../../../../service/network/subway.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { SubwayRouteGrid } from './grid.tsx'
+import { SubwayRoute, getSubwayRoutes } from '../../../../service/network/subway.ts'
+import { useSubwayRouteStore } from '../../../../stores/subway.ts'
 
 export default function SubwayRoutePage() {
     // Get the store

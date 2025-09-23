@@ -1,20 +1,21 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { SubwayStationGrid } from "./grid.tsx"
-import {
-    GridSubwayRoute,
-    useSubwayRouteStore,
-    useSubwayStationNameStore,
-    useSubwayStationStore
-} from "../../../../stores/subway.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { SubwayStationGrid } from './grid.tsx'
 import {
     getSubwayRoutes,
     getSubwayStationNames,
     getSubwayStations,
     SubwayRoute,
     SubwayStation
-} from "../../../../service/network/subway.ts"
+} from '../../../../service/network/subway.ts'
+import {
+    GridSubwayRoute,
+    useSubwayRouteStore,
+    useSubwayStationNameStore,
+    useSubwayStationStore
+} from '../../../../stores/subway.ts'
 
 export default function SubwayStationPage() {
     // Get the store
@@ -82,7 +83,7 @@ export default function SubwayStationPage() {
             headerName: '노선 ID',
             width: 150,
             type: 'singleSelect',
-            valueOptions: subwayRouteStore.rows.map(route => route.routeID),
+            valueOptions: subwayRouteStore.rows.map((route) => route.routeID),
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -102,7 +103,7 @@ export default function SubwayStationPage() {
             minWidth: 250,
             flex: 1,
             type: 'singleSelect',
-            valueOptions: subwayStationNameStore.rows.map(station => station.name),
+            valueOptions: subwayStationNameStore.rows.map((station) => station.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',

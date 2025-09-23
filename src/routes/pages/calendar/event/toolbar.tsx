@@ -1,23 +1,24 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    GridCalendarCategoryItem,
-    useCalendarCategoryStore,
-    useCalendarGridModelStore,
-    useCalendarStore
-} from "../../../../stores/calendar.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     CalendarCategoryResponse,
     CalendarResponse,
     getCalendarCategoryList,
     getCalendarList
-} from "../../../../service/network/calendar.ts"
+} from '../../../../service/network/calendar.ts'
+import {
+    GridCalendarCategoryItem,
+    useCalendarCategoryStore,
+    useCalendarGridModelStore,
+    useCalendarStore
+} from '../../../../stores/calendar.ts'
 
 
-export function Toolbar() {
+export const Toolbar = () => {
     // Get the store
     const rowModesModelStore = useCalendarGridModelStore()
     const categoryStore = useCalendarCategoryStore()
@@ -40,7 +41,7 @@ export function Toolbar() {
         if (response.status === 200) {
             const responseData = response.data
             rowStore.setRows(responseData.data.map((item: CalendarResponse) => {
-                const category = categoryList.find(category => category.categoryID === item.categoryID)
+                const category = categoryList.find((category) => category.categoryID === item.categoryID)
                 return {
                     id: uuidv4(),
                     eventID: item.id,
@@ -62,22 +63,22 @@ export function Toolbar() {
                 id,
                 eventID: rowStore.rows.length ? rowStore.rows[rowStore.rows.length - 1].eventID + 1 : 1,
                 category: `${category?.name} (${category?.categoryID})`,
-                title: "",
-                description: "",
-                start: "2999-12-31",
-                end: "2999-12-31",
+                title: '',
+                description: '',
+                start: '2999-12-31',
+                end: '2999-12-31',
                 isNew: true,
             },
             ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "title" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'title' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCalendar}>
                 새로고침
             </Button>

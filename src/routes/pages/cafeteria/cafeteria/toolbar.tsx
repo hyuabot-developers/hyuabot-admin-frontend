@@ -1,14 +1,15 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { useCafeteriaItemGridModelStore, useCafeteriaItemStore } from "../../../../stores/cafeteria.ts"
-import { useCampusStore } from "../../../../stores/campus.ts"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
-import { CafeteriaResponse, getCafeteriaList } from "../../../../service/network/cafeteria.ts"
+import { Button } from '@mui/material'
+import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { CafeteriaResponse, getCafeteriaList } from '../../../../service/network/cafeteria.ts'
+import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
+import { useCafeteriaItemGridModelStore, useCafeteriaItemStore } from '../../../../stores/cafeteria.ts'
+import { useCampusStore } from '../../../../stores/campus.ts'
+
+export const Toolbar = () => {
     const campusStore = useCampusStore()
     const rowStore = useCafeteriaItemStore()
     const rowModesModelStore = useCafeteriaItemGridModelStore()
@@ -29,7 +30,7 @@ export function Toolbar() {
         if (response.status === 200) {
             const responseData = response.data
             rowStore.setRows(responseData.data.map((item: CafeteriaResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
+                const campus = campusList.find((campus) => campus.id === item.campusID)
                 return {
                     id: uuidv4(),
                     cafeteriaID: item.id,
@@ -53,24 +54,24 @@ export function Toolbar() {
             {
                 id,
                 cafeteriaID: 0,
-                name: "",
+                name: '',
                 campus: `${campus?.name} (${campus?.id})`,
                 latitude: 0,
                 longitude: 0,
-                breakfastTime: "",
-                lunchTime: "",
-                dinnerTime: "",
+                breakfastTime: '',
+                lunchTime: '',
+                dinnerTime: '',
                 isNew: true,
             },
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "cafeteriaID" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'cafeteriaID' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
+        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
             <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCafeteriaList}>
                 새로고침
             </Button>
