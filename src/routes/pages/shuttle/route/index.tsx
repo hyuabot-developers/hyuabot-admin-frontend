@@ -9,12 +9,11 @@ import {
     ShuttleRouteResponse,
     ShuttleStopResponse
 } from '../../../../service/network/shuttle.ts'
-import { useShuttleRouteStore, useShuttleStopStore } from '../../../../stores/shuttle.ts'
+import { useShuttleRouteStore } from '../../../../stores/shuttle.ts'
 
 export default function ShuttleRoute() {
     // Get the store
     const shuttleRouteStore = useShuttleRouteStore()
-    const shuttleStopStore = useShuttleStopStore()
     // Fetch shuttle period
     const fetchShuttleRoute = async () => {
         const response = await getShuttleRoute()
@@ -37,7 +36,7 @@ export default function ShuttleRoute() {
         const response = await getShuttleStop()
         if (response.status === 200) {
             const responseData = response.data
-            shuttleStopStore.setRows(responseData.result.map((item: ShuttleStopResponse) => {
+            shuttleRouteStore.setStops(responseData.result.map((item: ShuttleStopResponse) => {
                 return {
                     id: uuidv4(),
                     name: item.name,
@@ -99,7 +98,7 @@ export default function ShuttleRoute() {
             headerName: '출발지',
             width: 200,
             type: 'singleSelect',
-            valueOptions: shuttleStopStore.rows.map((stop) => stop.name),
+            valueOptions: shuttleRouteStore.stops.map((stop) => stop.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -109,7 +108,7 @@ export default function ShuttleRoute() {
             headerName: '도착지',
             width: 200,
             type: 'singleSelect',
-            valueOptions: shuttleStopStore.rows.map((stop) => stop.name),
+            valueOptions: shuttleRouteStore.stops.map((stop) => stop.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',

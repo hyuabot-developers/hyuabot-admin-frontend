@@ -23,7 +23,7 @@ import {
 import {
     ShuttleTimetable,
     useShuttleTimetableStore,
-    useShuttleTimetableGridModelStore, useSelectedShuttleRouteStore,
+    useShuttleTimetableGridModelStore,
 } from '../../../../stores/shuttle.ts'
 
 interface GridProps {
@@ -33,7 +33,6 @@ interface GridProps {
 export const ShuttleTimetableGrid = (props: GridProps) => {
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
-    const selectedShuttleRouteStore = useSelectedShuttleRouteStore()
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
 
@@ -52,8 +51,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View } })
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
-        const { rows } = useShuttleTimetableStore.getState()
-        const { selectedRoute } = useSelectedShuttleRouteStore.getState()
+        const { rows, selectedRoute } = useShuttleTimetableStore.getState()
         const rowToDelete = rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
         if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
@@ -80,7 +78,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         }
         if (newRow.isNew) {
             const response = await createShuttleTimetable(
-                selectedShuttleRouteStore.selectedRoute!, {
+                rowStore.selectedRoute!, {
                     period: newRow.period,
                     weekdays: newRow.weekdays,
                     departureTime: newRow.time,
@@ -97,7 +95,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
             rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
             return updatedRow
         } else if (newRow.seq !== null) {
-            const response = await updateShuttleTimetable(selectedShuttleRouteStore.selectedRoute!, newRow.seq, {
+            const response = await updateShuttleTimetable(rowStore.selectedRoute!, newRow.seq, {
                 period: newRow.period,
                 weekdays: newRow.weekdays,
                 departureTime: newRow.time,

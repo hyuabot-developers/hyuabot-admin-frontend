@@ -13,20 +13,17 @@ import {
 import {
     useShuttleTimetableStore,
     useShuttleTimetableGridModelStore,
-    useShuttleRouteStore, useSelectedShuttleRouteStore
 } from '../../../../stores/shuttle.ts'
 
 
 export const GridToolbar = () => {
-    const routeStore = useShuttleRouteStore()
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
-    const selectedRouteStore = useSelectedShuttleRouteStore()
     const fetchShuttleRoute = async () => {
         const response = await getShuttleRoute()
         if (response.status === 200) {
             const responseData = response.data
-            routeStore.setRows(responseData.result.map((item: ShuttleRouteResponse) => {
+            rowStore.setRoutes(responseData.result.map((item: ShuttleRouteResponse) => {
                 return {
                     id: uuidv4(),
                     name: item.name,
@@ -56,7 +53,7 @@ export const GridToolbar = () => {
     }
     const onChangeSelectedRoute = (value: string | null) => {
         if (value) {
-            selectedRouteStore.setSelectedRoute(value)
+            rowStore.setSelectedRoute(value)
             fetchShuttleTimetable(value).then()
         }
     }
@@ -87,7 +84,7 @@ export const GridToolbar = () => {
             <Autocomplete
                 size="small"
                 disablePortal={true}
-                options={routeStore.rows.map((route) => route.name)}
+                options={rowStore.routes.map((route) => route.name)}
                 sx={{ width: 300, marginRight: 2 }}
                 renderInput={(params) => <TextField {...params} label="셔틀버스 노선" />}
                 onChange={(_, value) => onChangeSelectedRoute(value)}

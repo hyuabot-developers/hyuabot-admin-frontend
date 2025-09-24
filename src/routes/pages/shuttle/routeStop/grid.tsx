@@ -24,7 +24,6 @@ import {
     ShuttleRouteStop,
     useShuttleRouteStopStore,
     useShuttleRouteStopGridModelStore,
-    useSelectedShuttleRouteStore,
 } from '../../../../stores/shuttle.ts'
 
 interface GridProps {
@@ -34,7 +33,6 @@ interface GridProps {
 export const ShuttleRouteStopGrid = (props: GridProps) => {
     const rowStore = useShuttleRouteStopStore()
     const rowModesModelStore = useShuttleRouteStopGridModelStore()
-    const selectedShuttleRouteStore = useSelectedShuttleRouteStore()
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
 
@@ -53,8 +51,7 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View } })
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
-        const { rows } = useShuttleRouteStopStore.getState()
-        const { selectedRoute } = useSelectedShuttleRouteStore.getState()
+        const { rows, selectedRoute } = useShuttleRouteStopStore.getState()
         const rowToDelete = rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
         const response = await deleteShuttleRouteStop(selectedRoute!, rowToDelete.stop)
@@ -79,7 +76,7 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
             return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
-            const response = await createShuttleRouteStop(selectedShuttleRouteStore.selectedRoute!, {
+            const response = await createShuttleRouteStop(rowStore.selectedRoute!, {
                 stopName: newRow.stop,
                 order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
@@ -91,7 +88,7 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         } else {
-            const response = await updateShuttleRouteStop(selectedShuttleRouteStore.selectedRoute!, newRow.stop, {
+            const response = await updateShuttleRouteStop(rowStore.selectedRoute!, newRow.stop, {
                 order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
             })

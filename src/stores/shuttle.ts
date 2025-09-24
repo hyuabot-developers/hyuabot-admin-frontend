@@ -4,11 +4,6 @@ import { devtools } from 'zustand/middleware'
 
 import { GridModelStore } from './index.ts'
 
-type ShuttleTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type ShuttlePeriod = {
     id: string,
     seq: number | null,
@@ -18,11 +13,6 @@ export type ShuttlePeriod = {
     isNew: boolean,
 }
 
-type ShuttlePeriodStore = {
-    rows: Array<ShuttlePeriod>,
-    setRows: (periods: Array<ShuttlePeriod>) => void,
-}
-
 export type ShuttleHoliday = {
     id: string,
     seq: number | null,
@@ -30,11 +20,6 @@ export type ShuttleHoliday = {
     calendarType: string | null,
     date: Date | null,
     isNew: boolean,
-}
-
-type ShuttleHolidayStore = {
-    rows: Array<ShuttleHoliday>,
-    setRows: (holidays: Array<ShuttleHoliday>) => void,
 }
 
 export type ShuttleRoute = {
@@ -48,22 +33,12 @@ export type ShuttleRoute = {
     isNew: boolean,
 }
 
-type ShuttleRouteStore = {
-    rows: Array<ShuttleRoute>,
-    setRows: (routes: Array<ShuttleRoute>) => void,
-}
-
 export type ShuttleStop = {
     id: string,
     name: string,
     latitude: number,
     longitude: number,
     isNew: boolean,
-}
-
-type ShuttleStopStore = {
-    rows: Array<ShuttleStop>,
-    setRows: (stops: Array<ShuttleStop>) => void,
 }
 
 export type ShuttleRouteStop = {
@@ -73,11 +48,6 @@ export type ShuttleRouteStop = {
     order: number,
     cumulativeTime: string,
     isNew: boolean,
-}
-
-type ShuttleRouteStopStore = {
-    rows: Array<ShuttleRouteStop>,
-    setRows: (routeStops: Array<ShuttleRouteStop>) => void,
 }
 
 export type ShuttleTimetable = {
@@ -101,12 +71,54 @@ export type ShuttleTimetableView = {
     group: string
 }
 
-type ShuttleTimetableStore = {
+export type ShuttleTabStore = {
+    route: string,
+    setRoute: (route: string) => void,
+}
+
+export type ShuttlePeriodStore = {
+    rows: Array<ShuttlePeriod>,
+    setRows: (periods: Array<ShuttlePeriod>) => void,
+}
+
+export type ShuttleHolidayStore = {
+    rows: Array<ShuttleHoliday>,
+    setRows: (holidays: Array<ShuttleHoliday>) => void,
+}
+
+export type ShuttleRouteStore = {
+    stops: Array<ShuttleStop>,
+    rows: Array<ShuttleRoute>,
+    setStops: (stops: Array<ShuttleStop>) => void,
+    setRows: (routes: Array<ShuttleRoute>) => void,
+}
+
+export type ShuttleStopStore = {
+    rows: Array<ShuttleStop>,
+    setRows: (stops: Array<ShuttleStop>) => void,
+}
+
+export type ShuttleRouteStopStore = {
+    selectedRoute: string | null,
+    stops: Array<ShuttleStop>,
+    routes: Array<ShuttleRoute>,
+    rows: Array<ShuttleRouteStop>,
+    setSelectedRoute: (route: string) => void,
+    setStops: (stops: Array<ShuttleStop>) => void,
+    setRoutes: (routes: Array<ShuttleRoute>) => void,
+    setRows: (routeStops: Array<ShuttleRouteStop>) => void,
+}
+
+export type ShuttleTimetableStore = {
+    selectedRoute: string | null,
+    routes: Array<ShuttleRoute>,
     rows: Array<ShuttleTimetable>,
+    setSelectedRoute: (route: string) => void,
+    setRoutes: (routes: Array<ShuttleRoute>) => void,
     setRows: (timetables: Array<ShuttleTimetable>) => void,
 }
 
-type ShuttleTimetableViewStore = {
+export type ShuttleTimetableViewStore = {
     rows: Array<ShuttleTimetableView>,
     setRows: (timetables: Array<ShuttleTimetableView>) => void,
 }
@@ -174,11 +186,14 @@ export const useShuttleHolidayGridModelStore = create(
 export const useShuttleRouteStore = create(
     devtools<ShuttleRouteStore>(
         (set) => ({
+            selectedRoute: null,
+            stops: [],
             rows: [],
             setRows: (rows: Array<ShuttleRoute>) => {
                 rows.sort((a, b) => (a.tag < b.tag ? -1 : a.tag > b.tag ? 1 : 0))
                 set({ rows })
             },
+            setStops: (stops: Array<ShuttleStop>) => set({ stops }),
         }),
         { name: 'ShuttleRouteStore' }
     )
@@ -222,7 +237,13 @@ export const useShuttleStopGridModelStore = create(
 export const useShuttleRouteStopStore = create(
     devtools<ShuttleRouteStopStore>(
         (set) => ({
+            selectedRoute: null,
+            stops: [],
+            routes: [],
             rows: [],
+            setSelectedRoute: (route: string) => set({ selectedRoute: route }),
+            setStops: (stops: Array<ShuttleStop>) => set({ stops }),
+            setRoutes: (routes: Array<ShuttleRoute>) => set({ routes }),
             setRows: (rows: Array<ShuttleRouteStop>) => {
                 rows.sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : 0))
                 set({ rows })
@@ -242,21 +263,15 @@ export const useShuttleRouteStopGridModelStore = create(
     )
 )
 
-// Selected Route
-export const useSelectedShuttleRouteStore = create(
-    devtools<{ selectedRoute: string | null; setSelectedRoute: (route: string) => void }>(
-        (set) => ({
-            selectedRoute: null,
-            setSelectedRoute: (route: string) => set({ selectedRoute: route }),
-        }), { name: 'SelectedShuttleRouteStore' }
-    )
-)
-
 // Timetable Store
 export const useShuttleTimetableStore = create(
     devtools<ShuttleTimetableStore>(
         (set) => ({
+            selectedRoute: null,
+            routes: [],
             rows: [],
+            setSelectedRoute: (route: string) => set({ selectedRoute: route }),
+            setRoutes: (routes: Array<ShuttleRoute>) => set({ routes }),
             setRows: (rows: Array<ShuttleTimetable>) => {
                 rows.sort((a, b) => (a.time < b.time ? -1 : a.time > b.time ? 1 : 0))
                 set({ rows })

@@ -4,16 +4,16 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { ShuttleRouteStopGrid } from './grid.tsx'
 import { getShuttleStop, ShuttleStopResponse } from '../../../../service/network/shuttle.ts'
-import { useShuttleStopStore } from '../../../../stores/shuttle.ts'
+import { useShuttleRouteStopStore } from '../../../../stores/shuttle.ts'
 
 export default function ShuttleRouteStop() {
     // Get the store
-    const shuttleStopStore = useShuttleStopStore()
+    const rowStore = useShuttleRouteStopStore()
     const fetchShuttleStop = async () => {
         const response = await getShuttleStop()
         if (response.status === 200) {
             const responseData = response.data
-            shuttleStopStore.setRows(responseData.result.map((item: ShuttleStopResponse) => {
+            rowStore.setStops(responseData.result.map((item: ShuttleStopResponse) => {
                 return {
                     id: uuidv4(),
                     name: item.name,
@@ -34,7 +34,7 @@ export default function ShuttleRouteStop() {
             minWidth: 150,
             flex: 1,
             type: 'singleSelect',
-            valueOptions: shuttleStopStore.rows.map((stop) => stop.name),
+            valueOptions: rowStore.stops.map((stop) => stop.name),
             editable: true,
             headerAlign: 'center',
             align: 'center',
