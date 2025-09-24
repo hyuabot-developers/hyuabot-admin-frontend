@@ -1,36 +1,8 @@
 import { GridColDef } from '@mui/x-data-grid'
-import { useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 import { ShuttleTimetableGrid } from './grid.tsx'
-import {
-    getShuttleTimetable,
-    ShuttleTimetableResponse
-} from '../../../../service/network/shuttle.ts'
-import { useShuttleTimetableStore } from '../../../../stores/shuttle.ts'
 
 export default function ShuttleTimetable() {
-    // Get the store
-    const shuttleTimetableStore = useShuttleTimetableStore()
-    const fetchShuttleTimetable = async () => {
-        const response = await getShuttleTimetable()
-        if (response.status === 200) {
-            const responseData = response.data
-            shuttleTimetableStore.setRows(responseData.data.map((item: ShuttleTimetableResponse) => {
-                return {
-                    id: uuidv4(),
-                    sequence: item.sequence,
-                    period: item.period,
-                    weekdays: item.weekdays,
-                    route: item.route,
-                    time: item.time,
-                }
-            }))
-        }
-    }
-    useEffect(() => {
-        fetchShuttleTimetable().then()
-    }, [])
     // Configure DataGrid
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
@@ -44,7 +16,8 @@ export default function ShuttleTimetable() {
         {
             field: 'period',
             headerName: '운행 종류',
-            width: 200,
+            minWidth: 200,
+            flex: 1,
             valueFormatter: periodTypeValueFormatter,
             type: 'singleSelect',
             valueOptions: ['semester', 'vacation', 'vacation_session'],
@@ -55,17 +28,9 @@ export default function ShuttleTimetable() {
         {
             field: 'weekdays',
             headerName: '평일/주말',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'boolean',
-            editable: true,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        {
-            field: 'route',
-            headerName: '노선 ID',
-            width: 150,
-            type: 'string',
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -73,7 +38,8 @@ export default function ShuttleTimetable() {
         {
             field: 'time',
             headerName: '운행 시간',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',

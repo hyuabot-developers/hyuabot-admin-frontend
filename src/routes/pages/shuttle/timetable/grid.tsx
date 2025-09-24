@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import {
     createShuttleTimetable,
     deleteShuttleTimetable,
@@ -23,7 +23,7 @@ import {
 import {
     ShuttleTimetable,
     useShuttleTimetableStore,
-    useShuttleTimetableGridModelStore,
+    useShuttleTimetableGridModelStore, useSelectedShuttleRouteStore,
 } from '../../../../stores/shuttle.ts'
 
 interface GridProps {
@@ -33,6 +33,7 @@ interface GridProps {
 export const ShuttleTimetableGrid = (props: GridProps) => {
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
+    const selectedShuttleRouteStore = useSelectedShuttleRouteStore()
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
 
@@ -51,10 +52,12 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View } })
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
-        const rowToDelete = rowStore.rows.find((row) => row.id === id)
+        const { rows } = useShuttleTimetableStore.getState()
+        const { selectedRoute } = useSelectedShuttleRouteStore.getState()
+        const rowToDelete = rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        if (rowToDelete.sequence === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteShuttleTimetable(rowToDelete.sequence)
+        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteShuttleTimetable(selectedRoute!, rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -70,18 +73,19 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         }
     }
     const updateRowProcess = async (newRow: ShuttleTimetable) => {
-        if (newRow.period === '' || newRow.route === '' || newRow.time === '') {
+        if (newRow.period === '' || newRow.time === '') {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
-            const response = await createShuttleTimetable({
-                period: newRow.period,
-                route: newRow.route,
-                weekdays: newRow.weekdays,
-                time: newRow.time,
-            })
+            const response = await createShuttleTimetable(
+                selectedShuttleRouteStore.selectedRoute!, {
+                    period: newRow.period,
+                    weekdays: newRow.weekdays,
+                    departureTime: newRow.time,
+                }
+            )
             if (response.status !== 201) {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
                 rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
@@ -92,12 +96,11 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
             rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
             return updatedRow
-        } else if (newRow.sequence !== null) {
-            const response = await updateShuttleTimetable(newRow.sequence, {
+        } else if (newRow.seq !== null) {
+            const response = await updateShuttleTimetable(selectedShuttleRouteStore.selectedRoute!, newRow.seq, {
                 period: newRow.period,
-                route: newRow.route,
                 weekdays: newRow.weekdays,
-                time: newRow.time,
+                departureTime: newRow.time,
             })
             if (response.status !== 200) {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
@@ -163,6 +166,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -170,7 +174,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{ toolbar: Toolbar }}
+                slots={{ toolbar: GridToolbar }}
                 autoPageSize={true}
                 isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'name' || params.row.isNew)}
             />

@@ -82,10 +82,9 @@ type ShuttleRouteStopStore = {
 
 export type ShuttleTimetable = {
     id: string,
-    sequence: number | null,
+    seq: number | null,
     period: string,
     weekdays: boolean,
-    route: string,
     time: string,
     isNew: boolean,
 }

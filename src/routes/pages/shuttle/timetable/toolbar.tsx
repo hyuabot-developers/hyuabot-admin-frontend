@@ -1,61 +1,100 @@
 import AddIcon from '@mui/icons-material/Add'
-import RefreshIcon from '@mui/icons-material/Refresh'
-import { Button } from '@mui/material'
-import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { Autocomplete, TextField } from '@mui/material'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import { getShuttleTimetable, ShuttleTimetableResponse } from '../../../../service/network/shuttle.ts'
-import { useShuttleTimetableStore, useShuttleTimetableGridModelStore } from '../../../../stores/shuttle.ts'
+import {
+    getShuttleRoute,
+    getShuttleTimetable,
+    ShuttleRouteResponse,
+    ShuttleTimetableResponse
+} from '../../../../service/network/shuttle.ts'
+import {
+    useShuttleTimetableStore,
+    useShuttleTimetableGridModelStore,
+    useShuttleRouteStore, useSelectedShuttleRouteStore
+} from '../../../../stores/shuttle.ts'
 
 
-export const Toolbar = () => {
+export const GridToolbar = () => {
+    const routeStore = useShuttleRouteStore()
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
-    const fetchShuttleTimetable = async () => {
-        const response = await getShuttleTimetable()
+    const selectedRouteStore = useSelectedShuttleRouteStore()
+    const fetchShuttleRoute = async () => {
+        const response = await getShuttleRoute()
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.data.map((item: ShuttleTimetableResponse) => {
+            routeStore.setRows(responseData.result.map((item: ShuttleRouteResponse) => {
                 return {
                     id: uuidv4(),
-                    sequence: item.sequence,
-                    period: item.period,
-                    weekdays: item.weekdays,
-                    route: item.route,
-                    time: item.time,
+                    name: item.name,
+                    tag: item.tag,
+                    korean: item.descriptionKorean,
+                    english: item.descriptionEnglish,
+                    start: item.startStopID,
+                    end: item.endStopID,
                 }
             }))
+        }
+    }
+    const fetchShuttleTimetable = async (routeName: string) => {
+        const response = await getShuttleTimetable(routeName)
+        if (response.status === 200) {
+            const responseData = response.data
+            rowStore.setRows(responseData.result.map((item: ShuttleTimetableResponse) => {
+                return {
+                    id: uuidv4(),
+                    seq: item.seq,
+                    period: item.period,
+                    weekdays: item.weekdays,
+                    time: item.departureTime,
+                }
+            }))
+        }
+    }
+    const onChangeSelectedRoute = (value: string | null) => {
+        if (value) {
+            selectedRouteStore.setSelectedRoute(value)
+            fetchShuttleTimetable(value).then()
         }
     }
     // Add record button click event
     const addRowButtonClicked = () => {
         const id = uuidv4()
         rowStore.setRows([
-            ...rowStore.rows,
             {
                 id,
-                sequence: null,
+                seq: null,
                 period: '',
                 weekdays: true,
-                route: '',
                 time: '00:00:00',
                 isNew: true,
             },
+            ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
             [id]: { mode: GridRowModes.Edit, fieldToFocus: 'period' },
         }))
     }
-
+    useEffect(() => {
+        fetchShuttleRoute().then()
+    }, [])
     return (
-        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchShuttleTimetable}>
-                새로고침
-            </Button>
-            <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
-                항목 추가
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <Autocomplete
+                size="small"
+                disablePortal={true}
+                options={routeStore.rows.map((route) => route.name)}
+                sx={{ width: 300, marginRight: 2 }}
+                renderInput={(params) => <TextField {...params} label="셔틀버스 노선" />}
+                onChange={(_, value) => onChangeSelectedRoute(value)}
+            />
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }

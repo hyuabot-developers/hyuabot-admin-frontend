@@ -88,25 +88,23 @@ export type UpdateShuttleRouteStopRequest = {
 }
 
 export type ShuttleTimetableResponse = {
-    sequence: number,
+    seq: number,
     period: string,
     weekdays: boolean,
     route: string,
-    time: string,
+    departureTime: string,
 }
 
-export type CreateTimetableResponse = {
+export type CreateTimetableRequest = {
     period: string,
     weekdays: boolean,
-    route: string,
-    time: string,
+    departureTime: string,
 }
 
 export type UpdateShuttleTimetableRequest = {
     period: string,
     weekdays: boolean,
-    route: string,
-    time: string,
+    departureTime: string,
 }
 
 export const getShuttlePeriod = async () => {
@@ -189,18 +187,22 @@ export const deleteShuttleRouteStop = async (routeName: string, stopName: string
     return await client.delete(`/api/v1/shuttle/route/${routeName}/stop/${stopName}`)
 }
 
-export const getShuttleTimetable = async () => {
-    return await client.get('/api/shuttle/timetable')
+export const getShuttleAllTimetable = async () => {
+    return await client.get('/api/v1/shuttle/timetable')
 }
 
-export const createShuttleTimetable = async (data: CreateTimetableResponse) => {
-    return await client.post('/api/shuttle/timetable', data)
+export const getShuttleTimetable = async (routeName: string) => {
+    return await client.get(`/api/v1/shuttle/route/${routeName}/timetable`)
 }
 
-export const updateShuttleTimetable = async (sequence: number, data: UpdateShuttleTimetableRequest) => {
-    return await client.put(`/api/shuttle/timetable/${sequence}`, data)
+export const createShuttleTimetable = async (routeName: string, data: CreateTimetableRequest) => {
+    return await client.post(`/api/v1/shuttle/route/${routeName}/timetable`, data)
 }
 
-export const deleteShuttleTimetable = async (sequence: number) => {
-    return await client.delete(`/api/shuttle/timetable/${sequence}`)
+export const updateShuttleTimetable = async (routeName: string, seq: number, data: UpdateShuttleTimetableRequest) => {
+    return await client.put(`/api/v1/shuttle/route/${routeName}/timetable/${seq}`, data)
+}
+
+export const deleteShuttleTimetable = async (routeName: string, seq: number) => {
+    return await client.delete(`/api/v1/shuttle/route/${routeName}/timetable/${seq}`)
 }
