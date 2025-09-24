@@ -25,6 +25,7 @@ export default function Shuttle() {
                     <Tab label="정류장 관리" value="stop" />
                     <Tab label="노선별 정류장 관리" value="routeStop" />
                     <Tab label="시간표 관리" value="timetable" />
+                    <Tab label="시간표 (뷰)" value="timetableView" />
                 </Tabs>
             </Box>
             <Outlet />

@@ -89,9 +89,26 @@ export type ShuttleTimetable = {
     isNew: boolean,
 }
 
+export type ShuttleTimetableView = {
+    id: string,
+    seq: number,
+    period: string,
+    weekdays: boolean,
+    route: string,
+    stop: string,
+    tag: string,
+    time: string,
+    group: string
+}
+
 type ShuttleTimetableStore = {
     rows: Array<ShuttleTimetable>,
     setRows: (timetables: Array<ShuttleTimetable>) => void,
+}
+
+type ShuttleTimetableViewStore = {
+    rows: Array<ShuttleTimetableView>,
+    setRows: (timetables: Array<ShuttleTimetableView>) => void,
 }
 
 // Tab Store
@@ -256,5 +273,18 @@ export const useShuttleTimetableGridModelStore = create(
             setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
         }),
         { name: 'ShuttleTimetableGridModelStore' }
+    )
+)
+
+export const useShuttleTimetableViewStore = create(
+    devtools<ShuttleTimetableViewStore>(
+        (set) => ({
+            rows: [],
+            setRows: (rows: Array<ShuttleTimetableView>) => {
+                rows.sort((a, b) => (a.seq < b.seq ? -1 : a.seq > b.seq ? 1 : 0))
+                set({ rows })
+            },
+        }),
+        { name: 'ShuttleTimetableViewStore' }
     )
 )

@@ -27,6 +27,7 @@ import ShuttleRoute from './pages/shuttle/route'
 import ShuttleRouteStop from './pages/shuttle/routeStop'
 import ShuttleStop from './pages/shuttle/stop'
 import ShuttleTimetable from './pages/shuttle/timetable'
+import ShuttleTimetableView from './pages/shuttle/timetableView'
 import Subway from './pages/subway'
 import SubwayRealtimePage from './pages/subway/realtime'
 import SubwayRoutePage from './pages/subway/route'
@@ -47,6 +48,7 @@ const appRouter = createBrowserRouter([
                 { path: 'stop', element: <ShuttleStop /> },
                 { path: 'routeStop', element: <ShuttleRouteStop /> },
                 { path: 'timetable', element: <ShuttleTimetable /> },
+                { path: 'timetableView', element: <ShuttleTimetableView /> },
                 { path: '*', element: <Navigate replace to="/shuttle/period" /> },
             ] },
             { path: 'bus', element: <Bus />, children: [

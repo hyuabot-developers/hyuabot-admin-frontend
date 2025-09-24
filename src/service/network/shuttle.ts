@@ -107,6 +107,17 @@ export type UpdateShuttleTimetableRequest = {
     departureTime: string,
 }
 
+export type ShuttleTimetableViewResponse = {
+    seq: number,
+    period: string,
+    isWeekdays: boolean,
+    routeName: string,
+    stopName: string,
+    routeTag: string,
+    departureTime: string,
+    destinationGroup: string,
+}
+
 export const getShuttlePeriod = async () => {
     return await client.get('/api/v1/shuttle/period')
 }
