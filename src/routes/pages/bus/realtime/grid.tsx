@@ -1,13 +1,8 @@
 import { Alert, Box, Snackbar } from '@mui/material'
-import {
-    DataGrid,
-    GridColDef,
-    GridEventListener,
-    GridRowModesModel
-} from '@mui/x-data-grid'
+import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import {
     useBusRealtimeGridModelStore,
     useBusRealtimeStore,
@@ -23,17 +18,6 @@ export const BusRealtimeGrid = (props: GridProps) => {
     const rowModesModelStore = useBusRealtimeGridModelStore()
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
-
-    const rowEditStopped: GridEventListener<'rowEditStop'> = (params, event) => {
-        if (event.defaultMuiPrevented) {
-            return
-        }
-        const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
-    }
-    const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
-        rowModesModelStore.setRowModesModel(newRowModesModel)
-    }
     // Render
     return (
         <Box sx={{ height: '90vh', width: '100%' }}>
@@ -61,16 +45,10 @@ export const BusRealtimeGrid = (props: GridProps) => {
                     rows={rowStore.rows}
                     rowModesModel={rowModesModelStore.rowModesModel}
                     editMode="row"
-                    onRowModesModelChange={rowModesModelChanged}
-                    onRowEditStop={rowEditStopped}
-                    slots={{ toolbar: Toolbar }}
+                    slots={{ toolbar: GridToolbar }}
                     initialState={{
                         sorting: {
-                            sortModel: [
-                                { field: 'routeName', sort: 'asc' },
-                                { field: 'stopName', sort: 'asc' },
-                                { field: 'sequence', sort: 'asc' },
-                            ]
+                            sortModel: [{ field: 'route', sort: 'asc' }],
                         },
                         pagination: { paginationModel: { pageSize: 20 } }
                     }}
