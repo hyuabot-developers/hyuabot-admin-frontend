@@ -158,7 +158,7 @@ export const BusRouteGrid = (props: GridProps) => {
     })
     // Render
     return (
-        <Box sx={{ height: '100vh', width: '100%' }}>
+        <Box sx={{ height: '90vh', width: '100%' }}>
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 open={errorSnackbarContent !== ''}
