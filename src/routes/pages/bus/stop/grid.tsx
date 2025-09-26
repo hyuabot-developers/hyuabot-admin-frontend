@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import {
     createBusStop,
     deleteBusStop,
@@ -82,7 +82,7 @@ export const BusStopGrid = (props: GridProps) => {
                 latitude: newRow.latitude,
                 longitude: newRow.longitude,
                 mobileNumber: newRow.mobileNumber,
-                district: 2,
+                districtCode: 2,
                 regionName: '경기'
             })
             if (response.status !== 201) {
@@ -97,7 +97,7 @@ export const BusStopGrid = (props: GridProps) => {
                 latitude: newRow.latitude,
                 longitude: newRow.longitude,
                 mobileNumber: newRow.mobileNumber,
-                district: 2,
+                districtCode: 2,
                 regionName: '경기'
             })
             if (response.status !== 200) {
@@ -160,24 +160,24 @@ export const BusStopGrid = (props: GridProps) => {
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ width: '100%' }}>
-                <DataGrid
-                    columns={props.columns}
-                    rows={rowStore.rows}
-                    rowModesModel={rowModesModelStore.rowModesModel}
-                    editMode="row"
-                    onRowModesModelChange={rowModesModelChanged}
-                    onRowEditStop={rowEditStopped}
-                    processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'stopID' || params.row.isNew)}
-                    pageSizeOptions={[10]}
-                    hideFooterPagination={false}
-                    initialState={{
-                        pagination: { paginationModel: { pageSize: 10 } }
-                    }}
-                />
-            </div>
+            <DataGrid
+                showToolbar={true}
+                columns={props.columns}
+                rows={rowStore.rows}
+                rowModesModel={rowModesModelStore.rowModesModel}
+                editMode="row"
+                onRowModesModelChange={rowModesModelChanged}
+                onRowEditStop={rowEditStopped}
+                processRowUpdate={updateRowProcess}
+                slots={{ toolbar: GridToolbar }}
+                isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'stopID' || params.row.isNew)}
+                autoPageSize={true}
+                initialState={{
+                    sorting: {
+                        sortModel: [{ field: 'stopID', sort: 'asc' }]
+                    }
+                }}
+            />
         </Box>
     )
 }

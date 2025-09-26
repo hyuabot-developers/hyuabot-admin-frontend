@@ -1,34 +1,27 @@
 import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { Button } from '@mui/material'
-import {
-    GridRowModes,
-    GridToolbarContainer
-} from '@mui/x-data-grid'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
 import { v4 as uuidv4 } from 'uuid'
 
 import { BusStopResponse, getBusStops } from '../../../../service/network/bus.ts'
-import {
-    useBusStopGridModelStore,
-    useBusStopStore
-} from '../../../../stores/bus.ts'
+import { useBusStopGridModelStore, useBusStopStore } from '../../../../stores/bus.ts'
 
 
-export const Toolbar = () => {
+export const GridToolbar = () => {
     const rowStore = useBusStopStore()
     const rowModesModelStore = useBusStopGridModelStore()
     const fetchBusStop = async () => {
         const response = await getBusStops()
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.data.map((item: BusStopResponse) => {
+            rowStore.setRows(responseData.result.map((item: BusStopResponse) => {
                 return {
                     id: uuidv4(),
                     stopID: item.id,
                     name: item.name,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    district: item.district,
+                    districtCode: item.districtCode,
                     mobileNumber: item.mobileNumber,
                 }
             }))
@@ -44,7 +37,7 @@ export const Toolbar = () => {
                 name: '',
                 latitude: 0,
                 longitude: 0,
-                district: 2,
+                districtCode: 2,
                 mobileNumber: '',
                 isNew: true,
             },
@@ -56,13 +49,13 @@ export const Toolbar = () => {
         }))
     }
     return (
-        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBusStop}>
-                새로고침
-            </Button>
-            <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
-                항목 추가
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <ToolbarButton onClick={fetchBusStop}>
+                <RefreshIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }

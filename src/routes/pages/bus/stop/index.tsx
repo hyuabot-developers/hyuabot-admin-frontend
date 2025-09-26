@@ -14,14 +14,14 @@ export default function BusStop() {
         const response = await getBusStops()
         if (response.status === 200) {
             const responseData = response.data
-            busStopStore.setRows(responseData.data.map((item: BusStopResponse) => {
+            busStopStore.setRows(responseData.result.map((item: BusStopResponse) => {
                 return {
                     id: uuidv4(),
                     stopID: item.id,
                     name: item.name,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    district: item.district,
+                    districtCode: item.districtCode,
                     mobileNumber: item.mobileNumber,
                 }
             }))
@@ -44,7 +44,8 @@ export default function BusStop() {
         {
             field: 'name',
             headerName: '정류장 이름',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
@@ -53,7 +54,8 @@ export default function BusStop() {
         {
             field: 'latitude',
             headerName: '위도',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'number',
             editable: true,
             headerAlign: 'center',
@@ -62,7 +64,8 @@ export default function BusStop() {
         {
             field: 'longitude',
             headerName: '경도',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'number',
             editable: true,
             headerAlign: 'center',
@@ -70,8 +73,9 @@ export default function BusStop() {
         },
         {
             field: 'mobileNumber',
-            headerName: 'GBIS 전화 정류장 ID',
-            width: 200,
+            headerName: '검색용 ID',
+            minWidth: 150,
+            flex: 1,
             type: 'string',
             editable: true,
             headerAlign: 'center',
