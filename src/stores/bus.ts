@@ -1,5 +1,6 @@
 import { GridRowModesModel } from '@mui/x-data-grid'
 import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 import { GridModelStore } from './index.ts'
 
@@ -39,7 +40,6 @@ export type BusStop = {
 export type BusRouteStop = {
     id: string,
     seq: number | null,
-    route: string,
     stop: string,
     order: number,
     startStop: string,
@@ -86,9 +86,11 @@ type BusRouteStopStore = {
     routes: Array<BusRoute>,
     stops: Array<BusStop>,
     rows: Array<BusRouteStop>,
+    selectedRouteID?: number,
     setRoutes: (routeList: Array<BusRoute>) => void,
     setStops: (stopList: Array<BusStop>) => void,
     setRows: (routeStopList: Array<BusRouteStop>) => void,
+    setSelectedRouteID: (routeID: number) => void,
 }
 
 type BusTimetableStore = {
@@ -109,71 +111,106 @@ type BusRealtimeStore = {
     setRows: (realtimeList: Array<BusRealtime>) => void,
 }
 
-export const useBusTabStore = create<BusTabStore>((set) => ({
-    route: 'route',
-    setRoute: (route: string) => set({ route }),
-}))
+export const useBusTabStore = create(
+    devtools<BusTabStore>((set) => ({
+        route: 'route',
+        setRoute: (route: string) => set({ route }),
+    }),
+    { name: 'BusTabStore' })
+)
 
-export const useBusRouteStore = create<BusRouteStore>((set) => ({
-    stops: [],
-    rows: [],
-    setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
-    setRows: (routeList: Array<BusRoute>) => set({ rows: routeList }),
-}))
+export const useBusRouteStore = create(
+    devtools<BusRouteStore>((set) => ({
+        stops: [],
+        rows: [],
+        setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
+        setRows: (routeList: Array<BusRoute>) => set({ rows: routeList }),
+    }),
+    { name: 'BusRouteStore' })
+)
 
-export const useBusStopStore = create<BusStopStore>((set) => ({
-    rows: [],
-    setRows: (stopList: Array<BusStop>) => set({ rows: stopList }),
-}))
+export const useBusStopStore = create(
+    devtools<BusStopStore>((set) => ({
+        rows: [],
+        setRows: (stopList: Array<BusStop>) => set({ rows: stopList }),
+    }),
+    { name: 'BusStopStore' })
+)
 
-export const useBusRouteStopStore = create<BusRouteStopStore>((set) => ({
-    routes: [],
-    stops: [],
-    rows: [],
-    setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
-    setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
-    setRows: (routeStopList: Array<BusRouteStop>) => set({ rows: routeStopList }),
-}))
+export const useBusRouteStopStore = create(
+    devtools<BusRouteStopStore>((set) => ({
+        routes: [],
+        stops: [],
+        rows: [],
+        selectedRouteID: undefined,
+        setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
+        setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
+        setRows: (routeStopList: Array<BusRouteStop>) => set({ rows: routeStopList }),
+        setSelectedRouteID: (routeID: number) => set({ selectedRouteID: routeID }),
+    }),
+    { name: 'BusRouteStopStore' })
+)
 
-export const useBusTimetableStore = create<BusTimetableStore>((set) => ({
-    routes: [],
-    stops: [],
-    rows: [],
-    setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
-    setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
-    setRows: (timetableList: Array<BusTimetable>) => set({ rows: timetableList }),
-}))
+export const useBusTimetableStore = create(
+    devtools<BusTimetableStore>((set) => ({
+        routes: [],
+        stops: [],
+        rows: [],
+        setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
+        setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
+        setRows: (timetableList: Array<BusTimetable>) => set({ rows: timetableList }),
+    }),
+    { name: 'BusTimetableStore' })
+)
 
-export const useBusRealtimeStore = create<BusRealtimeStore>((set) => ({
-    routes: [],
-    stops: [],
-    rows: [],
-    setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
-    setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
-    setRows: (realtimeList: Array<BusRealtime>) => set({ rows: realtimeList }),
-}))
+export const useBusRealtimeStore = create(
+    devtools<BusRealtimeStore>((set) => ({
+        routes: [],
+        stops: [],
+        rows: [],
+        setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
+        setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
+        setRows: (realtimeList: Array<BusRealtime>) => set({ rows: realtimeList }),
+    }),
+    { name: 'BusRealtimeStore' })
+)
 
-export const useBusRouteGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useBusRouteGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'BusRouteGridModelStore' })
+)
 
-export const useBusStopGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useBusStopGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'BusStopGridModelStore' })
+)
 
-export const useBusRouteStopGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useBusRouteStopGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'BusRouteStopGridModelStore' })
+)
 
-export const useBusTimetableGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useBusTimetableGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'BusTimetableGridModelStore' })
+)
 
-export const useBusRealtimeGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useBusRealtimeGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'BusRealtimeGridModelStore' })
+)
