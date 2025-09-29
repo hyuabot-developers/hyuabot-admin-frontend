@@ -121,6 +121,14 @@ export type BusRealtimeResponse = {
     updatedAt: string,
 }
 
+export type BusDepartureLogResponse = {
+    routeID: number,
+    stopID: number,
+    date: string,
+    time: string,
+    vehicleID: string,
+}
+
 
 export const getBusRoutes = async () => {
     return await client.get('/api/v1/bus/route')
@@ -188,4 +196,8 @@ export const deleteBusTimetable = async (seq: number) => {
 
 export const getBusRealtime = async () => {
     return await client.get('/api/v1/bus/realtime')
+}
+
+export const getBusDepartureLogs = async (routeID: number, seq: number) => {
+    return await client.get(`/api/v1/bus/route/${routeID}/stop/${seq}/log`)
 }

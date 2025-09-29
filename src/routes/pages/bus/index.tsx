@@ -24,6 +24,7 @@ export default function Bus() {
                     <Tab label="노선별 정류장 관리" value="routeStop" />
                     <Tab label="시간표 관리" value="timetable" />
                     <Tab label="실시간 도착 정보" value="realtime" />
+                    <Tab label="도착 기록" value="log" />
                 </Tabs>
             </Box>
             <Outlet />

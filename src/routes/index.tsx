@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import Bus from './pages/bus'
+import BusDepartureLog from './pages/bus/log'
 import BusRealtime from './pages/bus/realtime'
 import BusRoute from './pages/bus/route'
 import BusRouteStop from './pages/bus/routeStop'
@@ -57,6 +58,7 @@ const appRouter = createBrowserRouter([
                 { path: 'routeStop', element: <BusRouteStop /> },
                 { path: 'timetable', element: <BusTimetable /> },
                 { path: 'realtime', element: <BusRealtime /> },
+                { path: 'log', element: <BusDepartureLog /> },
                 { path: '*', element: <Navigate replace to="/bus/route" /> },
             ] },
             { path: 'subway', element: <Subway />, children: [
