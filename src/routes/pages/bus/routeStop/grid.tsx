@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createBusRouteStop, deleteBusRouteStop, updateBusRouteStop } from '../../../../service/network/bus.ts'
 import {
     BusRouteStop,
@@ -50,10 +50,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteBusRouteStop(
-            parseInt(rowToDelete.route.split('(')[1].split(')')[0]),
-            parseInt(rowToDelete.stop.split('(')[1].split(')')[0])
-        )
+        const response = await deleteBusRouteStop(rowStore.selectedRouteID!, rowToDelete.seq!)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -70,7 +67,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
     }
     const updateRowProcess = async (newRow: BusRouteStop) => {
         if (
-            newRow.route === '' || newRow.stop === '' || newRow.sequence < 0 || newRow.minuteFromStart < 0 || newRow.startStop === ''
+            newRow.stop === '' || newRow.order < 0 || newRow.travelTime < 0 || newRow.startStop === ''
         ) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
@@ -78,13 +75,12 @@ export const BusRouteStopGrid = (props: GridProps) => {
         }
         if (newRow.isNew) {
             const response = await createBusRouteStop(
-                parseInt(newRow.route.split('(')[1].split(')')[0]),
+                rowStore.selectedRouteID!,
                 {
-                    routeID: parseInt(newRow.route.split('(')[1].split(')')[0]),
                     stopID: parseInt(newRow.stop.split('(')[1].split(')')[0]),
-                    sequence: newRow.sequence,
-                    minuteFromStart: newRow.minuteFromStart,
-                    start: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
+                    order: newRow.order,
+                    travelTime: newRow.travelTime,
+                    startStopID: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
                 }
             )
             if (response.status !== 201) {
@@ -95,12 +91,13 @@ export const BusRouteStopGrid = (props: GridProps) => {
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         } else {
             const response = await updateBusRouteStop(
-                parseInt(newRow.route.split('(')[1].split(')')[0]),
-                parseInt(newRow.stop.split('(')[1].split(')')[0]),
+                rowStore.selectedRouteID!,
+                newRow.seq!,
                 {
-                    sequence: newRow.sequence,
-                    minuteFromStart: newRow.minuteFromStart,
-                    start: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
+                    stopID: parseInt(newRow.stop.split('(')[1].split(')')[0]),
+                    order: newRow.order,
+                    travelTime: newRow.travelTime,
+                    startStopID: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
                 }
             )
             if (response.status !== 200) {
@@ -165,6 +162,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
             </Snackbar>
             <div style={{ width: '100%' }}>
                 <DataGrid
+                    showToolbar={true}
                     columns={props.columns}
                     rows={rowStore.rows}
                     rowModesModel={rowModesModelStore.rowModesModel}
@@ -172,18 +170,15 @@ export const BusRouteStopGrid = (props: GridProps) => {
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
                     processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && ((params.colDef.field !== 'route' && params.colDef.field !== 'stop') || params.row.isNew)}
+                    slots={{ toolbar: GridToolbar }}
+                    isCellEditable={(params) => params.colDef.field !== 'actions' || params.row.isNew}
                     initialState={{
                         sorting: {
                             sortModel: [
-                                { field: 'route', sort: 'asc' },
-                                { field: 'sequence', sort: 'asc' },
+                                { field: 'order', sort: 'asc' },
                             ]
                         },
-                        pagination: { paginationModel: { pageSize: 10 } }
                     }}
-                    pageSizeOptions={[10]}
                     hideFooterPagination={false}
                 />
             </div>
