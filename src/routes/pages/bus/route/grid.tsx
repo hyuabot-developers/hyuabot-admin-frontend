@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar  } from './toolbar.tsx'
 import { createBusRoute, deleteBusRoute, updateBusRoute } from '../../../../service/network/bus.ts'
 import { BusRoute, useBusRouteGridModelStore, useBusRouteStore } from '../../../../stores/bus.ts'
 
@@ -84,16 +84,16 @@ export const BusRouteGrid = (props: GridProps) => {
                 name: newRow.name,
                 typeCode: routeTypeCode(newRow.type).toString(),
                 typeName: newRow.type,
-                start: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
-                end: parseInt(newRow.endStop.split('(')[1].split(')')[0]),
+                startStopID: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
+                endStopID: parseInt(newRow.endStop.split('(')[1].split(')')[0]),
                 upFirstTime: newRow.upFirstTime,
                 upLastTime: newRow.upLastTime,
                 downFirstTime: newRow.downFirstTime,
                 downLastTime: newRow.downLastTime,
                 companyID: newRow.companyID,
                 companyName: newRow.companyName,
-                companyTelephone: newRow.companyTelephone,
-                district: 2,
+                companyPhone: newRow.companyTelephone,
+                districtCode: 2,
             })
             if (response.status !== 201) {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
@@ -106,16 +106,16 @@ export const BusRouteGrid = (props: GridProps) => {
                 name: newRow.name,
                 typeCode: routeTypeCode(newRow.type).toString(),
                 typeName: newRow.type,
-                start: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
-                end: parseInt(newRow.endStop.split('(')[1].split(')')[0]),
+                startStopID: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
+                endStopID: parseInt(newRow.endStop.split('(')[1].split(')')[0]),
                 upFirstTime: newRow.upFirstTime,
                 upLastTime: newRow.upLastTime,
                 downFirstTime: newRow.downFirstTime,
                 downLastTime: newRow.downLastTime,
                 companyID: newRow.companyID,
                 companyName: newRow.companyName,
-                companyTelephone: newRow.companyTelephone,
-                district: 2,
+                companyPhone: newRow.companyTelephone,
+                districtCode: 2,
             })
             if (response.status !== 200) {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
@@ -178,6 +178,7 @@ export const BusRouteGrid = (props: GridProps) => {
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -185,7 +186,7 @@ export const BusRouteGrid = (props: GridProps) => {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{ toolbar: Toolbar }}
+                slots={{ toolbar: GridToolbar }}
                 isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'routeID' || params.row.isNew)}
             />
         </Box>

@@ -52,7 +52,7 @@ export default function BusRealtime() {
                     endStop: `${endStop?.name} (${endStop?.stopID})`,
                     companyID: item.companyID,
                     companyName: item.companyName,
-                    companyTelephone: item.companyTelephone,
+                    companyTelephone: item.companyPhone,
                     upFirstTime: item.upFirstTime,
                     upLastTime: item.upLastTime,
                     downFirstTime: item.downFirstTime,

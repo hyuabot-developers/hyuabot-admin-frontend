@@ -14,13 +14,14 @@ export type BusRouteResponse = {
     districtCode: number,
     companyID: number,
     companyName: string,
-    companyTelephone: string,
+    companyPhone: string,
 }
 
 export type CreateBusRouteRequest = {
     id: number,
     name: string,
     typeCode: string,
+    typeName: string,
     startStopID: number,
     endStopID: number,
     upFirstTime: string,
@@ -30,12 +31,13 @@ export type CreateBusRouteRequest = {
     districtCode: number,
     companyID: number,
     companyName: string,
-    companyTelephone: string,
+    companyPhone: string,
 }
 
 export type UpdateBusRouteRequest = {
     name: string,
     typeCode: string,
+    typeName: string,
     startStopID: number,
     endStopID: number,
     upFirstTime: string,
@@ -45,7 +47,7 @@ export type UpdateBusRouteRequest = {
     districtCode: number,
     companyID: number,
     companyName: string,
-    companyTelephone: string,
+    companyPhone: string,
 }
 
 export type BusStopResponse = {

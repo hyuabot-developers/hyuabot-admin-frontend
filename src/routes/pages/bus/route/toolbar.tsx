@@ -1,56 +1,55 @@
 import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { Button } from '@mui/material'
-import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
 import { v4 as uuidv4 } from 'uuid'
 
 import { BusRouteResponse, BusStopResponse, getBusRoutes, getBusStops } from '../../../../service/network/bus.ts'
-import { BusStop, useBusRouteGridModelStore, useBusRouteStore, useBusStopStore } from '../../../../stores/bus.ts'
+import { BusStop, useBusRouteGridModelStore, useBusRouteStore } from '../../../../stores/bus.ts'
 
-export const Toolbar = () => {
+export const GridToolbar = () => {
     const rowStore = useBusRouteStore()
     const rowModesModelStore = useBusRouteGridModelStore()
-    const busStopStore = useBusStopStore()
     const fetchBusRoute = async () => {
         // Fetch bus stop
         const stopResponse = await getBusStops()
         let stopData: BusStop[] = []
         if (stopResponse.status === 200) {
             const responseData = stopResponse.data
-            stopData = responseData.data.map((item: BusStopResponse) => {
+            stopData = responseData.result.map((item: BusStopResponse) => {
                 return {
                     id: uuidv4(),
                     stopID: item.id,
                     name: item.name,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    district: item.district,
+                    districtCode: item.districtCode,
                     mobileNumber: item.mobileNumber,
                 }
             })
-            busStopStore.setRows(stopData)
+            rowStore.setStops(stopData)
         }
         // Fetch bus route
         const routeResponse = await getBusRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            rowStore.setRows(responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find((stop) => stop.stopID === item.start)
-                const endStop = stopData.find((stop) => stop.stopID === item.end)
+            rowStore.setRows(responseData.result.map((item: BusRouteResponse) => {
+                const startStop = stopData.find((stop) => stop.stopID === item.startStopID)
+                const endStop = stopData.find((stop) => stop.stopID === item.endStopID)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
                     name: item.name,
-                    type: item.type,
+                    type: item.typeName,
                     startStop: `${startStop?.name} (${startStop?.stopID})`,
                     endStop: `${endStop?.name} (${endStop?.stopID})`,
-                    companyID: item.company.id,
-                    companyName: item.company.name,
-                    companyTelephone: item.company.telephone,
-                    upFirstTime: item.up.first,
-                    upLastTime: item.up.last,
-                    downFirstTime: item.down.first,
-                    downLastTime: item.down.last,
+                    companyID: item.companyID,
+                    companyName: item.companyName,
+                    companyTelephone: item.companyPhone,
+                    upFirstTime: item.upFirstTime,
+                    upLastTime: item.upLastTime,
+                    downFirstTime: item.downFirstTime,
+                    downLastTime: item.downLastTime,
+                    isNew: false,
                 }
             }))
         }
@@ -58,14 +57,15 @@ export const Toolbar = () => {
     // Add record button click event
     const addRowButtonClicked = () => {
         const id = uuidv4()
+        const { stops } = useBusRouteStore.getState()
         rowStore.setRows([
             {
                 id,
                 routeID: 0,
                 name: '',
                 type: '',
-                startStop: `${busStopStore.rows[0].name} (${busStopStore.rows[0].stopID})`,
-                endStop: `${busStopStore.rows[0].name} (${busStopStore.rows[0].stopID})`,
+                startStop: `${stops[0].name} (${stops[0].stopID})`,
+                endStop: `${stops[0].name} (${stops[0].stopID})`,
                 companyID: 0,
                 companyName: '',
                 companyTelephone: '',
@@ -84,13 +84,13 @@ export const Toolbar = () => {
     }
 
     return (
-        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBusRoute}>
-                새로고침
-            </Button>
-            <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
-                항목 추가
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <ToolbarButton onClick={fetchBusRoute}>
+                <RefreshIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }

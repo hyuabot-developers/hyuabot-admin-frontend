@@ -4,12 +4,11 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { BusRouteGrid } from './grid.tsx'
 import { BusRouteResponse, BusStopResponse, getBusRoutes, getBusStops } from '../../../../service/network/bus.ts'
-import { BusStop, useBusRouteStore, useBusStopStore } from '../../../../stores/bus.ts'
+import { BusStop, useBusRouteStore } from '../../../../stores/bus.ts'
 
 export default function BusRoute() {
     // Get the store
-    const busRouteStore = useBusRouteStore()
-    const busStopStore = useBusStopStore()
+    const rowStore = useBusRouteStore()
     // Fetch bus period
     const fetchBusRoute = async () => {
         // Fetch bus stop
@@ -17,40 +16,41 @@ export default function BusRoute() {
         let stopData: BusStop[] = []
         if (stopResponse.status === 200) {
             const responseData = stopResponse.data
-            stopData = responseData.data.map((item: BusStopResponse) => {
+            stopData = responseData.result.map((item: BusStopResponse) => {
                 return {
                     id: uuidv4(),
                     stopID: item.id,
                     name: item.name,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    district: item.district,
+                    districtCode: item.districtCode,
                     mobileNumber: item.mobileNumber,
                 }
             })
-            busStopStore.setRows(stopData)
+            rowStore.setStops(stopData)
         }
         // Fetch bus route
         const routeResponse = await getBusRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            busRouteStore.setRows(responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find((stop) => stop.stopID === item.start)
-                const endStop = stopData.find((stop) => stop.stopID === item.end)
+            rowStore.setRows(responseData.result.map((item: BusRouteResponse) => {
+                const startStop = stopData.find((stop) => stop.stopID === item.startStopID)
+                const endStop = stopData.find((stop) => stop.stopID === item.endStopID)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
                     name: item.name,
-                    type: item.type,
+                    type: item.typeName,
                     startStop: `${startStop?.name} (${startStop?.stopID})`,
                     endStop: `${endStop?.name} (${endStop?.stopID})`,
-                    companyID: item.company.id,
-                    companyName: item.company.name,
-                    companyTelephone: item.company.telephone,
-                    upFirstTime: item.up.first,
-                    upLastTime: item.up.last,
-                    downFirstTime: item.down.first,
-                    downLastTime: item.down.last,
+                    companyID: item.companyID,
+                    companyName: item.companyName,
+                    companyTelephone: item.companyPhone,
+                    upFirstTime: item.upFirstTime,
+                    upLastTime: item.upLastTime,
+                    downFirstTime: item.downFirstTime,
+                    downLastTime: item.downLastTime,
+                    isNew: false,
                 }
             }))
         }
@@ -90,7 +90,8 @@ export default function BusRoute() {
         {
             field: 'type',
             headerName: '노선 분류',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'singleSelect',
             valueOptions: ['일반형시내버스', '직행좌석형시내버스'],
             editable: true,
@@ -100,9 +101,10 @@ export default function BusRoute() {
         {
             field: 'startStop',
             headerName: '출발지',
-            width: 200,
+            minWidth: 200,
+            flex: 1,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
+            valueOptions: rowStore.stops.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busStopFormatter,
             headerAlign: 'center',
@@ -111,9 +113,10 @@ export default function BusRoute() {
         {
             field: 'endStop',
             headerName: '도착지',
-            width: 200,
+            minWidth: 200,
+            flex: 1,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map((stop) => `${stop.name} (${stop.stopID})`),
+            valueOptions: rowStore.stops.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busStopFormatter,
             headerAlign: 'center',
