@@ -14,8 +14,8 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
-import { createBusTimetable, deleteBusTimetable } from '../../../../service/network/bus.ts'
+import { GridToolbar } from './toolbar.tsx'
+import { createBusTimetable, deleteBusTimetable, updateBusTimetable } from '../../../../service/network/bus.ts'
 import {
     BusTimetable,
     useBusTimetableGridModelStore,
@@ -49,13 +49,8 @@ export const BusTimetableGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteBusTimetable(
-            parseInt(rowToDelete.route.split('(')[1].split(')')[0]),
-            parseInt(rowToDelete.startStop.split('(')[1].split(')')[0]),
-            rowToDelete.weekdays,
-            rowToDelete.departureTime
-        )
+        if (rowToDelete === undefined || rowToDelete.seq == null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteBusTimetable(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -72,24 +67,40 @@ export const BusTimetableGrid = (props: GridProps) => {
     }
     const updateRowProcess = async (newRow: BusTimetable) => {
         if (
-            newRow.route === '' || newRow.startStop === ''
+            newRow.dayType === '' || newRow.departureTime === ''
         ) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
-        const response = await createBusTimetable(
-            {
-                routeID: parseInt(newRow.route.split('(')[1].split(')')[0]),
-                start: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
-                weekdays: newRow.weekdays,
-                departureTime: newRow.departureTime,
+        if (newRow.isNew) {
+            const response = await createBusTimetable(
+                {
+                    routeID: rowStore.selectedRouteID!,
+                    startStopID: rowStore.selectedStopID!,
+                    dayType: newRow.dayType,
+                    departureTime: newRow.departureTime,
+                }
+            )
+            if (response.status !== 201) {
+                setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+                rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+                return { ...newRow, _action: 'delete' }
             }
-        )
-        if (response.status !== 201) {
-            setErrorSnackbarContent('데이터 저장에 실패했습니다.')
-            rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
-            return { ...newRow, _action: 'delete' }
+        } else {
+            const response = await updateBusTimetable(
+                newRow.seq!,
+                {
+                    routeID: rowStore.selectedRouteID!,
+                    startStopID: rowStore.selectedStopID!,
+                    dayType: newRow.dayType,
+                    departureTime: newRow.departureTime,
+                }
+            )
+            if (response.status !== 200) {
+                setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+                return { ...newRow, _action: 'delete' }
+            }
         }
         setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         const updatedRow = { ...newRow, isNew: false }
@@ -146,31 +157,27 @@ export const BusTimetableGrid = (props: GridProps) => {
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ width: '100%' }}>
-                <DataGrid
-                    columns={props.columns}
-                    rows={rowStore.rows}
-                    rowModesModel={rowModesModelStore.rowModesModel}
-                    editMode="row"
-                    onRowModesModelChange={rowModesModelChanged}
-                    onRowEditStop={rowEditStopped}
-                    processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && params.row.isNew}
-                    initialState={{
-                        sorting: {
-                            sortModel: [
-                                { field: 'route', sort: 'asc' },
-                                { field: 'weekdays', sort: 'asc' },
-                                { field: 'time', sort: 'asc' }
-                            ]
-                        },
-                        pagination: { paginationModel: { pageSize: 10 } }
-                    }}
-                    pageSizeOptions={[10]}
-                    hideFooterPagination={false}
-                />
-            </div>
+            <DataGrid
+                showToolbar={true}
+                columns={props.columns}
+                rows={rowStore.rows}
+                rowModesModel={rowModesModelStore.rowModesModel}
+                editMode="row"
+                onRowModesModelChange={rowModesModelChanged}
+                onRowEditStop={rowEditStopped}
+                processRowUpdate={updateRowProcess}
+                slots={{ toolbar: GridToolbar }}
+                isCellEditable={(params) => params.colDef.field !== 'actions'}
+                initialState={{
+                    sorting: {
+                        sortModel: [
+                            { field: 'time', sort: 'asc' }
+                        ]
+                    },
+                }}
+                autoPageSize={true}
+                hideFooterPagination={false}
+            />
         </Box>
     )
 }

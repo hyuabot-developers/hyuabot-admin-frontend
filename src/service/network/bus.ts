@@ -178,8 +178,13 @@ export const deleteBusRouteStop = async (routeID: number, seq: number) => {
     return await client.delete(`/api/v1/bus/route/${routeID}/stop/${seq}`)
 }
 
-export const getBusTimetables = async () => {
-    return await client.get('/api/v1/bus/timetable')
+export const getBusTimetables = async (routeID: number | null, startStopID: number | null) => {
+    return client.get('/api/v1/bus/timetable', {
+        params: {
+            ...(routeID != null && { routeID }),
+            ...(startStopID != null && { startStopID }),
+        },
+    })
 }
 
 export const createBusTimetable = async (data: BusTimetableRequest) => {

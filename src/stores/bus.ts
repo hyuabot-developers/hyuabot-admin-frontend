@@ -50,8 +50,6 @@ export type BusRouteStop = {
 export type BusTimetable = {
     id: string,
     seq: number | null,
-    route: string,
-    startStop: string,
     dayType: string,
     departureTime: string,
     isNew: boolean,
@@ -99,11 +97,17 @@ type BusRouteStopStore = {
 }
 
 type BusTimetableStore = {
+    selectedRouteID: number | null,
+    selectedStopID: number | null,
     routes: Array<BusRoute>,
     stops: Array<BusStop>,
+    routeStops: Array<BusStop>,
     rows: Array<BusTimetable>,
+    setSelectedRouteID: (routeID: number | null) => void,
+    setSelectedStopID: (stopID: number | null) => void,
     setRoutes: (routeList: Array<BusRoute>) => void,
     setStops: (stopList: Array<BusStop>) => void,
+    setRouteStops: (routeStopList: Array<BusStop>) => void,
     setRows: (timetableList: Array<BusTimetable>) => void,
 }
 
@@ -173,12 +177,18 @@ export const useBusRouteStopStore = create(
 
 export const useBusTimetableStore = create(
     devtools<BusTimetableStore>((set) => ({
+        selectedRouteID: null,
+        selectedStopID: null,
         routes: [],
         stops: [],
+        routeStops: [],
         rows: [],
+        setRows: (timetableList: Array<BusTimetable>) => set({ rows: timetableList }),
         setRoutes: (routeList: Array<BusRoute>) => set({ routes: routeList }),
         setStops: (stopList: Array<BusStop>) => set({ stops: stopList }),
-        setRows: (timetableList: Array<BusTimetable>) => set({ rows: timetableList }),
+        setRouteStops: (routeStopList: Array<BusStop>) => set({ routeStops: routeStopList }),
+        setSelectedRouteID: (routeID: number | null) => set({ selectedRouteID: routeID }),
+        setSelectedStopID: (stopID: number | null) => set({ selectedStopID: stopID }),
     }),
     { name: 'BusTimetableStore' })
 )
