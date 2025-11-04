@@ -9,5 +9,5 @@ type CampusStore = {
 
 export const useCampusStore = create<CampusStore>((set) => ({
     rows: [],
-    setRows: (cafeteriaList) => set({ rows: cafeteriaList }),
+    setRows: (campuses) => set({ rows: campuses }),
 }))

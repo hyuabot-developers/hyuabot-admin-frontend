@@ -1,87 +1,81 @@
 import client from './client.ts'
 
-export type CafeteriaRunningTimeResponse = {
-    breakfast: string,
-    lunch: string,
-    dinner: string,
-}
-
 export type CafeteriaResponse = {
-    id: string,
-    name: string,
+    seq: number,
     campusID: number,
+    name: string,
     latitude: number,
     longitude: number,
-    runningTime: CafeteriaRunningTimeResponse,
-}
-
-export type CafeteriaMenuResponse = {
-    cafeteriaID: number,
-    date: string,
-    time: string,
-    menu: string,
-    price: number,
+    breakfastTime: string,
+    lunchTime: string,
+    dinnerTime: string,
 }
 
 export type CreateCafeteriaRequest = {
     id: number,
-    name: string,
     campusID: number,
+    name: string,
     latitude: number,
     longitude: number,
-    breakfast: string,
-    lunch: string,
-    dinner: string,
+    breakfastTime: string,
+    lunchTime: string,
+    dinnerTime: string,
 }
 
 export type UpdateCafeteriaRequest = {
+    campusID: number,
     name: string,
     latitude: number,
     longitude: number,
-    breakfast: string,
-    lunch: string,
-    dinner: string,
+    breakfastTime: string,
+    lunchTime: string,
+    dinnerTime: string,
 }
 
-export type CreateCafeteriaMenuRequest = {
+export type MenuResponse = {
+    seq: number,
+    cafeteriaID: number,
     date: string,
-    time: string,
-    menu: string,
+    type: string,
+    food: string,
     price: string,
 }
 
-export type UpdateCafeteriaMenuResponse = {
+export type CafeteriaMenuRequest = {
+    date: string,
+    type: string,
+    food: string,
     price: string,
 }
 
 export const getCafeteriaList = async ()=> {
-    return await client.get('/api/cafeteria/cafeteria')
+    return await client.get('/api/v1/cafeteria')
 }
 
 export const createCafeteria = async (data: CreateCafeteriaRequest) => {
-    return await client.post('/api/cafeteria/cafeteria', data)
+    return await client.post('/api/v1/cafeteria', data)
 }
 
 export const updateCafeteria = async (id: number, data: UpdateCafeteriaRequest) => {
-    return await client.put(`/api/cafeteria/cafeteria/${id}`, data)
+    return await client.put(`/api/v1/cafeteria/${id}`, data)
 }
 
 export const deleteCafeteria = async (id: number) => {
-    return await client.delete(`/api/cafeteria/cafeteria/${id}`)
+    return await client.delete(`/api/v1/cafeteria/${id}`)
 }
 
-export const getCafeteriaMenuList = async ()=> {
-    return await client.get('/api/cafeteria/menu')
+export const getCafeteriaMenuList = async (id: number)=> {
+    return await client.get(`/api/v1/cafeteria/${id}/menu`)
 }
 
-export const createCafeteriaMenu = async (id: number, data: CreateCafeteriaMenuRequest) => {
-    return await client.post(`/api/cafeteria/cafeteria/${id}/menu`, data)
+export const createCafeteriaMenu = async (cafeteriaID: number, data: CafeteriaMenuRequest) => {
+    return await client.post(`/api/v1/cafeteria/${cafeteriaID}/menu`, data)
 }
 
-export const updateCafeteriaMenu = async (id: number, date: string, time: string, menu: string, data: UpdateCafeteriaRequest) => {
-    return await client.put(`/api/cafeteria/cafeteria/${id}/${date}/${time}/${menu}`, data)
+export const updateCafeteriaMenu = async (cafeteriaID: number, seq: number, data: CafeteriaMenuRequest) => {
+    return await client.put(`/api/v1/cafeteria/${cafeteriaID}/${seq}`, data)
 }
 
-export const deleteCafeteriaMenu = async (id: number, date: string, time: string, menu: string) => {
-    return await client.delete(`/api/cafeteria/cafeteria/${id}/${date}/${time}/${menu}`)
+export const deleteCafeteriaMenu = async (cafeteriaID: number, seq: number) => {
+    return await client.delete(`/api/v1/cafeteria/${cafeteriaID}/menu/${seq}`)
 }
