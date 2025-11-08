@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createCafeteria, deleteCafeteria, updateCafeteria } from '../../../../service/network/cafeteria.ts'
 import {
     GridCafeteriaItem,
@@ -48,8 +48,8 @@ export const CafeteriaGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteCafeteria(rowToDelete.cafeteriaID)
+        if (rowToDelete === undefined || rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteCafeteria(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -65,42 +65,45 @@ export const CafeteriaGrid = (props: GridProps) => {
         }
     }
     const updateRowProcess = async (newRow: GridCafeteriaItem) => {
-        if (newRow.name === '' || newRow.cafeteriaID === 0) {
+        if (newRow.name === '' || newRow.seq === 0 || newRow.seq == null) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
-            const response = await createCafeteria({
-                id: newRow.cafeteriaID,
-                name: newRow.name,
-                campusID: Number(newRow.campus.split(' ')[1].slice(1, -1)),
-                latitude: newRow.latitude,
-                longitude: newRow.longitude,
-                breakfast: newRow.breakfastTime,
-                lunch: newRow.lunchTime,
-                dinner: newRow.dinnerTime,
-            })
-            if (response.status !== 201) {
+            try {
+                await createCafeteria({
+                    id: newRow.seq,
+                    name: newRow.name,
+                    campusID: parseInt(newRow.campus.split('(')[1].split(')')[0]),
+                    latitude: newRow.latitude,
+                    longitude: newRow.longitude,
+                    breakfastTime: newRow.breakfastTime.length > 0 ? newRow.breakfastTime : null,
+                    lunchTime: newRow.lunchTime.length > 0 ? newRow.lunchTime : null,
+                    dinnerTime: newRow.dinnerTime.length > 0 ? newRow.dinnerTime : null,
+                })
+                setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
+            } catch {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
                 rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
                 return { ...newRow, _action: 'delete' }
             }
-            setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         } else {
-            const response = await updateCafeteria(newRow.cafeteriaID, {
-                name: newRow.name,
-                latitude: newRow.latitude,
-                longitude: newRow.longitude,
-                breakfast: newRow.breakfastTime,
-                lunch: newRow.lunchTime,
-                dinner: newRow.dinnerTime,
-            })
-            if (response.status !== 200) {
+            try {
+                await updateCafeteria(newRow.seq, {
+                    name: newRow.name,
+                    latitude: newRow.latitude,
+                    longitude: newRow.longitude,
+                    campusID: parseInt(newRow.campus.split('(')[1].split(')')[0]),
+                    breakfastTime: newRow.breakfastTime.length > 0 ? newRow.breakfastTime : null,
+                    lunchTime: newRow.lunchTime.length > 0 ? newRow.lunchTime : null,
+                    dinnerTime: newRow.dinnerTime.length > 0 ? newRow.dinnerTime : null,
+                })
+                setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
+            } catch {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
-                return { ...newRow, _action: 'delete' }
+                return newRow
             }
-            setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         }
         const updatedRow = { ...newRow, isNew: false }
         rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
@@ -164,7 +167,8 @@ export const CafeteriaGrid = (props: GridProps) => {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{ toolbar: Toolbar }}
+                showToolbar={true}
+                slots={{ toolbar: GridToolbar }}
                 isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'id' || params.row.isNew)}
             />
         </Box>

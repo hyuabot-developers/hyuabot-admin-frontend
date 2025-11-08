@@ -6,9 +6,9 @@ export type CafeteriaResponse = {
     name: string,
     latitude: number,
     longitude: number,
-    breakfastTime: string,
-    lunchTime: string,
-    dinnerTime: string,
+    breakfastTime: string | null,
+    lunchTime: string | null,
+    dinnerTime: string | null,
 }
 
 export type CreateCafeteriaRequest = {
@@ -17,9 +17,9 @@ export type CreateCafeteriaRequest = {
     name: string,
     latitude: number,
     longitude: number,
-    breakfastTime: string,
-    lunchTime: string,
-    dinnerTime: string,
+    breakfastTime: string | null,
+    lunchTime: string | null,
+    dinnerTime: string | null,
 }
 
 export type UpdateCafeteriaRequest = {
@@ -27,9 +27,9 @@ export type UpdateCafeteriaRequest = {
     name: string,
     latitude: number,
     longitude: number,
-    breakfastTime: string,
-    lunchTime: string,
-    dinnerTime: string,
+    breakfastTime: string | null,
+    lunchTime: string | null,
+    dinnerTime: string | null,
 }
 
 export type MenuResponse = {

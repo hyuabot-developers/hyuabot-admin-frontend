@@ -1,5 +1,6 @@
 import { GridRowModesModel } from '@mui/x-data-grid'
 import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 import { GridModelStore } from './index.ts'
 import { CafeteriaResponse } from '../service/network/cafeteria.ts'
@@ -13,7 +14,7 @@ type CafeteriaTabStore = {
 export type GridCafeteriaItem = {
     id: string
     seq: number | null,
-    campusID: number,
+    campus: string,
     name: string,
     latitude: number,
     longitude: number,
@@ -49,31 +50,46 @@ type CafeteriaMenuStore = {
     setCafeterias: (cafeteriaList: Array<CafeteriaResponse>) => void,
 }
 
-export const useCafeteriaTabStore = create<CafeteriaTabStore>((set) => ({
-    route: 'cafeteria',
-    setRoute: (route) => set({ route }),
-}))
+export const useCafeteriaTabStore = create(
+    devtools<CafeteriaTabStore>((set) => ({
+        route: 'cafeteria',
+        setRoute: (route: string) => set({ route }),
+    }),
+    { name: 'CafeteriaTabStore' })
+)
 
-export const useCafeteriaItemGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useCafeteriaItemGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'CafeteriaItemGridModelStore' })
+)
 
-export const useCafeteriaItemStore = create<CafeteriaItemStore>((set) => ({
-    rows: [],
-    campuses: [],
-    setRows: (cafeteriaList) => set({ rows: cafeteriaList }),
-    setCampuses: (campusList) => set({ campuses: campusList }),
-}))
+export const useCafeteriaItemStore = create(
+    devtools<CafeteriaItemStore>((set) => ({
+        rows: [],
+        campuses: [],
+        setRows: (cafeteriaList) => set({ rows: cafeteriaList }),
+        setCampuses: (campusList) => set({ campuses: campusList }),
+    }),
+    { name: 'CafeteriaItemStore' })
+)
 
-export const useCafeteriaMenuGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useCafeteriaMenuGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'CafeteriaMenuGridModelStore' })
+)
 
-export const useCafeteriaMenuStore = create<CafeteriaMenuStore>((set) => ({
-    rows: [],
-    cafeterias: [],
-    setRows: (menuList) => set({ rows: menuList }),
-    setCafeterias: (cafeteriaList) => set({ cafeterias: cafeteriaList }),
-}))
+export const useCafeteriaMenuStore = create(
+    devtools<CafeteriaMenuStore>((set) => ({
+        rows: [],
+        cafeterias: [],
+        setRows: (menuList) => set({ rows: menuList }),
+        setCafeterias: (cafeteriaList) => set({ cafeterias: cafeteriaList }),
+    }),
+    { name: 'CafeteriaMenuStore' })
+)

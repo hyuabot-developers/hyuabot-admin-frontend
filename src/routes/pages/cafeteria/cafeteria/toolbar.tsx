@@ -1,46 +1,42 @@
 import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import { Button } from '@mui/material'
-import { GridRowModes, GridToolbarContainer } from '@mui/x-data-grid'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
 import { v4 as uuidv4 } from 'uuid'
 
 import { CafeteriaResponse, getCafeteriaList } from '../../../../service/network/cafeteria.ts'
 import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
 import { useCafeteriaItemGridModelStore, useCafeteriaItemStore } from '../../../../stores/cafeteria.ts'
-import { useCampusStore } from '../../../../stores/campus.ts'
 
-export const Toolbar = () => {
-    const campusStore = useCampusStore()
+export const GridToolbar = () => {
     const rowStore = useCafeteriaItemStore()
     const rowModesModelStore = useCafeteriaItemGridModelStore()
-    let campusList: CampusResponse[] = []
     const fetchCafeteriaList = async () => {
         const campusResponse = await getCampusList()
         if (campusResponse.status === 200) {
             const campusResponseData = campusResponse.data
-            campusList = campusResponseData.data.map((item: CampusResponse) => {
+            rowStore.setCampuses(campusResponseData.result.map((item: CampusResponse) => {
                 return {
-                    id: item.id,
+                    seq: item.seq,
                     name: item.name,
                 }
-            })
-            campusStore.setRows(campusList)
+            }))
         }
         const response = await getCafeteriaList()
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.data.map((item: CafeteriaResponse) => {
-                const campus = campusList.find((campus) => campus.id === item.campusID)
+            rowStore.setRows(responseData.result.map((item: CafeteriaResponse) => {
+                const campus = rowStore.campuses.find((campus) => campus.seq === item.campusID)
                 return {
                     id: uuidv4(),
-                    cafeteriaID: item.id,
+                    seq: item.seq,
+                    campus: `${campus ? campus.name : ''} (${item.campusID})`,
                     name: item.name,
-                    campus: `${campus?.name} (${campus?.id})`,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    breakfastTime: item.runningTime.breakfast,
-                    lunchTime: item.runningTime.lunch,
-                    dinnerTime: item.runningTime.dinner,
+                    breakfastTime: item.breakfastTime,
+                    lunchTime: item.lunchTime,
+                    dinnerTime: item.dinnerTime,
+                    isNew: false,
                 }
             }))
         }
@@ -48,14 +44,13 @@ export const Toolbar = () => {
     // Add record button click event
     const addRowButtonClicked = () => {
         const id = uuidv4()
-        const campus = campusStore.rows.at(0)
+        const campus = rowStore.campuses[0]
         rowStore.setRows([
-            ...rowStore.rows,
             {
                 id,
-                cafeteriaID: 0,
+                seq: null,
                 name: '',
-                campus: `${campus?.name} (${campus?.id})`,
+                campus: campus ? `${campus.name} (${campus.seq})` : '',
                 latitude: 0,
                 longitude: 0,
                 breakfastTime: '',
@@ -63,21 +58,22 @@ export const Toolbar = () => {
                 dinnerTime: '',
                 isNew: true,
             },
+            ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'cafeteriaID' },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'seq' },
         }))
     }
 
     return (
-        <GridToolbarContainer style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCafeteriaList}>
-                새로고침
-            </Button>
-            <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
-                항목 추가
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <ToolbarButton onClick={fetchCafeteriaList}>
+                <RefreshIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }
