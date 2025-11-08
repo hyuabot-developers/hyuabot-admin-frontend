@@ -73,7 +73,7 @@ export const createCafeteriaMenu = async (cafeteriaID: number, data: CafeteriaMe
 }
 
 export const updateCafeteriaMenu = async (cafeteriaID: number, seq: number, data: CafeteriaMenuRequest) => {
-    return await client.put(`/api/v1/cafeteria/${cafeteriaID}/${seq}`, data)
+    return await client.put(`/api/v1/cafeteria/${cafeteriaID}/menu/${seq}`, data)
 }
 
 export const deleteCafeteriaMenu = async (cafeteriaID: number, seq: number) => {

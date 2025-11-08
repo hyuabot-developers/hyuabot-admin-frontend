@@ -27,7 +27,7 @@ export type GridCafeteriaItem = {
 export type GridCafeteriaMenu = {
     id: string
     seq: number | null,
-    cafeteriaID: number,
+    cafeteria: string,
     date: string,
     type: string,
     food: string,
@@ -46,8 +46,10 @@ type CafeteriaItemStore = {
 type CafeteriaMenuStore = {
     rows: Array<GridCafeteriaMenu>,
     cafeterias: Array<CafeteriaResponse>,
+    selectedCafeteriaID?: number,
     setRows: (menuList: Array<GridCafeteriaMenu>) => void,
     setCafeterias: (cafeteriaList: Array<CafeteriaResponse>) => void,
+    setSelectedCafeteriaID: (cafeteriaID: number) => void,
 }
 
 export const useCafeteriaTabStore = create(
@@ -88,8 +90,10 @@ export const useCafeteriaMenuStore = create(
     devtools<CafeteriaMenuStore>((set) => ({
         rows: [],
         cafeterias: [],
+        selectedCafeteriaID: undefined,
         setRows: (menuList) => set({ rows: menuList }),
         setCafeterias: (cafeteriaList) => set({ cafeterias: cafeteriaList }),
+        setSelectedCafeteriaID: (cafeteriaID) => set({ selectedCafeteriaID: cafeteriaID }),
     }),
     { name: 'CafeteriaMenuStore' })
 )
