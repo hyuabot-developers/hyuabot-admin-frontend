@@ -12,7 +12,7 @@ type ReadingRoomTabStore = {
 
 export type GridReadingRoomItem = {
     id: string
-    seq: number,
+    seq: number | null,
     name: string,
     campus: string,
     isActive: boolean,
@@ -22,6 +22,7 @@ export type GridReadingRoomItem = {
     available: number,
     occupied: number,
     updatedAt: string,
+    isNew: boolean,
 }
 
 
