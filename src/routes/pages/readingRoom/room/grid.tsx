@@ -169,11 +169,13 @@ export const ReadingRoomGrid = (props: GridProps) => {
                     processRowUpdate={updateRowProcess}
                     showToolbar={true}
                     slots={{ toolbar: GridToolbar }}
-                    isCellEditable={(params) => (
-                        params.colDef.field !== 'actions' &&
-                        params.colDef.field !== 'updatedAt' &&
-                        params.colDef.field !== 'available'
-                    )}
+                    isCellEditable={(params) => {
+                        const newRowFields = ['seq', 'name', 'campus', 'total']
+                        const existingRowFields = ['name', 'campus', 'total', 'active', 'occupied', 'isActive', 'isReservable']
+
+                        const allowedFields = params.row.isNew ? newRowFields : existingRowFields
+                        return allowedFields.includes(params.colDef.field)
+                    }}
                     pageSizeOptions={[10]}
                     hideFooterPagination={false}
                     initialState={{
