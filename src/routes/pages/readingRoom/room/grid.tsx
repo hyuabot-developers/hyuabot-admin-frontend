@@ -33,7 +33,7 @@ export const ReadingRoomGrid = (props: GridProps) => {
     }
     // Render
     return (
-        <Box sx={{ height: '100vh', width: '100%' }}>
+        <Box sx={{ height: '90vh', width: '100%' }}>
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 open={errorSnackbarContent !== ''}
@@ -52,7 +52,7 @@ export const ReadingRoomGrid = (props: GridProps) => {
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ width: '100%' }}>
+            <div style={{ minHeight: '100%', width: '100%' }}>
                 <DataGrid
                     columns={props.columns}
                     rows={rowStore.rows}
