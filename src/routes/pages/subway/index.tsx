@@ -19,7 +19,6 @@ export default function Subway() {
         <div style={{ backgroundColor: 'white', height: '100%', paddingTop: '1rem' }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={subwayTabStore.route} onChange={tabClicked} variant="scrollable">
-                    <Tab label="전철 역명 관리" value="station-name" />
                     <Tab label="전철역 관리" value="station" />
                     <Tab label="노선 관리" value="route" />
                     <Tab label="시간표 관리" value="timetable" />

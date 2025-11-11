@@ -33,7 +33,6 @@ import Subway from './pages/subway'
 import SubwayRealtimePage from './pages/subway/realtime'
 import SubwayRoutePage from './pages/subway/route'
 import SubwayStationPage from './pages/subway/station'
-import SubwayStationNamePage from './pages/subway/stationName'
 import SubwayTimetablePage from './pages/subway/timetable'
 
 const appRouter = createBrowserRouter([
@@ -62,7 +61,6 @@ const appRouter = createBrowserRouter([
                 { path: '*', element: <Navigate replace to="/bus/route" /> },
             ] },
             { path: 'subway', element: <Subway />, children: [
-                { path: 'station-name', element: <SubwayStationNamePage /> },
                 { path: 'station', element: <SubwayStationPage /> },
                 { path: 'route', element: <SubwayRoutePage /> },
                 { path: 'timetable', element: <SubwayTimetablePage /> },

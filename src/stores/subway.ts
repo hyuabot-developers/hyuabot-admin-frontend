@@ -8,12 +8,6 @@ type SubwayTabStore = {
     setRoute: (route: string) => void,
 }
 
-export type GridSubwayStationName = {
-    id: string,
-    name: string,
-    isNew: boolean,
-}
-
 export type GridSubwayRoute = {
     id: string,
     routeID: number,
@@ -59,11 +53,6 @@ export type GridSubwayRealtime = {
     isNew: boolean,
 }
 
-type SubwayStationNameStore = {
-    rows: Array<GridSubwayStationName>,
-    setRows: (nameList: Array<GridSubwayStationName>) => void,
-}
-
 type SubwayRouteStore = {
     rows: Array<GridSubwayRoute>,
     setRows: (routeList: Array<GridSubwayRoute>) => void,
@@ -85,13 +74,8 @@ type SubwayRealtimeStore = {
 }
 
 export const useSubwayTabStore = create<SubwayTabStore>((set) => ({
-    route: 'station-name',
+    route: 'station',
     setRoute: (route) => set({ route }),
-}))
-
-export const useSubwayStationNameStore = create<SubwayStationNameStore>((set) => ({
-    rows: [],
-    setRows: (nameList) => set({ rows: nameList }),
 }))
 
 export const useSubwayRouteStore = create<SubwayRouteStore>((set) => ({

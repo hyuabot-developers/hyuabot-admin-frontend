@@ -1,10 +1,5 @@
 import client from './client.ts'
 
-export type SubwayStationName = {
-    name: string
-}
-
-
 export type SubwayRoute = {
     id: number,
     name: string,
@@ -57,18 +52,6 @@ export type SubwayRealtime = {
     last: string,
     terminalStationID: string,
     status: string
-}
-
-export const getSubwayStationNames = async ()=> {
-    return await client.get('/api/subway/stationName')
-}
-
-export const createSubwayStationName = async (data: SubwayStationName) => {
-    return await client.post('/api/subway/stationName', data)
-}
-
-export const deleteSubwayStationName = async (name: string) => {
-    return await client.delete(`/api/subway/stationName/${name}`)
 }
 
 export const getSubwayRoutes = async () => {
