@@ -40,6 +40,7 @@ export type GridSubwayTimetable = {
 }
 
 export type GridSubwayRealtime = {
+    sortableId: string,
     id: string,
     station: string,
     direction: string,
@@ -78,8 +79,10 @@ type SubwayTimetableStore = {
 type SubwayRealtimeStore = {
     rows: Array<GridSubwayRealtime>,
     stations: Array<SubwayStation>,
+    routes: Array<SubwayRoute>,
     setRows: (realtimeList: Array<GridSubwayRealtime>) => void,
     setStations: (stationList: Array<SubwayStation>) => void,
+    setRoutes: (routeList: Array<SubwayRoute>) => void,
 }
 
 export const useSubwayTabStore = create(
@@ -122,8 +125,10 @@ export const useSubwayRealtimeStore = create(
     devtools<SubwayRealtimeStore>((set) => ({
         rows: [],
         stations: [],
+        routes: [],
         setRows: (realtimeList) => set({ rows: realtimeList }),
         setStations: (stationList) => set({ stations: stationList }),
+        setRoutes: (routeList) => set({ routes: routeList }),
     }),
     { name: 'SubwayRealtimeStore' })
 )

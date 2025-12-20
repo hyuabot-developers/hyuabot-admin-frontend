@@ -7,7 +7,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import {
     useSubwayRealtimeGridModelStore,
     useSubwayRealtimeStore,
@@ -63,22 +63,12 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
                     editMode="row"
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
-                    slots={{ toolbar: Toolbar }}
+                    showToolbar={true}
+                    slots={{ toolbar: GridToolbar }}
                     initialState={{
-                        sorting: {
-                            sortModel: [
-                                { field: 'sortID', sort: 'asc' },
-                            ]
-                        },
-                        pagination: { paginationModel: { pageSize: 10 } },
-                        columns: {
-                            columnVisibilityModel: {
-                                sortID: false
-                            }
-                        }
+                        sorting: { sortModel: [{ field: 'sortableId', sort: 'asc' }] },
+                        columns: { columnVisibilityModel: { sortableId: false, order: false } },
                     }}
-                    pageSizeOptions={[10]}
-                    hideFooterPagination={false}
                 />
             </div>
         </Box>
