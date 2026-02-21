@@ -11,7 +11,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createContactCategory, deleteContactCategory } from '../../../../service/network/contact.ts'
 import {
     GridContactCategoryItem,
@@ -51,7 +51,8 @@ export const ContactCategoryGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteContactCategory(rowToDelete.categoryID)
+        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteContactCategory(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -101,13 +102,7 @@ export const ContactCategoryGrid = (props: GridProps) => {
                 ]
             }
             return [
-                <GridActionsCellItem
-                    label="edit"
-                    key="edit"
-                    icon={<EditIcon />}
-                    disabled={true}
-                    onClick={() => editRowButtonClicked(id)}
-                />,
+                <GridActionsCellItem label="edit" key="edit" disabled={true} icon={<EditIcon />} onClick={() => editRowButtonClicked(id)} />,
                 <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
             ]
         }
@@ -142,15 +137,15 @@ export const ContactCategoryGrid = (props: GridProps) => {
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
                     processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
+                    showToolbar={true}
+                    slots={{ toolbar: GridToolbar }}
                     isCellEditable={(params) => params.colDef.field !== 'actions' && params.row.isNew}
                     pageSizeOptions={[10]}
                     hideFooterPagination={false}
                     initialState={{
-                        pagination: { paginationModel: { pageSize: 10 } },
                         sorting: {
                             sortModel: [
-                                { field: 'categoryID', sort: 'asc' },
+                                { field: 'seq', sort: 'asc' },
                             ]
                         },
                     }}

@@ -14,10 +14,10 @@ export default function ContactCategoryPage() {
         const response = await getContactCategoryList()
         if (response.status === 200) {
             const responseData = response.data
-            categoryStore.setRows(responseData.data.map((item: ContactCategoryResponse) => {
+            categoryStore.setRows(responseData.result.map((item: ContactCategoryResponse) => {
                 return {
                     id: uuidv4(),
-                    categoryID: item.id,
+                    seq: item.seq,
                     name: item.name,
                     isNew: false,
                 }
@@ -30,11 +30,11 @@ export default function ContactCategoryPage() {
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'categoryID',
+            field: 'seq',
             headerName: '카테고리 ID',
             width: 150,
-            type: 'string',
-            editable: true,
+            type: 'number',
+            editable: false,
             headerAlign: 'center',
             align: 'center',
         },

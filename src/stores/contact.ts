@@ -2,6 +2,7 @@ import { GridRowModesModel } from '@mui/x-data-grid'
 import { create } from 'zustand'
 
 import { GridModelStore } from './index.ts'
+import { ContactCategoryResponse } from '../service/network/contact.ts'
 
 type ContactTabStore = {
     route: string,
@@ -10,18 +11,17 @@ type ContactTabStore = {
 
 export type GridContactCategoryItem = {
     id: string
-    categoryID: number
+    seq: number | null
     name: string
     isNew: boolean
 }
 
 export type GridContactItem = {
     id: string
-    contactID: number
+    seq: number | null
     name: string
     phone: string
     category: string
-    campus: string
     isNew: boolean
 }
 
@@ -33,7 +33,9 @@ type ContactCategoryStore = {
 
 type ContactStore = {
     rows: Array<GridContactItem>,
+    categories: Array<ContactCategoryResponse>,
     setRows: (menuList: Array<GridContactItem>) => void,
+    setCategories: (categories: Array<ContactCategoryResponse>) => void,
 }
 
 export const useContactTabStore = create<ContactTabStore>((set) => ({
@@ -58,5 +60,7 @@ export const useContactGridModelStore = create<GridModelStore>((set) => ({
 
 export const useContactStore = create<ContactStore>((set) => ({
     rows: [],
+    categories: [],
     setRows: (contactList) => set({ rows: contactList }),
+    setCategories: (categories) => set({ categories }),
 }))

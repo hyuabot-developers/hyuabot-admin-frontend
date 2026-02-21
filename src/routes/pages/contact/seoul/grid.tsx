@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createContact, deleteContact, updateContact } from '../../../../service/network/contact.ts'
 import { GridContactItem, useContactGridModelStore, useContactStore } from '../../../../stores/contact.ts'
 
@@ -45,10 +45,8 @@ export const ContactGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteContact(
-            parseInt(rowToDelete.category.split('(')[1].split(')')[0]),
-            rowToDelete.contactID
-        )
+        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteContact(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -71,11 +69,11 @@ export const ContactGrid = (props: GridProps) => {
         }
         if (newRow.isNew) {
             const response = await createContact(
-                parseInt(newRow.category.split('(')[1].split(')')[0]),
                 {
                     name: newRow.name,
                     phone: newRow.phone,
-                    campusID: Number(newRow.campus.split(' ')[1].slice(1, -1)),
+                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    campusID: 1,
                 }
             )
             if (response.status !== 201) {
@@ -84,14 +82,14 @@ export const ContactGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
-        } else {
+        } else if (newRow.seq !== null) {
             const response = await updateContact(
-                parseInt(newRow.category.split('(')[1].split(')')[0]),
-                newRow.contactID,
+                newRow.seq,
                 {
                     name: newRow.name,
                     phone: newRow.phone,
-                    campusID: Number(newRow.campus.split(' ')[1].slice(1, -1)),
+                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    campusID: 1,
                 }
             )
             if (response.status !== 200) {
@@ -163,15 +161,14 @@ export const ContactGrid = (props: GridProps) => {
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
                     processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.row.isNew || (params.colDef.field !== 'contactID' && params.colDef.field !== 'category'))}
-                    pageSizeOptions={[10]}
+                    showToolbar={true}
+                    slots={{ toolbar: GridToolbar }}
+                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.row.isNew || params.colDef.field !== 'contactID')}
                     hideFooterPagination={false}
                     initialState={{
-                        pagination: { paginationModel: { pageSize: 10 } },
                         sorting: {
                             sortModel: [
-                                { field: 'contactID', sort: 'asc' },
+                                { field: 'seq', sort: 'asc' },
                             ]
                         },
                     }}
