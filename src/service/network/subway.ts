@@ -24,6 +24,7 @@ export type SubwayStation = {
 
 export type UpdateSubwayStationRequest = {
     name: string,
+    routeID: number,
     order: number,
     cumulativeTime: string,
 }
@@ -42,7 +43,7 @@ export type SubwayTimetableRequest = {
     startStationID: string,
     terminalStationID: string,
     departureTime: string,
-    weekdays: string,
+    weekday: string,
     direction: string,
 }
 
@@ -93,8 +94,13 @@ export const deleteSubwayStation = async (stationID: string) => {
     return await client.delete(`/api/v1/subway/station/${stationID}`)
 }
 
-export const getSubwayTimetableByStation = async (stationID: string) => {
-    return await client.get(`/api/v1/subway/station/${stationID}/timetable`)
+export const getSubwayTimetableByStation = async (stationID: string, direction: string, weekday: string) => {
+    return await client.get(`/api/v1/subway/station/${stationID}/timetable`, {
+        params: {
+            direction,
+            weekday,
+        },
+    })
 }
 
 export const createSubwayTimetable = async (stationID: string, data: SubwayTimetableRequest) => {

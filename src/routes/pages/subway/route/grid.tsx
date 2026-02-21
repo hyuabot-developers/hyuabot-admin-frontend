@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createSubwayRoute, deleteSubwayRoute, updateSubwayRoute } from '../../../../service/network/subway.ts'
 import { GridSubwayRoute, useSubwayRouteGridModelStore, useSubwayRouteStore } from '../../../../stores/subway.ts'
 
@@ -142,27 +142,25 @@ export const SubwayRouteGrid = (props: GridProps) => {
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ height: '100%', width: '100%' }}>
-                <DataGrid
-                    columns={props.columns}
-                    rows={rowStore.rows}
-                    rowModesModel={rowModesModelStore.rowModesModel}
-                    editMode="row"
-                    onRowModesModelChange={rowModesModelChanged}
-                    onRowEditStop={rowEditStopped}
-                    processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    initialState={{
-                        sorting: {
-                            sortModel: [
-                                { field: 'routeID', sort: 'asc' },
-                            ]
-                        },
-                        pagination: { paginationModel: { pageSize: 10 } },
-                    }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'routeID' || params.row.isNew)}
-                />
-            </div>
+            <DataGrid
+                columns={props.columns}
+                rows={rowStore.rows}
+                rowModesModel={rowModesModelStore.rowModesModel}
+                editMode="row"
+                onRowModesModelChange={rowModesModelChanged}
+                onRowEditStop={rowEditStopped}
+                processRowUpdate={updateRowProcess}
+                slots={{ toolbar: GridToolbar }}
+                showToolbar={true}
+                initialState={{
+                    sorting: {
+                        sortModel: [
+                            { field: 'routeID', sort: 'asc' },
+                        ]
+                    },
+                }}
+                isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'routeID' || params.row.isNew)}
+            />
         </Box>
     )
 }

@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createSubwayStation, deleteSubwayStation, updateSubwayStation } from '../../../../service/network/subway.ts'
 import { GridSubwayStation, useSubwayStationGridModelStore, useSubwayStationStore } from '../../../../stores/subway.ts'
 
@@ -72,7 +72,7 @@ export const SubwayStationGrid = (props: GridProps) => {
                 id: newRow.stationID,
                 name: newRow.name,
                 routeID: newRow.routeID,
-                sequence: newRow.sequence,
+                order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
             })
             if (response.status !== 201) {
@@ -86,7 +86,8 @@ export const SubwayStationGrid = (props: GridProps) => {
                 newRow.stationID,
                 {
                     name: newRow.name,
-                    sequence: newRow.sequence,
+                    routeID: newRow.routeID,
+                    order: newRow.order,
                     cumulativeTime: newRow.cumulativeTime,
                 }
             )
@@ -150,29 +151,27 @@ export const SubwayStationGrid = (props: GridProps) => {
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ height: '100%', width: '100%' }}>
-                <DataGrid
-                    columns={props.columns}
-                    rows={rowStore.rows}
-                    rowModesModel={rowModesModelStore.rowModesModel}
-                    editMode="row"
-                    onRowModesModelChange={rowModesModelChanged}
-                    onRowEditStop={rowEditStopped}
-                    processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && ((params.colDef.field !== 'stationID' && params.colDef.field !== 'routeID') || params.row.isNew)}
-                    initialState={{
-                        sorting: {
-                            sortModel: [
-                                { field: 'stationID', sort: 'asc' },
-                            ]
-                        },
-                        pagination: { paginationModel: { pageSize: 10 } }
-                    }}
-                    pageSizeOptions={[10]}
-                    hideFooterPagination={false}
-                />
-            </div>
+            <DataGrid
+                columns={props.columns}
+                rows={rowStore.rows}
+                rowModesModel={rowModesModelStore.rowModesModel}
+                editMode="row"
+                onRowModesModelChange={rowModesModelChanged}
+                onRowEditStop={rowEditStopped}
+                processRowUpdate={updateRowProcess}
+                slots={{ toolbar: GridToolbar }}
+                showToolbar={true}
+                isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'stationID' || params.row.isNew)}
+                initialState={{
+                    sorting: {
+                        sortModel: [
+                            { field: 'stationID', sort: 'asc' },
+                        ]
+                    },
+                }}
+                autoPageSize={true}
+                hideFooterPagination={false}
+            />
         </Box>
     )
 }

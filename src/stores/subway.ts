@@ -20,7 +20,7 @@ export type GridSubwayRoute = {
 export type GridSubwayStation = {
     id: string,
     stationID: string,
-    route: string,
+    routeID: number,
     name: string,
     order: number,
     cumulativeTime: string,
@@ -29,13 +29,10 @@ export type GridSubwayStation = {
 
 export type GridSubwayTimetable = {
     id: string,
-    seq: number,
-    station: string,
+    seq: number | null,
     startStation: string,
     terminalStation: string,
     departureTime: string,
-    weekday: string,
-    direction: string,
     isNew: boolean,
 }
 
@@ -72,8 +69,14 @@ type SubwayStationStore = {
 type SubwayTimetableStore = {
     rows: Array<GridSubwayTimetable>,
     stations: Array<SubwayStation>,
+    selectedStationID: string | null,
+    selectedDirection: string | null,
+    selectedWeekday: string | null,
     setRows: (timetableList: Array<GridSubwayTimetable>) => void,
     setStations: (stationList: Array<SubwayStation>) => void,
+    setSelectedStationID: (station: string | null) => void,
+    setSelectedDirection: (direction: string | null) => void,
+    setSelectedWeekday: (weekday: string | null) => void,
 }
 
 type SubwayRealtimeStore = {
@@ -115,8 +118,14 @@ export const useSubwayTimetableStore = create(
     devtools<SubwayTimetableStore>((set) => ({
         rows: [],
         stations: [],
+        selectedStationID: null,
+        selectedDirection: null,
+        selectedWeekday: null,
         setRows: (timetableList) => set({ rows: timetableList }),
         setStations: (stationList) => set({ stations: stationList }),
+        setSelectedStationID: (stationID) => set({ selectedStationID: stationID }),
+        setSelectedDirection: (direction) => set({ selectedDirection: direction }),
+        setSelectedWeekday: (weekday) => set({ selectedWeekday: weekday }),
     }),
     { name: 'SubwayTimetableStore' })
 )

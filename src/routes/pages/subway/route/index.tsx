@@ -14,7 +14,7 @@ export default function SubwayRoutePage() {
         const routeResponse = await getSubwayRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            subwayRouteStore.setRows(responseData.data.map((item: SubwayRoute) => {
+            subwayRouteStore.setRows(responseData.result.map((item: SubwayRoute) => {
                 return {
                     id: uuidv4(),
                     routeID: item.id,

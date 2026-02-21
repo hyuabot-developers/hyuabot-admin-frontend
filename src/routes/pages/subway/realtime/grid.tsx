@@ -55,22 +55,20 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
-            <div style={{ height: '100%', width: '100%' }}>
-                <DataGrid
-                    columns={props.columns}
-                    rows={rowStore.rows}
-                    rowModesModel={rowModesModelStore.rowModesModel}
-                    editMode="row"
-                    onRowModesModelChange={rowModesModelChanged}
-                    onRowEditStop={rowEditStopped}
-                    showToolbar={true}
-                    slots={{ toolbar: GridToolbar }}
-                    initialState={{
-                        sorting: { sortModel: [{ field: 'sortableId', sort: 'asc' }] },
-                        columns: { columnVisibilityModel: { sortableId: false, order: false } },
-                    }}
-                />
-            </div>
+            <DataGrid
+                columns={props.columns}
+                rows={rowStore.rows}
+                rowModesModel={rowModesModelStore.rowModesModel}
+                editMode="row"
+                onRowModesModelChange={rowModesModelChanged}
+                onRowEditStop={rowEditStopped}
+                showToolbar={true}
+                slots={{ toolbar: GridToolbar }}
+                initialState={{
+                    sorting: { sortModel: [{ field: 'sortableId', sort: 'asc' }] },
+                    columns: { columnVisibilityModel: { sortableId: false, order: false } },
+                }}
+            />
         </Box>
     )
 }

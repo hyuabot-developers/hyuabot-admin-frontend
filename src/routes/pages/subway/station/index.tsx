@@ -5,60 +5,32 @@ import { v4 as uuidv4 } from 'uuid'
 import { SubwayStationGrid } from './grid.tsx'
 import {
     getSubwayRoutes,
-    getSubwayStationNames,
     getSubwayStations,
-    SubwayRoute,
     SubwayStation
 } from '../../../../service/network/subway.ts'
-import {
-    GridSubwayRoute,
-    useSubwayRouteStore,
-    useSubwayStationNameStore,
-    useSubwayStationStore
-} from '../../../../stores/subway.ts'
+import { useSubwayStationStore } from '../../../../stores/subway.ts'
 
 export default function SubwayStationPage() {
     // Get the store
-    const subwayStationNameStore = useSubwayStationNameStore()
-    const subwayRouteStore = useSubwayRouteStore()
-    const subwayStationStore = useSubwayStationStore()
-    let routeData: GridSubwayRoute[] = []
+    const rowStore = useSubwayStationStore()
     const fetchSubwayStation = async () => {
-        // Fetch subway station name
-        const stationNameResponse = await getSubwayStationNames()
-        if (stationNameResponse.status === 200) {
-            const responseData = stationNameResponse.data
-            subwayStationNameStore.setRows(responseData.data.map((item: SubwayStation) => {
-                return {
-                    id: uuidv4(),
-                    name: item.name,
-                }
-            }))
-        }
         // Fetch subway route
         const routeResponse = await getSubwayRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            routeData = responseData.data.map((item: SubwayRoute) => {
-                return {
-                    id: uuidv4(),
-                    routeID: item.id,
-                    name: item.name,
-                }
-            })
-            subwayRouteStore.setRows(routeData)
+            rowStore.setRoutes(responseData.result)
         }
         // Fetch subway station
         const stationResponse = await getSubwayStations()
         if (stationResponse.status === 200) {
             const stationData = stationResponse.data
-            subwayStationStore.setRows(stationData.data.map((item: SubwayStation) => {
+            rowStore.setRows(stationData.result.map((item: SubwayStation) => {
                 return {
                     id: uuidv4(),
                     stationID: item.id,
                     routeID: item.routeID,
                     name: item.name,
-                    sequence: item.sequence,
+                    order: item.order,
                     cumulativeTime: item.cumulativeTime,
                 }
             }))
@@ -83,13 +55,13 @@ export default function SubwayStationPage() {
             headerName: '노선 ID',
             width: 150,
             type: 'singleSelect',
-            valueOptions: subwayRouteStore.rows.map((route) => route.routeID),
+            valueOptions: rowStore.routes.map((route) => route.id),
             editable: true,
             headerAlign: 'center',
             align: 'center',
         },
         {
-            field: 'sequence',
+            field: 'order',
             headerName: '순서',
             width: 150,
             type: 'number',
@@ -102,8 +74,7 @@ export default function SubwayStationPage() {
             headerName: '역 이름',
             minWidth: 250,
             flex: 1,
-            type: 'singleSelect',
-            valueOptions: subwayStationNameStore.rows.map((station) => station.name),
+            type: 'string',
             editable: true,
             headerAlign: 'center',
             align: 'center',
