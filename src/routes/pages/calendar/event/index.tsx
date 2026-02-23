@@ -10,36 +10,28 @@ import {
     getCalendarCategoryList,
     getCalendarList
 } from '../../../../service/network/calendar.ts'
-import { GridCalendarCategoryItem, useCalendarCategoryStore, useCalendarStore } from '../../../../stores/calendar.ts'
+import { useCalendarStore } from '../../../../stores/calendar.ts'
 
 
 export default function CalendarEventPage() {
     // Get the store
-    const categoryStore = useCalendarCategoryStore()
-    const calendarStore = useCalendarStore()
-    let categoryList: GridCalendarCategoryItem[] = []
+    const rowStore = useCalendarStore()
     const fetchCalendar = async () => {
         const categoryResponse = await getCalendarCategoryList()
         if (categoryResponse.status === 200) {
             const categoryResponseData = categoryResponse.data
-            categoryList = categoryResponseData.data.map((item: CalendarCategoryResponse) => {
-                return {
-                    id: uuidv4(),
-                    categoryID: item.id,
-                    name: item.name,
-                }
-            })
-            categoryStore.setRows(categoryList)
+            rowStore.setCategories(categoryResponseData.result)
         }
         const response = await getCalendarList()
         if (response.status === 200) {
             const responseData = response.data
-            calendarStore.setRows(responseData.data.map((item: CalendarResponse) => {
-                const category = categoryList.find((category) => category.categoryID === item.categoryID)
+            const { categories } = useCalendarStore.getState()
+            rowStore.setRows(responseData.result.map((item: CalendarResponse) => {
+                const category = categories.find((category) => category.seq === item.categoryID)
                 return {
                     id: uuidv4(),
-                    eventID: item.id,
-                    category: `${category?.name} (${category?.categoryID})`,
+                    seq: item.seq,
+                    category: `${category?.name} (${category?.seq})`,
                     title: item.title,
                     description: item.description,
                     start: item.start,
@@ -57,7 +49,7 @@ export default function CalendarEventPage() {
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'eventID',
+            field: 'seq',
             headerName: '일정 ID',
             width: 150,
             type: 'string',
@@ -71,8 +63,8 @@ export default function CalendarEventPage() {
             minWidth: 150,
             flex: 1,
             type: 'singleSelect',
-            valueOptions: categoryStore.rows.map((item: GridCalendarCategoryItem) => {
-                return `${item.name} (${item.categoryID})`
+            valueOptions: rowStore.categories.map((item: CalendarCategoryResponse) => {
+                return `${item.name} (${item.seq})`
             }),
             editable: true,
             headerAlign: 'center',

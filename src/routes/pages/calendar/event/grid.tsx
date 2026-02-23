@@ -14,7 +14,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../../../service/network/calendar.ts'
 import { GridCalendarEventItem, useCalendarGridModelStore, useCalendarStore } from '../../../../stores/calendar.ts'
 
@@ -28,6 +28,17 @@ export const CalendarGrid = (props: GridProps) => {
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
 
+    const toLocalDateString = (date: string | Date) => {
+        if (typeof date === 'string') return date
+
+        // 한국 시간대(Asia/Seoul) 기준으로 연-월-일 포맷팅
+        return new Intl.DateTimeFormat('sv-SE', {
+            timeZone: 'Asia/Seoul',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }).format(date)
+    }
     const rowEditStopped: GridEventListener<'rowEditStop'> = (params, event) => {
         if (event.defaultMuiPrevented) {
             return
@@ -45,10 +56,8 @@ export const CalendarGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteCalendar(
-            parseInt(rowToDelete.category.split('(')[1].split(')')[0]),
-            rowToDelete.eventID
-        )
+        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteCalendar(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -69,14 +78,16 @@ export const CalendarGrid = (props: GridProps) => {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
+        const formattedStart = toLocalDateString(newRow.start)
+        const formattedEnd = toLocalDateString(newRow.end)
         if (newRow.isNew) {
             const response = await createCalendar(
-                parseInt(newRow.category.split('(')[1].split(')')[0]),
                 {
                     title: newRow.title,
+                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
                     description: newRow.description,
-                    start: newRow.start,
-                    end: newRow.end,
+                    start: formattedStart,
+                    end: formattedEnd,
                 }
             )
             if (response.status !== 201) {
@@ -85,15 +96,16 @@ export const CalendarGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
-        } else {
+        } else if (newRow.seq !== null) {
+            // Format start and end to YYYY-MM-DD if Date object is passed
             const response = await updateCalendar(
-                parseInt(newRow.category.split('(')[1].split(')')[0]),
-                newRow.eventID,
+                newRow.seq,
                 {
                     title: newRow.title,
+                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
                     description: newRow.description,
-                    start: newRow.start,
-                    end: newRow.end,
+                    start: formattedStart,
+                    end: formattedEnd,
                 }
             )
             if (response.status !== 200) {
@@ -165,15 +177,14 @@ export const CalendarGrid = (props: GridProps) => {
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
                     processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
+                    slots={{ toolbar: GridToolbar }}
+                    showToolbar={true}
                     isCellEditable={(params) => params.colDef.field !== 'actions' && (params.row.isNew || (params.colDef.field !== 'eventID'))}
-                    pageSizeOptions={[10]}
                     hideFooterPagination={false}
                     initialState={{
-                        pagination: { paginationModel: { pageSize: 10 } },
                         sorting: {
                             sortModel: [
-                                { field: 'eventID', sort: 'desc' },
+                                { field: 'seq', sort: 'asc' },
                             ]
                         },
                     }}

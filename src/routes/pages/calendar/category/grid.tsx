@@ -11,7 +11,7 @@ import {
 } from '@mui/x-data-grid'
 import { useState } from 'react'
 
-import { Toolbar } from './toolbar.tsx'
+import { GridToolbar } from './toolbar.tsx'
 import {
     createCalendarCategory,
     deleteCalendarCategory,
@@ -54,7 +54,8 @@ export const CalendarCategoryGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
         if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteCalendarCategory(rowToDelete.categoryID)
+        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteCalendarCategory(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -83,9 +84,9 @@ export const CalendarCategoryGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
-        } else {
+        } else if (newRow.seq !== null) {
             const response = await updateCalendarCategory(
-                newRow.categoryID,
+                newRow.seq,
                 newRow.name,
             )
             if (response.status !== 200) {
@@ -154,15 +155,14 @@ export const CalendarCategoryGrid = (props: GridProps) => {
                     onRowModesModelChange={rowModesModelChanged}
                     onRowEditStop={rowEditStopped}
                     processRowUpdate={updateRowProcess}
-                    slots={{ toolbar: Toolbar }}
-                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.row.isNew || params.colDef.field !== 'categoryID')}
-                    pageSizeOptions={[10]}
+                    showToolbar={true}
+                    slots={{ toolbar: GridToolbar }}
+                    isCellEditable={(params) => params.colDef.field !== 'actions' && (params.row.isNew || params.colDef.field !== 'seq')}
                     hideFooterPagination={false}
                     initialState={{
-                        pagination: { paginationModel: { pageSize: 10 } },
                         sorting: {
                             sortModel: [
-                                { field: 'categoryID', sort: 'asc' },
+                                { field: 'seq', sort: 'asc' },
                             ]
                         },
                     }}
