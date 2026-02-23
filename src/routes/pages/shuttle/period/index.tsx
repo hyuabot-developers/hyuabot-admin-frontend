@@ -1,43 +1,53 @@
-import dayjs from "dayjs"
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { ShuttlePeriodGrid } from "./grid.tsx"
-import { useShuttlePeriodStore } from "../../../../stores/shuttle.ts"
-import { getShuttlePeriod, ShuttlePeriodResponse } from "../../../../service/network/shuttle.ts"
+import { GridColDef, GridRowModes, GridRowModesModel } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { ShuttlePeriodGrid } from './grid.tsx'
+import { getShuttlePeriod, ShuttlePeriodResponse } from '../../../../service/network/shuttle.ts'
+import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from '../../../../stores/shuttle.ts'
 
 export default function Period() {
     // Get the store
-    const shuttlePeriodStore = useShuttlePeriodStore()
+    const rowStore = useShuttlePeriodStore()
+    const rowModesModelStore = useShuttlePeriodGridModelStore()
     // Fetch shuttle period
     const fetchShuttlePeriod = async () => {
         const response = await getShuttlePeriod()
         if (response.status === 200) {
             const responseData = response.data
-            shuttlePeriodStore.setRows(responseData.data.map((period: ShuttlePeriodResponse) => {
+            const rows = responseData.result.map((period: ShuttlePeriodResponse) => {
                 return {
                     id: uuidv4(),
+                    seq: period.seq,
                     type: period.type,
-                    start: period.start,
-                    end: period.end,
+                    start: dayjs(period.start),
+                    end: dayjs(period.end),
                 }
-            }))
+            })
+            rowStore.setRows(rows as ShuttlePeriod[])
+            rowModesModelStore.setRowModesModel(
+                rows.reduce((acc: GridRowModesModel, row: ShuttlePeriod) => {
+                    acc[row.id] = { mode: GridRowModes.View }
+                    return acc
+                }, {} as Record<string, { mode: GridRowModes }>)
+            )
         }
     }
     useEffect(() => { fetchShuttlePeriod().then() }, [])
     // Configure DataGrid
-    const startDateValueFormatter = (value: string) => {
-        return dayjs(value).set('hour', 0).set('minute', 0).set('second', 0).set('millisecond', 0).format('YYYY-MM-DD HH:mm:ss Z')
+    const startDateValueFormatter = (value: Date) => {
+        return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     }
-    const endDateValueFormatter = (value: string) => {
-        return dayjs(value).set('hour', 23).set('minute', 59).set('second', 59).set('millisecond', 0).format('YYYY-MM-DD HH:mm:ss Z')
+    const endDateValueFormatter = (value: Date) => {
+        return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     }
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
-        case "semester": return "학기"
-        case "vacation": return "방학"
-        case "vacation_session": return "계절학기"
-        default: return "기타"
+        case 'semester': return '학기'
+        case 'vacation': return '방학'
+        case 'vacation_session': return '계절학기'
+        default: return '기타'
         }
     }
     const columns: GridColDef[] = [
@@ -55,9 +65,10 @@ export default function Period() {
         {
             field: 'start',
             headerName: '시작 날짜',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             valueFormatter: startDateValueFormatter,
-            type: 'date',
+            type: 'dateTime',
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -65,9 +76,10 @@ export default function Period() {
         {
             field: 'end',
             headerName: '종료 날짜',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             valueFormatter: endDateValueFormatter,
-            type: 'date',
+            type: 'dateTime',
             editable: true,
             headerAlign: 'center',
             align: 'center',

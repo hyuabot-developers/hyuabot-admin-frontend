@@ -1,4 +1,12 @@
-import { createElement, useEffect } from "react"
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import ContactsIcon from '@mui/icons-material/Contacts'
+import DepartureBoardIcon from '@mui/icons-material/DepartureBoard'
+import DiningIcon from '@mui/icons-material/Dining'
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'
+import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway'
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
+import LogOutIcon from '@mui/icons-material/Logout'
+import MenuIcon from '@mui/icons-material/Menu'
 import {
     AppBar,
     Box,
@@ -10,20 +18,13 @@ import {
     ListItemIcon, ListItemText,
     Toolbar,
     Typography
-} from "@mui/material"
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
-import ContactsIcon from '@mui/icons-material/Contacts'
-import DepartureBoardIcon from '@mui/icons-material/DepartureBoard'
-import DiningIcon from '@mui/icons-material/Dining'
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'
-import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway'
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
-import LogOutIcon from '@mui/icons-material/Logout'
-import MenuIcon from '@mui/icons-material/Menu'
-import { useDrawerOpenedStore } from "../../stores/home.ts"
-import { getUserInfo } from "../../service/network/auth.ts"
-import { useAuthenticatedStore, useUserInfoStore } from "../../stores/auth.ts"
-import { Outlet, useNavigate } from "react-router-dom"
+} from '@mui/material'
+import { createElement, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+
+import { getUserInfo, logout } from '../../service/network/auth.ts'
+import { useAuthenticatedStore, useUserInfoStore } from '../../stores/auth.ts'
+import { useDrawerOpenedStore } from '../../stores/home.ts'
 
 
 export default function Home() {
@@ -45,11 +46,14 @@ export default function Home() {
             )
         }
     }
-    // Log out button clicked
-    const logOutButtonClicked = () => {
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
-        window.location.href = '/login'
+    // Logout
+    const logOutButtonClicked = async () => {
+        const response = await logout()
+        if (response.status === 200) {
+            localStorage.removeItem('accessToken')
+            localStorage.removeItem('refreshToken')
+            window.location.href = '/login'
+        }
     }
     // Menu button clicked
     const menuButtonClicked = () => {
@@ -90,8 +94,8 @@ export default function Home() {
                 <Typography
                     variant="h6"
                     component="div"
-                    style={{ textAlign: "end" }}
-                    sx={{ flexGrow: 1}}>
+                    style={{ textAlign: 'end' }}
+                    sx={{ flexGrow: 1 }}>
                     {window.innerWidth > 600 ? userInfoStore.nickname : ''}
                 </Typography>
                 <IconButton size="large" color="inherit" onClick={logOutButtonClicked}>

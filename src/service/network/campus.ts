@@ -1,10 +1,10 @@
-import client from "./client.ts"
+import client from './client.ts'
 
 export type CampusResponse = {
-    id: number,
+    seq: number,
     name: string,
 }
 
 export const getCampusList = async ()=> {
-    return await client.get('/api/campus')
+    return await client.get('/api/v1/campus')
 }

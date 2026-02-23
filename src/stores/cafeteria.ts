@@ -1,6 +1,10 @@
-import { create } from "zustand"
-import { GridModelStore } from "./index.ts"
-import { GridRowModesModel } from "@mui/x-data-grid"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+
+import { GridModelStore } from './index.ts'
+import { CafeteriaResponse } from '../service/network/cafeteria.ts'
+import { CampusResponse } from '../service/network/campus.ts'
 
 type CafeteriaTabStore = {
     route: string,
@@ -9,59 +13,87 @@ type CafeteriaTabStore = {
 
 export type GridCafeteriaItem = {
     id: string
-    cafeteriaID: number
-    name: string
-    campus: string
-    latitude: number
-    longitude: number
-    breakfastTime: string
-    lunchTime: string
-    dinnerTime: string
-    isNew: boolean
+    seq: number | null,
+    campus: string,
+    name: string,
+    latitude: number,
+    longitude: number,
+    breakfastTime: string,
+    lunchTime: string,
+    dinnerTime: string,
+    isNew: boolean,
 }
 
 export type GridCafeteriaMenu = {
     id: string
-    date: string
-    time: string
-    cafeteria: string
-    name: string
-    price: number
-    isNew: boolean
+    seq: number | null,
+    cafeteria: string,
+    date: string,
+    type: string,
+    food: string,
+    price: string,
+    isNew: boolean,
 }
 
 
 type CafeteriaItemStore = {
     rows: Array<GridCafeteriaItem>,
+    campuses: Array<CampusResponse>,
     setRows: (cafeteriaList: Array<GridCafeteriaItem>) => void,
+    setCampuses: (campusList: Array<CampusResponse>) => void,
 }
 
 type CafeteriaMenuStore = {
     rows: Array<GridCafeteriaMenu>,
+    cafeterias: Array<CafeteriaResponse>,
+    selectedCafeteriaID?: number,
     setRows: (menuList: Array<GridCafeteriaMenu>) => void,
+    setCafeterias: (cafeteriaList: Array<CafeteriaResponse>) => void,
+    setSelectedCafeteriaID: (cafeteriaID: number) => void,
 }
 
-export const useCafeteriaTabStore = create<CafeteriaTabStore>((set) => ({
-    route: "cafeteria",
-    setRoute: (route) => set({ route }),
-}))
+export const useCafeteriaTabStore = create(
+    devtools<CafeteriaTabStore>((set) => ({
+        route: 'cafeteria',
+        setRoute: (route: string) => set({ route }),
+    }),
+    { name: 'CafeteriaTabStore' })
+)
 
-export const useCafeteriaItemGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useCafeteriaItemGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'CafeteriaItemGridModelStore' })
+)
 
-export const useCafeteriaItemStore = create<CafeteriaItemStore>((set) => ({
-    rows: [],
-    setRows: (cafeteriaList) => set({ rows: cafeteriaList }),
-}))
+export const useCafeteriaItemStore = create(
+    devtools<CafeteriaItemStore>((set) => ({
+        rows: [],
+        campuses: [],
+        setRows: (cafeteriaList) => set({ rows: cafeteriaList }),
+        setCampuses: (campusList) => set({ campuses: campusList }),
+    }),
+    { name: 'CafeteriaItemStore' })
+)
 
-export const useCafeteriaMenuGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useCafeteriaMenuGridModelStore = create(
+    devtools<GridModelStore>((set) => ({
+        rowModesModel: {},
+        setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
+    }),
+    { name: 'CafeteriaMenuGridModelStore' })
+)
 
-export const useCafeteriaMenuStore = create<CafeteriaMenuStore>((set) => ({
-    rows: [],
-    setRows: (menuList) => set({ rows: menuList }),
-}))
+export const useCafeteriaMenuStore = create(
+    devtools<CafeteriaMenuStore>((set) => ({
+        rows: [],
+        cafeterias: [],
+        selectedCafeteriaID: undefined,
+        setRows: (menuList) => set({ rows: menuList }),
+        setCafeterias: (cafeteriaList) => set({ cafeterias: cafeteriaList }),
+        setSelectedCafeteriaID: (cafeteriaID) => set({ selectedCafeteriaID: cafeteriaID }),
+    }),
+    { name: 'CafeteriaMenuStore' })
+)

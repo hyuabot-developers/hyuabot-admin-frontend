@@ -1,44 +1,43 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { CafeteriaGrid } from "./grid.tsx"
-import { useCafeteriaItemStore } from "../../../../stores/cafeteria.ts"
-import { CafeteriaResponse, getCafeteriaList } from "../../../../service/network/cafeteria.ts"
-import { CampusResponse, getCampusList } from "../../../../service/network/campus.ts"
-import { useCampusStore } from "../../../../stores/campus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { CafeteriaGrid } from './grid.tsx'
+import { CafeteriaResponse, getCafeteriaList } from '../../../../service/network/cafeteria.ts'
+import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
+import { useCafeteriaItemStore } from '../../../../stores/cafeteria.ts'
 
 export default function CafeteriaPage() {
     // Get the store
-    const campusStore = useCampusStore()
-    const cafeteriaStore = useCafeteriaItemStore()
-    let campusList: CampusResponse[] = []
+    const rowStore = useCafeteriaItemStore()
     const fetchCafeteriaList = async () => {
         const campusResponse = await getCampusList()
+        let campuses: CampusResponse[] = []
         if (campusResponse.status === 200) {
             const campusResponseData = campusResponse.data
-            campusList = campusResponseData.data.map((item: CampusResponse) => {
+            campuses = campusResponseData.result.map((item: CampusResponse) => {
                 return {
-                    id: item.id,
+                    seq: item.seq,
                     name: item.name,
                 }
             })
-            campusStore.setRows(campusList)
         }
+        rowStore.setCampuses(campuses)
         const response = await getCafeteriaList()
         if (response.status === 200) {
             const responseData = response.data
-            cafeteriaStore.setRows(responseData.data.map((item: CafeteriaResponse) => {
-                const campus = campusList.find(campus => campus.id === item.campusID)
+            rowStore.setRows(responseData.result.map((item: CafeteriaResponse) => {
                 return {
                     id: uuidv4(),
-                    cafeteriaID: item.id,
+                    seq: item.seq,
+                    campus: `${campuses.find((campus) => campus.seq === item.campusID)?.name || ''} (${item.campusID})`,
                     name: item.name,
-                    campus: `${campus?.name} (${campus?.id})`,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    breakfastTime: item.runningTime.breakfast,
-                    lunchTime: item.runningTime.lunch,
-                    dinnerTime: item.runningTime.dinner,
+                    breakfastTime: item.breakfastTime,
+                    lunchTime: item.lunchTime,
+                    dinnerTime: item.dinnerTime,
+                    isNew: false,
                 }
             }))
         }
@@ -49,7 +48,7 @@ export default function CafeteriaPage() {
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'cafeteriaID',
+            field: 'seq',
             headerName: '식당 ID',
             width: 150,
             type: 'string',
@@ -71,8 +70,8 @@ export default function CafeteriaPage() {
             headerName: '캠퍼스',
             width: 150,
             type: 'singleSelect',
-            valueOptions: campusStore.rows.map((item: CampusResponse) => {
-                return `${item.name} (${item.id})`
+            valueOptions: rowStore.campuses.map((item: CampusResponse) => {
+                return `${item.name} (${item.seq})`
             }),
             editable: true,
             headerAlign: 'center',

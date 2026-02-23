@@ -1,56 +1,20 @@
-import { useEffect } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 import { GridColDef } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
+import { useEffect } from 'react'
+
 import { CafeteriaMenuGrid } from './grid.tsx'
-import { GridCafeteriaItem, useCafeteriaItemStore, useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
-import {
-    CafeteriaMenuResponse,
-    CafeteriaResponse,
-    getCafeteriaList,
-    getCafeteriaMenuList
-} from '../../../../service/network/cafeteria.ts'
-import dayjs from "dayjs"
+import { getCafeteriaList } from '../../../../service/network/cafeteria.ts'
+import { useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
 
 
 export default function CafeteriaMenuPage() {
     // Get the store
-    const cafeteriaStore = useCafeteriaItemStore()
-    const menuStore = useCafeteriaMenuStore()
-    let cafeteriaList: Array<GridCafeteriaItem> = []
+    const rowStore = useCafeteriaMenuStore()
     const fetchCafeteriaMenu = async () => {
-        const campusResponse = await getCafeteriaList()
-        if (campusResponse.status === 200) {
-            const campusResponseData = campusResponse.data
-            cafeteriaList = campusResponseData.data.map((item: CafeteriaResponse) => {
-                return {
-                    id: uuidv4(),
-                    cafeteriaID: item.id,
-                    name: item.name,
-                    campus: '',
-                    latitude: item.latitude,
-                    longitude: item.longitude,
-                    breakfastTime: item.runningTime.breakfast,
-                    lunchTime: item.runningTime.lunch,
-                    dinnerTime: item.runningTime.dinner,
-                }
-            })
-            cafeteriaStore.setRows(cafeteriaList)
-        }
-        const response = await getCafeteriaMenuList()
-        if (response.status === 200) {
-            const responseData = response.data
-            menuStore.setRows(responseData.data.map((item: CafeteriaMenuResponse) => {
-                const cafeteria = cafeteriaList.find(cafeteria => cafeteria.cafeteriaID === item.cafeteriaID)
-                return {
-                    id: uuidv4(),
-                    date: item.date,
-                    time: item.time,
-                    cafeteria: `${cafeteria?.name} (${cafeteria?.cafeteriaID})`,
-                    name: item.menu,
-                    price: item.price,
-                    isNew: false,
-                }
-            }))
+        const cafeteriaResponse = await getCafeteriaList()
+        if (cafeteriaResponse.status === 200) {
+            const responseData = cafeteriaResponse.data
+            rowStore.setCafeterias(responseData.result)
         }
     }
     const getMenuDate = (value: string) => {
@@ -63,13 +27,10 @@ export default function CafeteriaMenuPage() {
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'cafeteria',
-            headerName: '식당',
+            field: 'seq',
+            headerName: '메뉴 ID',
             width: 150,
-            type: 'singleSelect',
-            valueOptions: cafeteriaStore.rows.map((item: GridCafeteriaItem) => {
-                return `${item.name} (${item.cafeteriaID})`
-            }),
+            type: 'number',
             editable: true,
             headerAlign: 'center',
             align: 'center',
@@ -85,7 +46,7 @@ export default function CafeteriaMenuPage() {
             valueFormatter: getMenuDate,
         },
         {
-            field: 'time',
+            field: 'type',
             headerName: '배식 시간',
             width: 150,
             type: 'string',
@@ -94,7 +55,7 @@ export default function CafeteriaMenuPage() {
             align: 'center',
         },
         {
-            field: 'name',
+            field: 'food',
             headerName: '메뉴',
             minWidth: 200,
             flex: 1,

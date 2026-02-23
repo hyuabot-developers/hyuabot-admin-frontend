@@ -1,7 +1,8 @@
-import { Box, Tab, Tabs } from "@mui/material"
-import { Outlet, useNavigate } from "react-router-dom"
-import { SyntheticEvent, useEffect } from "react"
-import { useBusTabStore } from "../../../stores/bus.ts"
+import { Box, Tab, Tabs } from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+
+import { useBusTabStore } from '../../../stores/bus.ts'
 
 export default function Bus() {
     // Get the store
@@ -23,6 +24,7 @@ export default function Bus() {
                     <Tab label="노선별 정류장 관리" value="routeStop" />
                     <Tab label="시간표 관리" value="timetable" />
                     <Tab label="실시간 도착 정보" value="realtime" />
+                    <Tab label="도착 기록" value="log" />
                 </Tabs>
             </Box>
             <Outlet />

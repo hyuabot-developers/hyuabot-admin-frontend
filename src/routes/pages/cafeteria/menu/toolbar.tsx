@@ -1,63 +1,88 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    GridCafeteriaItem,
-    useCafeteriaItemStore, useCafeteriaMenuStore
-} from "../../../../stores/cafeteria.ts"
-import {
-    CafeteriaMenuResponse,
-    CafeteriaResponse,
-    getCafeteriaList,
-    getCafeteriaMenuList
-} from "../../../../service/network/cafeteria.ts"
+import { Autocomplete, TextField } from '@mui/material'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
-    const cafeteriaStore = useCafeteriaItemStore()
+import { getCafeteriaMenuList, MenuResponse } from '../../../../service/network/cafeteria.ts'
+import { useCafeteriaMenuGridModelStore, useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
+
+export const GridToolbar = () => {
     const rowStore = useCafeteriaMenuStore()
-    let cafeteriaList: Array<GridCafeteriaItem> = []
-    const fetchCafeteriaMenu = async () => {
-        const campusResponse = await getCafeteriaList()
-        if (campusResponse.status === 200) {
-            const campusResponseData = campusResponse.data
-            cafeteriaList = campusResponseData.data.map((item: CafeteriaResponse) => {
-                return {
-                    id: uuidv4(),
-                    cafeteriaID: item.id,
-                    name: item.name,
-                    campus: '',
-                    latitude: item.latitude,
-                    longitude: item.longitude,
-                    breakfastTime: item.runningTime.breakfast,
-                    lunchTime: item.runningTime.lunch,
-                    dinnerTime: item.runningTime.dinner,
-                }
-            })
-            cafeteriaStore.setRows(cafeteriaList)
-        }
-        const response = await getCafeteriaMenuList()
+    const rowModesModelStore = useCafeteriaMenuGridModelStore()
+    const addRowButtonClicked = () => {
+        const id = uuidv4()
+        const cafeteria = rowStore.cafeterias[0]
+        rowStore.setRows([
+            {
+                id,
+                seq: null,
+                cafeteria: cafeteria ? `${cafeteria.name} (${cafeteria.seq})` : '',
+                date: '',
+                type: '',
+                food: '',
+                price: '',
+                isNew: true,
+            },
+            ...rowStore.rows,
+        ])
+        rowModesModelStore.setRowModesModel(({
+            ...rowModesModelStore.rowModesModel,
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'date' },
+        }))
+    }
+    const fetchMenuByCafeteria = async (cafeteriaID: number) => {
+        const response = await getCafeteriaMenuList(cafeteriaID)
         if (response.status === 200) {
             const responseData = response.data
-            rowStore.setRows(responseData.data.map((item: CafeteriaMenuResponse) => {
-                const cafeteria = cafeteriaList.find(cafeteria => cafeteria.cafeteriaID === item.cafeteriaID)
+            const { cafeterias } = useCafeteriaMenuStore.getState()
+            rowStore.setRows(responseData.result.map((item: MenuResponse) => {
+                const cafeteria = cafeterias.find((cafeteria) => cafeteria.seq === item.cafeteriaID)
                 return {
                     id: uuidv4(),
+                    seq: item.seq,
+                    cafeteria: cafeteria ? `${cafeteria.name} (${cafeteria.seq})` : '',
                     date: item.date,
-                    time: item.time,
-                    cafeteria: `${cafeteria?.name} (${cafeteria?.cafeteriaID})`,
-                    name: item.menu,
+                    type: item.type,
+                    food: item.food,
                     price: item.price,
                     isNew: false,
                 }
             }))
         }
     }
+    const refreshMenu = () => {
+        const { selectedCafeteriaID } = useCafeteriaMenuStore.getState()
+        if (selectedCafeteriaID) {
+            fetchMenuByCafeteria(selectedCafeteriaID).then()
+        }
+    }
+
+    const onChangeSelectedCafeteria = (value: number) => {
+        if (value) {
+            rowStore.setSelectedCafeteriaID(value)
+            fetchMenuByCafeteria(value).then()
+        }
+    }
+
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchCafeteriaMenu}>
-                새로고침
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <Autocomplete
+                size="small"
+                disablePortal={true}
+                options={rowStore.cafeterias.map((cafeteria) => `${cafeteria.name} (${cafeteria.seq})`)}
+                sx={{ width: 300, marginRight: 2 }}
+                renderInput={(params) => <TextField {...params} label="식당" />}
+                onChange={(_, value) => onChangeSelectedCafeteria(
+                    parseInt(value ? value.match(/\(([^)]+)\)/)?.[1] || '0' : '0', 10)
+                )}
+            />
+            <ToolbarButton onClick={refreshMenu}>
+                <RefreshIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }

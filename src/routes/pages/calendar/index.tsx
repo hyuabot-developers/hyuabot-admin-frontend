@@ -1,7 +1,8 @@
-import { Box, Tab, Tabs } from "@mui/material"
-import { Outlet, useNavigate } from "react-router-dom"
-import { SyntheticEvent, useEffect } from "react"
-import { useCalendarTabStore } from "../../../stores/calendar.ts"
+import { Box, Tab, Tabs } from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+
+import { useCalendarTabStore } from '../../../stores/calendar.ts'
 
 export default function Calendar() {
     // Get the store

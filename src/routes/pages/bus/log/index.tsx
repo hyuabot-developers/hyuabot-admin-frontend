@@ -2,19 +2,17 @@ import { GridColDef } from '@mui/x-data-grid'
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
-import { BusTimetableGrid } from './grid.tsx'
+import { BusDepartureGrid } from './grid.tsx'
 import {
     BusRouteResponse,
     BusStopResponse,
     getBusRoutes,
-    getBusStops,
+    getBusStops
 } from '../../../../service/network/bus.ts'
-import { useBusTimetableStore } from '../../../../stores/bus.ts'
+import { useBusDepartureLogStore } from '../../../../stores/bus.ts'
 
-export default function BusTimetable() {
-    // Get the store
-    const rowStore = useBusTimetableStore()
-    // Fetch bus data
+export default function BusDepartureLog() {
+    const rowStore = useBusDepartureLogStore()
     const fetchBusRouteStops = async () => {
         // Fetch bus stop
         const stopResponse = await getBusStops()
@@ -36,7 +34,7 @@ export default function BusTimetable() {
         const routeResponse = await getBusRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            const { stops } = useBusTimetableStore.getState()
+            const { stops } = useBusDepartureLogStore.getState()
             rowStore.setRoutes(responseData.result.map((item: BusRouteResponse) => {
                 const startStop = stops.find((stop) => stop.stopID === item.startStopID)
                 const endStop = stops.find((stop) => stop.stopID === item.endStopID)
@@ -61,41 +59,31 @@ export default function BusTimetable() {
     useEffect(() => {
         fetchBusRouteStops().then()
     }, [])
-    const busWeekdaysFormatter = (value: string) => {
-        switch (value) {
-        case 'weekdays' : return '평일'
-        case 'saturday' : return '토요일'
-        case 'sunday' : return '공휴일'
-        default: return ''
-        }
-    }
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'dayType',
-            headerName: '평일/토요일/공휴일',
-            minWidth: 200,
+            field: 'timestamp',
+            headerName: '출발 시간',
+            minWidth: 150,
             flex: 1,
-            type: 'singleSelect',
-            valueOptions: ['weekdays', 'saturday', 'sunday'],
-            valueFormatter: busWeekdaysFormatter,
-            editable: true,
+            type: 'string',
+            editable: false,
             headerAlign: 'center',
             align: 'center',
         },
         {
-            field: 'departureTime',
-            headerName: '출발 시간',
-            minWidth: 200,
+            field: 'vehicleID',
+            headerName: '차량 ID',
+            minWidth: 250,
             flex: 1,
             type: 'string',
-            editable: true,
+            editable: false,
             headerAlign: 'center',
             align: 'center',
         },
     ]
 
     return (
-        <BusTimetableGrid columns={columns} />
+        <BusDepartureGrid columns={columns} />
     )
 }

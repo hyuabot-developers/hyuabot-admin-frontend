@@ -1,6 +1,8 @@
-import { create } from "zustand"
-import { GridModelStore } from "./index.ts"
-import { GridRowModesModel } from "@mui/x-data-grid"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand'
+
+import { GridModelStore } from './index.ts'
+import { CalendarCategoryResponse } from '../service/network/calendar.ts'
 
 type CalendarTabStore = {
     route: string,
@@ -9,19 +11,19 @@ type CalendarTabStore = {
 
 export type GridCalendarCategoryItem = {
     id: string
-    categoryID: number
+    seq: number | null
     name: string
     isNew: boolean
 }
 
 export type GridCalendarEventItem = {
     id: string
-    eventID: number
+    seq: number | null
     category: string
     title: string
     description: string
-    start: string
-    end: string
+    start: string | Date
+    end: string | Date
     isNew: boolean
 }
 
@@ -33,11 +35,13 @@ type CalendarCategoryStore = {
 
 type CalendarStore = {
     rows: Array<GridCalendarEventItem>,
+    categories: Array<CalendarCategoryResponse>,
     setRows: (menuList: Array<GridCalendarEventItem>) => void,
+    setCategories: (categories: Array<CalendarCategoryResponse>) => void,
 }
 
 export const useCalendarTabStore = create<CalendarTabStore>((set) => ({
-    route: "category",
+    route: 'category',
     setRoute: (route) => set({ route }),
 }))
 
@@ -58,5 +62,7 @@ export const useCalendarGridModelStore = create<GridModelStore>((set) => ({
 
 export const useCalendarStore = create<CalendarStore>((set) => ({
     rows: [],
+    categories: [],
     setRows: (events) => set({ rows: events }),
+    setCategories: (categories) => set({ categories }),
 }))

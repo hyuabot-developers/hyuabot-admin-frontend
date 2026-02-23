@@ -4,8 +4,8 @@ import { useState } from 'react'
 
 import { GridToolbar } from './toolbar.tsx'
 import {
-    useBusRealtimeGridModelStore,
-    useBusRealtimeStore,
+    useBusDepartureLogGridModelStore,
+    useBusDepartureLogStore,
 } from '../../../../stores/bus.ts'
 
 
@@ -13,9 +13,9 @@ interface GridProps {
     columns: GridColDef[]
 }
 
-export const BusRealtimeGrid = (props: GridProps) => {
-    const rowStore = useBusRealtimeStore()
-    const rowModesModelStore = useBusRealtimeGridModelStore()
+export const BusDepartureGrid = (props: GridProps) => {
+    const rowStore = useBusDepartureLogStore()
+    const rowModesModelStore = useBusDepartureLogGridModelStore()
     const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
     // Render
@@ -41,6 +41,7 @@ export const BusRealtimeGrid = (props: GridProps) => {
             </Snackbar>
             <div style={{ height: '100%', width: '100%' }}>
                 <DataGrid
+                    showToolbar={true}
                     columns={props.columns}
                     rows={rowStore.rows}
                     rowModesModel={rowModesModelStore.rowModesModel}
@@ -48,7 +49,7 @@ export const BusRealtimeGrid = (props: GridProps) => {
                     slots={{ toolbar: GridToolbar }}
                     initialState={{
                         sorting: {
-                            sortModel: [{ field: 'route', sort: 'asc' }],
+                            sortModel: [{ field: 'timestamp', sort: 'desc' }],
                         },
                         pagination: { paginationModel: { pageSize: 20 } }
                     }}

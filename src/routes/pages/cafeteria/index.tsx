@@ -1,7 +1,8 @@
-import { Box, Tab, Tabs } from "@mui/material"
-import { Outlet, useNavigate } from "react-router-dom"
-import { SyntheticEvent, useEffect } from "react"
-import { useCafeteriaTabStore } from "../../../stores/cafeteria.ts"
+import { Box, Tab, Tabs } from '@mui/material'
+import { SyntheticEvent, useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
+
+import { useCafeteriaTabStore } from '../../../stores/cafeteria.ts'
 
 export default function Cafeteria() {
     // Get the store

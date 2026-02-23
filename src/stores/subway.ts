@@ -1,16 +1,13 @@
-import { create } from "zustand/index"
-import { GridRowModesModel } from "@mui/x-data-grid"
-import { GridModelStore } from "./index.ts"
+import { GridRowModesModel } from '@mui/x-data-grid'
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+
+import { GridModelStore } from './index.ts'
+import { SubwayRoute, SubwayStation } from '../service/network/subway.ts'
 
 type SubwayTabStore = {
     route: string,
     setRoute: (route: string) => void,
-}
-
-export type GridSubwayStationName = {
-    id: string,
-    name: string,
-    isNew: boolean,
 }
 
 export type GridSubwayRoute = {
@@ -25,42 +22,36 @@ export type GridSubwayStation = {
     stationID: string,
     routeID: number,
     name: string,
-    sequence: number,
+    order: number,
     cumulativeTime: string,
     isNew: boolean,
 }
 
 export type GridSubwayTimetable = {
     id: string,
-    stationID: string,
-    startStationID: string,
-    terminalStationID: string,
+    seq: number | null,
+    startStation: string,
+    terminalStation: string,
     departureTime: string,
-    weekday: string,
-    heading: string,
     isNew: boolean,
 }
 
 export type GridSubwayRealtime = {
-    id: string
-    sortID: string,
-    stationName: string,
-    sequence: number,
-    current: string,
-    heading: string,
+    sortableId: string,
+    id: string,
     station: string,
+    direction: string,
+    order: number,
+    location: string,
+    stop: number,
     time: string,
+    terminalStation: string,
     trainNumber: string,
-    express: string,
-    last: string,
-    terminalStationName: string,
+    updateTime: string,
+    isExpress: boolean,
+    isLast: boolean,
     status: string,
     isNew: boolean,
-}
-
-type SubwayStationNameStore = {
-    rows: Array<GridSubwayStationName>,
-    setRows: (nameList: Array<GridSubwayStationName>) => void,
 }
 
 type SubwayRouteStore = {
@@ -70,53 +61,86 @@ type SubwayRouteStore = {
 
 type SubwayStationStore = {
     rows: Array<GridSubwayStation>,
+    routes: Array<SubwayRoute>,
     setRows: (stationList: Array<GridSubwayStation>) => void,
+    setRoutes: (routeList: Array<SubwayRoute>) => void,
 }
 
 type SubwayTimetableStore = {
     rows: Array<GridSubwayTimetable>,
+    stations: Array<SubwayStation>,
+    selectedStationID: string | null,
+    selectedDirection: string | null,
+    selectedWeekday: string | null,
     setRows: (timetableList: Array<GridSubwayTimetable>) => void,
+    setStations: (stationList: Array<SubwayStation>) => void,
+    setSelectedStationID: (station: string | null) => void,
+    setSelectedDirection: (direction: string | null) => void,
+    setSelectedWeekday: (weekday: string | null) => void,
 }
 
 type SubwayRealtimeStore = {
     rows: Array<GridSubwayRealtime>,
+    stations: Array<SubwayStation>,
+    routes: Array<SubwayRoute>,
     setRows: (realtimeList: Array<GridSubwayRealtime>) => void,
+    setStations: (stationList: Array<SubwayStation>) => void,
+    setRoutes: (routeList: Array<SubwayRoute>) => void,
 }
 
-export const useSubwayTabStore = create<SubwayTabStore>((set) => ({
-    route: "station-name",
-    setRoute: (route) => set({ route }),
-}))
+export const useSubwayTabStore = create(
+    devtools<SubwayTabStore>((set) => ({
+        route: 'route',
+        setRoute: (route) => set({ route }),
+    }),
+    { name: 'SubwayTabStore' })
+)
 
-export const useSubwayStationNameStore = create<SubwayStationNameStore>((set) => ({
-    rows: [],
-    setRows: (nameList) => set({ rows: nameList }),
-}))
+export const useSubwayRouteStore = create(
+    devtools<SubwayRouteStore>((set) => ({
+        rows: [],
+        setRows: (routeList) => set({ rows: routeList }),
+    }),
+    { name: 'SubwayRouteStore' })
+)
 
-export const useSubwayRouteStore = create<SubwayRouteStore>((set) => ({
-    rows: [],
-    setRows: (routeList) => set({ rows: routeList }),
-}))
+export const useSubwayStationStore = create(
+    devtools<SubwayStationStore>((set) => ({
+        rows: [],
+        routes: [],
+        setRows: (stationList) => set({ rows: stationList }),
+        setRoutes: (routeList) => set({ routes: routeList }),
+    }),
+    { name: 'SubwayStationStore' })
+)
 
-export const useSubwayStationStore = create<SubwayStationStore>((set) => ({
-    rows: [],
-    setRows: (stationList) => set({ rows: stationList }),
-}))
+export const useSubwayTimetableStore = create(
+    devtools<SubwayTimetableStore>((set) => ({
+        rows: [],
+        stations: [],
+        selectedStationID: null,
+        selectedDirection: null,
+        selectedWeekday: null,
+        setRows: (timetableList) => set({ rows: timetableList }),
+        setStations: (stationList) => set({ stations: stationList }),
+        setSelectedStationID: (stationID) => set({ selectedStationID: stationID }),
+        setSelectedDirection: (direction) => set({ selectedDirection: direction }),
+        setSelectedWeekday: (weekday) => set({ selectedWeekday: weekday }),
+    }),
+    { name: 'SubwayTimetableStore' })
+)
 
-export const useSubwayTimetableStore = create<SubwayTimetableStore>((set) => ({
-    rows: [],
-    setRows: (timetableList) => set({ rows: timetableList }),
-}))
-
-export const useSubwayRealtimeStore = create<SubwayRealtimeStore>((set) => ({
-    rows: [],
-    setRows: (realtimeList) => set({ rows: realtimeList }),
-}))
-
-export const useSubwayStationNameGridModelStore = create<GridModelStore>((set) => ({
-    rowModesModel: {},
-    setRowModesModel: (rowModesModel: GridRowModesModel) => set({ rowModesModel }),
-}))
+export const useSubwayRealtimeStore = create(
+    devtools<SubwayRealtimeStore>((set) => ({
+        rows: [],
+        stations: [],
+        routes: [],
+        setRows: (realtimeList) => set({ rows: realtimeList }),
+        setStations: (stationList) => set({ stations: stationList }),
+        setRoutes: (routeList) => set({ routes: routeList }),
+    }),
+    { name: 'SubwayRealtimeStore' })
+)
 
 export const useSubwayRouteGridModelStore = create<GridModelStore>((set) => ({
     rowModesModel: {},

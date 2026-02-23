@@ -1,8 +1,8 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { BusRealtimeGrid } from "./grid.tsx"
-import { BusRoute, BusStop, useBusRealtimeStore, useBusRouteStore, useBusStopStore } from "../../../../stores/bus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { BusRealtimeGrid } from './grid.tsx'
 import {
     BusRealtimeResponse,
     BusRouteResponse,
@@ -10,13 +10,11 @@ import {
     getBusRealtime,
     getBusRoutes,
     getBusStops
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import { BusRoute, BusStop, useBusRealtimeStore } from '../../../../stores/bus.ts'
 
 export default function BusRealtime() {
-    // Get the store
-    const busRealtimeStore = useBusRealtimeStore()
-    const busRouteStore = useBusRouteStore()
-    const busStopStore = useBusStopStore()
+    const rowStore = useBusRealtimeStore()
     let stopData: BusStop[] = []
     let routeData: BusRoute[] = []
     // Fetch bus realtime
@@ -25,58 +23,58 @@ export default function BusRealtime() {
         const stopResponse = await getBusStops()
         if (stopResponse.status === 200) {
             const responseData = stopResponse.data
-            stopData = responseData.data.map((item: BusStopResponse) => {
+            stopData = responseData.result.map((item: BusStopResponse) => {
                 return {
                     id: uuidv4(),
                     stopID: item.id,
                     name: item.name,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    district: item.district,
+                    districtCode: item.districtCode,
                     mobileNumber: item.mobileNumber,
                 }
             })
-            busStopStore.setRows(stopData)
+            rowStore.setStops(stopData)
         }
         // Fetch bus route
         const routeResponse = await getBusRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+            routeData = responseData.result.map((item: BusRouteResponse) => {
+                const startStop = stopData.find((stop) => stop.stopID === item.startStopID)
+                const endStop = stopData.find((stop) => stop.stopID === item.endStopID)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
                     name: item.name,
-                    type: item.type,
+                    type: item.typeCode,
                     startStop: `${startStop?.name} (${startStop?.stopID})`,
                     endStop: `${endStop?.name} (${endStop?.stopID})`,
-                    companyID: item.company.id,
-                    companyName: item.company.name,
-                    companyTelephone: item.company.telephone,
-                    upFirstTime: item.up.first,
-                    upLastTime: item.up.last,
-                    downFirstTime: item.down.first,
-                    downLastTime: item.down.last,
+                    companyID: item.companyID,
+                    companyName: item.companyName,
+                    companyTelephone: item.companyPhone,
+                    upFirstTime: item.upFirstTime,
+                    upLastTime: item.upLastTime,
+                    downFirstTime: item.downFirstTime,
+                    downLastTime: item.downLastTime
                 }
             })
-            busRouteStore.setRows(routeData)
+            rowStore.setRoutes(routeData)
         }
         // Fetch bus realtime
         const realtimeResponse = await getBusRealtime()
         if (realtimeResponse.status === 200) {
             const responseData = realtimeResponse.data
-            busRealtimeStore.setRows(responseData.data.map((item: BusRealtimeResponse) => {
+            rowStore.setRows(responseData.result.map((item: BusRealtimeResponse) => {
                 return {
                     id: uuidv4(),
-                    routeName: routeData.find(route => route.routeID === item.routeID)?.name || "",
-                    stopName: stopData.find(stop => stop.stopID === item.stopID)?.name || "",
-                    sequence: item.sequence,
-                    stop: item.stop,
-                    time: item.time,
-                    seat: item.seat,
-                    lowFloor: item.lowFloor,
+                    route: routeData.find((route) => route.routeID === item.routeID)?.name || '',
+                    stop: stopData.find((stop) => stop.stopID === item.stopID)?.name || '',
+                    order: item.order,
+                    remainingStop: item.stop,
+                    remainingTime: item.time,
+                    remainingSeat: item.seat,
+                    lowFloor: item.isLowFloor,
                     updatedAt: item.updatedAt,
                 }
             }))
@@ -94,25 +92,27 @@ export default function BusRealtime() {
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'routeName',
+            field: 'route',
             headerName: '노선',
-            width: 150,
+            minWidth: 150,
+            flex: 1,
             type: 'string',
             editable: false,
             headerAlign: 'center',
             align: 'center',
         },
         {
-            field: 'stopName',
+            field: 'stop',
             headerName: '정류장',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'string',
             editable: false,
             headerAlign: 'center',
             align: 'center',
         },
         {
-            field: 'sequence',
+            field: 'order',
             headerName: '도착 순번',
             width: 150,
             type: 'number',
@@ -121,7 +121,7 @@ export default function BusRealtime() {
             align: 'center',
         },
         {
-            field: 'stop',
+            field: 'remainingStop',
             headerName: '남은 정류장',
             width: 150,
             type: 'number',
@@ -130,7 +130,7 @@ export default function BusRealtime() {
             align: 'center',
         },
         {
-            field: 'time',
+            field: 'remainingTime',
             headerName: '남은 시간',
             width: 150,
             type: 'number',
@@ -139,7 +139,7 @@ export default function BusRealtime() {
             align: 'center',
         },
         {
-            field: 'seat',
+            field: 'remainingSeat',
             headerName: '잔여 좌석',
             width: 150,
             type: 'number',
@@ -160,7 +160,8 @@ export default function BusRealtime() {
         {
             field: 'updatedAt',
             headerName: '업데이트 시간',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'number',
             editable: false,
             headerAlign: 'center',

@@ -1,4 +1,4 @@
-import { GridRowModesModel } from "@mui/x-data-grid"
+import { GridRowModesModel } from '@mui/x-data-grid'
 
 export type GridModelStore = {
     rowModesModel: GridRowModesModel

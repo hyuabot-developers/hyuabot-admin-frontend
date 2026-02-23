@@ -2,7 +2,7 @@ import { GridColDef } from '@mui/x-data-grid'
 
 import { ShuttleTimetableGrid } from './grid.tsx'
 
-export default function ShuttleTimetable() {
+export default function ShuttleTimetableView() {
     // Configure DataGrid
     const periodTypeValueFormatter = (value: string) => {
         switch (value) {
@@ -21,7 +21,47 @@ export default function ShuttleTimetable() {
             valueFormatter: periodTypeValueFormatter,
             type: 'singleSelect',
             valueOptions: ['semester', 'vacation', 'vacation_session'],
-            editable: true,
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'route',
+            headerName: '노선',
+            minWidth: 150,
+            flex: 1,
+            type: 'string',
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'tag',
+            headerName: '노선 태그',
+            minWidth: 150,
+            flex: 1,
+            type: 'string',
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'stop',
+            headerName: '정류장',
+            minWidth: 150,
+            flex: 1,
+            type: 'string',
+            editable: false,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'group',
+            headerName: '행선지 그룹',
+            minWidth: 150,
+            flex: 1,
+            type: 'string',
+            editable: false,
             headerAlign: 'center',
             align: 'center',
         },
@@ -31,7 +71,7 @@ export default function ShuttleTimetable() {
             minWidth: 150,
             flex: 1,
             type: 'boolean',
-            editable: true,
+            editable: false,
             headerAlign: 'center',
             align: 'center',
         },
@@ -41,7 +81,7 @@ export default function ShuttleTimetable() {
             minWidth: 150,
             flex: 1,
             type: 'string',
-            editable: true,
+            editable: false,
             headerAlign: 'center',
             align: 'center',
         },

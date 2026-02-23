@@ -1,14 +1,7 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridToolbarContainer } from "@mui/x-data-grid"
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    GridSubwayRoute,
-    GridSubwayStation,
-    useSubwayRealtimeStore,
-    useSubwayRouteStore,
-    useSubwayStationStore
-} from "../../../../stores/subway.ts"
+import { Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
+
 import {
     SubwayRealtime,
     SubwayRoute,
@@ -16,83 +9,75 @@ import {
     getSubwayRealtime,
     getSubwayRoutes,
     getSubwayStations
-} from "../../../../service/network/subway.ts"
+} from '../../../../service/network/subway.ts'
+import {
+    useSubwayRealtimeStore,
+} from '../../../../stores/subway.ts'
 
 
-export function Toolbar() {
+export const GridToolbar = () => {
+    // Get the store
     const rowStore = useSubwayRealtimeStore()
-    const subwayRouteStore = useSubwayRouteStore()
-    const subwayStationStore = useSubwayStationStore()
-    let stationData: GridSubwayStation[] = []
-    let routeData: GridSubwayRoute[]
     // Fetch Subway realtime
     const fetchSubwayRealtime = async () => {
         // Fetch Subway station
         const stationResponse = await getSubwayStations()
         if (stationResponse.status === 200) {
             const responseData = stationResponse.data
-            stationData = responseData.data.map((item: SubwayStation) => {
+            rowStore.setStations(responseData.result.map((item: SubwayStation) => {
                 return {
-                    id: uuidv4(),
-                    stationID: item.id,
+                    id: item.id,
                     routeID: item.routeID,
                     name: item.name,
-                    sequence: item.sequence,
+                    order: item.order,
                     cumulativeTime: item.cumulativeTime,
                 }
-            })
-            subwayStationStore.setRows(stationData)
+            }))
         }
         // Fetch Subway route
         const routeResponse = await getSubwayRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            routeData = responseData.data.map((item: SubwayRoute) => {
+            rowStore.setRoutes(responseData.result.map((item: SubwayRoute) => {
                 return {
-                    id: uuidv4(),
-                    routeID: item.id,
+                    id: item.id,
                     name: item.name,
                 }
-            })
-            subwayRouteStore.setRows(routeData)
+            }))
         }
         // Fetch Subway realtime
         const realtimeResponse = await getSubwayRealtime()
         if (realtimeResponse.status === 200) {
             const responseData = realtimeResponse.data
-            rowStore.setRows(responseData.data.map((item: SubwayRealtime) => {
-                const departureStation = stationData.find(station => station.stationID === item.stationID)
-                const terminalStation = stationData.find(station => station.stationID === item.terminalStationID)
-                const routeName = routeData.find(route => route.routeID === departureStation?.routeID)?.name
+            rowStore.setRows(responseData.result.map((item: SubwayRealtime) => {
+                const { stations } = useSubwayRealtimeStore.getState()
+                const departureStation = stations.find((station) => station.id === item.stationID)
+                const terminalStation = stations.find((station) => station.id === item.terminalStationID)
                 return {
                     id: uuidv4(),
-                    sortID: `${item.stationID}-${headingSortFormatter(item.heading)}-${item.sequence}`,
-                    stationName: departureStation?.name,
-                    routeName: routeName,
-                    sequence: item.sequence,
-                    current: item.current,
-                    heading: item.heading,
-                    station: item.station,
+                    sortableId: `${departureStation ? departureStation.id : ''}-${item.direction}-${item.time}`,
+                    station: departureStation ? `${departureStation.name} (${departureStation.id})` : '',
+                    direction: item.direction,
+                    order: item.order,
+                    location: item.location,
+                    stop: item.stop,
                     time: item.time,
+                    terminalStation: terminalStation ? `${terminalStation.name} (${terminalStation.id})` : '',
                     trainNumber: item.trainNumber,
-                    express: item.express,
-                    last: item.last,
-                    terminalStationName: terminalStation?.name,
+                    updateTime: item.updateTime,
+                    isExpress: item.isExpress,
+                    isLast: item.isLast,
                     status: item.status,
+                    isNew: false,
                 }
             }))
         }
     }
-    const headingSortFormatter = (value: string) => {
-        if (value == 'true') { return 1 }
-        else if (value == 'false') { return 2 }
-        else { return -1 }
-    }
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchSubwayRealtime}>
-                새로고침
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <ToolbarButton onClick={fetchSubwayRealtime}>
+                <RefreshIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }

@@ -1,20 +1,30 @@
-import { Alert, Box, Button, Snackbar, TextField } from "@mui/material"
-import { useState } from "react"
-import { login } from "../../service/network/auth.ts"
-import { AxiosError } from "axios"
+import { Alert, Box, Button, Snackbar, TextField } from '@mui/material'
+import { AxiosError } from 'axios'
+import { useState } from 'react'
+
+import { login } from '../../service/network/auth.ts'
 
 export default function Login() {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
     const [snackbarOpened, setSnackbarOpened] = useState(false)
 
     const handleLogin = async () => {
         try {
             const response = await login({ username, password })
-            if (response?.status === 200) {
-                const data = response.data
-                localStorage.setItem('accessToken', data.access_token)
-                localStorage.setItem('refreshToken', data.refresh_token)
+            if (response?.status === 201) {
+                const cookies = response.headers['Set-Cookie']
+                if (cookies) {
+                    cookies.forEach((cookie: string) => {
+                        if (cookie.startsWith('access_token=')) {
+                            const accessToken = cookie.split(';')[0].split('=')[1]
+                            localStorage.setItem('accessToken', accessToken)
+                        } else if (cookie.startsWith('refresh_token=')) {
+                            const refreshToken = cookie.split(';')[0].split('=')[1]
+                            localStorage.setItem('refreshToken', refreshToken)
+                        }
+                    })
+                }
                 window.location.href = '/'
             }
         } catch (error) {

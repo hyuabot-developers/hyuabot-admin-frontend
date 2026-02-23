@@ -1,21 +1,19 @@
-import { useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
-import { GridColDef } from "@mui/x-data-grid"
-import { BusRouteStopGrid } from "./grid.tsx"
-import { BusRoute, BusStop, useBusRouteStopStore, useBusRouteStore, useBusStopStore } from "../../../../stores/bus.ts"
+import { GridColDef } from '@mui/x-data-grid'
+import { useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+
+import { BusRouteStopGrid } from './grid.tsx'
 import {
-    BusRouteResponse, BusRouteStopResponse,
+    BusRouteResponse,
     BusStopResponse,
     getBusRoutes,
-    getBusRouteStops,
     getBusStops
-} from "../../../../service/network/bus.ts"
+} from '../../../../service/network/bus.ts'
+import { BusRoute, BusStop, useBusRouteStopGridModelStore, useBusRouteStopStore } from '../../../../stores/bus.ts'
 
 export default function BusRouteStop() {
-    // Get the store
-    const busRouteStore = useBusRouteStore()
-    const busStopStore = useBusStopStore()
-    const busRouteStopStore = useBusRouteStopStore()
+    const rowStore = useBusRouteStopStore()
+    const rowModesModelStore = useBusRouteStopGridModelStore()
     // Fetch bus data
     let stopData: BusStop[] = []
     let routeData: BusRoute[] = []
@@ -24,94 +22,70 @@ export default function BusRouteStop() {
         const stopResponse = await getBusStops()
         if (stopResponse.status === 200) {
             const responseData = stopResponse.data
-            stopData = responseData.data.map((item: BusStopResponse) => {
+            stopData = responseData.result.map((item: BusStopResponse) => {
                 return {
                     id: uuidv4(),
                     stopID: item.id,
                     name: item.name,
                     latitude: item.latitude,
                     longitude: item.longitude,
-                    district: item.district,
+                    district: item.districtCode,
                     mobileNumber: item.mobileNumber,
                 }
             })
-            busStopStore.setRows(stopData)
+            rowStore.setStops(stopData)
         }
         // Fetch bus route
         const routeResponse = await getBusRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
-            routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
+            routeData = responseData.result.map((item: BusRouteResponse) => {
+                const startStop = stopData.find((stop) => stop.stopID === item.startStopID)
+                const endStop = stopData.find((stop) => stop.stopID === item.endStopID)
                 return {
                     id: uuidv4(),
                     routeID: item.id,
                     name: item.name,
-                    type: item.type,
+                    type: item.typeName,
                     startStop: `${startStop?.name} (${startStop?.stopID})`,
                     endStop: `${endStop?.name} (${endStop?.stopID})`,
-                    companyID: item.company.id,
-                    companyName: item.company.name,
-                    companyTelephone: item.company.telephone,
-                    upFirstTime: item.up.first,
-                    upLastTime: item.up.last,
-                    downFirstTime: item.down.first,
-                    downLastTime: item.down.last,
+                    companyID: item.companyID,
+                    companyName: item.companyName,
+                    companyTelephone: item.companyPhone,
+                    upFirstTime: item.upFirstTime,
+                    upLastTime: item.upLastTime,
+                    downFirstTime: item.downFirstTime,
+                    downLastTime: item.downLastTime,
+                    isNew: false,
                 }
             })
-            busRouteStore.setRows(routeData)
-        }
-        const routeStopResponse = await getBusRouteStops()
-        if (routeStopResponse.status === 200) {
-            const responseData = routeStopResponse.data
-            busRouteStopStore.setRows(responseData.data.map((item: BusRouteStopResponse) => {
-                const route = routeData.find(route => route.routeID === item.routeID)
-                const stop = stopData.find(stop => stop.stopID === item.stopID)
-                const startStop = stopData.find(stop => stop.stopID === item.startStopID)
-                return {
-                    id: uuidv4(),
-                    route: `${route?.name} (${route?.routeID})`,
-                    stop: `${stop?.name} (${stop?.stopID})`,
-                    sequence: item.sequence,
-                    startStop: `${startStop?.name} (${startStop?.stopID})`,
-                    minuteFromStart: item.minuteFromStart,
-                }
-            }))
+            rowStore.setRoutes(routeData)
         }
     }
     useEffect(() => {
         fetchBusRouteStop().then()
+        rowStore.setRows([])
+        rowModesModelStore.setRowModesModel({})
     }, [])
     const busRouteStopFormatter = (value: string) => {
-        return value.split(" ")[0]
+        return value.split(' ')[0]
     }
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'route',
-            headerName: '노선',
-            width: 150,
-            type: 'singleSelect',
-            valueOptions: busRouteStore.rows.map(route => `${route.name} (${route.routeID})`),
-            editable: true,
-            valueFormatter: busRouteStopFormatter,
-            headerAlign: 'center',
-            align: 'center',
-        },
-        {
             field: 'stop',
             headerName: '정류장',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: rowStore.stops.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',
             align: 'center',
         },
         {
-            field: 'sequence',
+            field: 'order',
             headerName: '경유 순서',
             width: 150,
             type: 'number',
@@ -122,16 +96,17 @@ export default function BusRouteStop() {
         {
             field: 'startStop',
             headerName: '출발 정류장',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'singleSelect',
-            valueOptions: busStopStore.rows.map(stop => `${stop.name} (${stop.stopID})`),
+            valueOptions: rowStore.stops.map((stop) => `${stop.name} (${stop.stopID})`),
             editable: true,
             valueFormatter: busRouteStopFormatter,
             headerAlign: 'center',
             align: 'center',
         },
         {
-            field: 'minuteFromStart',
+            field: 'travelTime',
             headerName: '출발지 기준 분',
             width: 200,
             type: 'number',

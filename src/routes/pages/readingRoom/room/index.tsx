@@ -1,24 +1,40 @@
+import { GridColDef } from '@mui/x-data-grid'
+import dayjs from 'dayjs'
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { GridColDef } from '@mui/x-data-grid'
+
 import { ReadingRoomGrid } from './grid.tsx'
-import dayjs from "dayjs"
-import { useReadingRoomItemStore } from "../../../../stores/readingRoom.ts"
-import { getReadingRoomList, ReadingRoomResponse } from "../../../../service/network/readingRoom.ts"
+import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
+import { getReadingRoomList, ReadingRoomResponse } from '../../../../service/network/readingRoom.ts'
+import { useReadingRoomItemStore } from '../../../../stores/readingRoom.ts'
 
 
 export default function ReadingRoomPage() {
     // Get the store
-    const readingRoomStore = useReadingRoomItemStore()
+    const rowStore = useReadingRoomItemStore()
     const fetchReadingRoom = async () => {
+        const campusResponse = await getCampusList()
+        if (campusResponse.status === 200) {
+            const campusResponseData = campusResponse.data
+            rowStore.setCampuses(campusResponseData.result.map((item: CampusResponse) => {
+                return {
+                    seq: item.seq,
+                    name: item.name,
+                }
+            }))
+        }
         const response = await getReadingRoomList()
         if (response.status === 200) {
             const responseData = response.data
-            readingRoomStore.setRows(responseData.data.map((item: ReadingRoomResponse) => {
+            const { campuses } = useReadingRoomItemStore.getState()
+            rowStore.setRows(responseData.result.map((item: ReadingRoomResponse) => {
                 return {
                     id: uuidv4(),
-                    readingRoomID: item.id,
+                    seq: item.seq,
                     name: item.name,
+                    campus: `${campuses.find((campus) => campus.seq === item.campusID)?.name || ''} (${item.campusID})`,
+                    isActive: item.isActive,
+                    isReservable: item.isReservable,
                     total: item.total,
                     active: item.active,
                     available: item.available,
@@ -39,20 +55,33 @@ export default function ReadingRoomPage() {
     // Configure DataGrid
     const columns: GridColDef[] = [
         {
-            field: 'readingRoomID',
+            field: 'seq',
             headerName: '열람실 ID',
             width: 150,
             type: 'number',
-            editable: false,
+            editable: true,
             headerAlign: 'center',
             align: 'center',
         },
         {
             field: 'name',
             headerName: '열람실 이름',
-            width: 250,
+            minWidth: 250,
+            flex: 1,
             type: 'string',
-            editable: false,
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'campus',
+            headerName: '캠퍼스',
+            width: 150,
+            type: 'singleSelect',
+            valueOptions: rowStore.campuses.map((item: CampusResponse) => {
+                return `${item.name} (${item.seq})`
+            }),
+            editable: true,
             headerAlign: 'center',
             align: 'center',
         },
@@ -61,7 +90,7 @@ export default function ReadingRoomPage() {
             headerName: '총 좌석',
             width: 150,
             type: 'number',
-            editable: false,
+            editable: true,
             headerAlign: 'center',
             align: 'center',
         },
@@ -70,7 +99,7 @@ export default function ReadingRoomPage() {
             headerName: '활성 좌석',
             width: 150,
             type: 'number',
-            editable: false,
+            editable: true,
             headerAlign: 'center',
             align: 'center',
         },
@@ -88,15 +117,32 @@ export default function ReadingRoomPage() {
             headerName: '점유 좌석',
             width: 150,
             type: 'number',
-            editable: false,
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'isActive',
+            headerName: '활성화 여부',
+            width: 150,
+            type: 'boolean',
+            editable: true,
+            headerAlign: 'center',
+            align: 'center',
+        },
+        {
+            field: 'isReservable',
+            headerName: '예약 가능 여부',
+            width: 150,
+            type: 'boolean',
+            editable: true,
             headerAlign: 'center',
             align: 'center',
         },
         {
             field: 'updatedAt',
             headerName: '갱신 시간',
-            minWidth: 150,
-            flex: 1,
+            width: 250,
             type: 'dateTime',
             editable: false,
             headerAlign: 'center',

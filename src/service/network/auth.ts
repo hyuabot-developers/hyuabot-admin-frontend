@@ -1,14 +1,14 @@
-import client from "./client.ts"
+import client from './client.ts'
 
 export const getUserInfo = async () => {
-    return await client.get('/api/auth/users/me')
+    return await client.get('/api/v1/user/profile')
 }
 
 export const login = async (data: { username: string, password: string }) => {
-    const formData = new FormData()
-    formData.append('username', data.username)
-    formData.append('password', data.password)
-    return await client.post('/api/auth/users/token', formData, {
+    const params = new URLSearchParams()
+    params.append('username', data.username)
+    params.append('password', data.password)
+    return await client.post('/api/v1/user/token', params, {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -16,9 +16,17 @@ export const login = async (data: { username: string, password: string }) => {
 }
 
 export const refreshToken = async () => {
-    return await client.put('/api/auth/users/token', {
+    return await client.put('/api/v1/user/token', {
         headers: {
             'Cookie': `refresh_token=${localStorage.getItem('refreshToken')}`
+        }
+    })
+}
+
+export const logout = async () => {
+    return await client.delete('/api/v1/user/token', {
+        headers: {
+            'Cookie': `access_token=${localStorage.getItem('accessToken')}; refresh_token=${localStorage.getItem('refreshToken')}`
         }
     })
 }

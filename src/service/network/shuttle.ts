@@ -1,35 +1,64 @@
-import client from "./client.ts"
+import client from './client.ts'
 
 export type ShuttlePeriodResponse = {
+    seq: number,
+    type: string,
+    start: string,
+    end: string,
+}
+
+export type ShuttlePeriodRequest = {
     type: string,
     start: string,
     end: string,
 }
 
 export type ShuttleHolidayResponse = {
+    seq: number,
     type: string,
-    calendar: string,
+    calendarType: string,
+    date: string,
+}
+
+export type ShuttleHolidayRequest = {
+    type: string,
+    calendarType: string,
     date: string,
 }
 
 export type ShuttleRouteResponse = {
     name: string,
     tag: string,
-    korean: string,
-    english: string,
-    start: string,
-    end: string,
+    descriptionKorean: string,
+    descriptionEnglish: string,
+    startStopID: string,
+    endStopID: string,
+}
+
+export type CreateShuttleRouteRequest = {
+    name: string,
+    tag: string,
+    descriptionKorean: string,
+    descriptionEnglish: string,
+    startStopID: string,
+    endStopID: string,
 }
 
 export type UpdateShuttleRouteRequest = {
     tag: string,
-    korean: string,
-    english: string,
-    start: string,
-    end: string,
+    descriptionKorean: string,
+    descriptionEnglish: string,
+    startStopID: string,
+    endStopID: string,
 }
 
 export type ShuttleStopResponse = {
+    name: string,
+    latitude: number,
+    longitude: number,
+}
+
+export type CreateShuttleStopRequest = {
     name: string,
     latitude: number,
     longitude: number,
@@ -41,129 +70,150 @@ export type UpdateShuttleStopRequest = {
 }
 
 export type ShuttleRouteStopResponse = {
-    stop: string,
-    route: string,
-    sequence: number,
-    cumulativeTime: number,
+    seq: number,
+    name: string,
+    order: number,
+    cumulativeTime: string,
 }
 
 export type CreateRouteStopRequest = {
-    stop: string,
-    sequence: number,
-    cumulativeTime: number,
+    stopName: string,
+    order: number,
+    cumulativeTime: string,
 }
 
 export type UpdateShuttleRouteStopRequest = {
-    sequence: number,
-    cumulativeTime: number,
+    order: number,
+    cumulativeTime: string,
 }
 
 export type ShuttleTimetableResponse = {
-    sequence: number,
+    seq: number,
     period: string,
     weekdays: boolean,
     route: string,
-    time: string,
+    departureTime: string,
 }
 
-export type CreateTimetableResponse = {
+export type CreateTimetableRequest = {
     period: string,
     weekdays: boolean,
-    route: string,
-    time: string,
+    departureTime: string,
 }
 
 export type UpdateShuttleTimetableRequest = {
     period: string,
     weekdays: boolean,
-    route: string,
-    time: string,
+    departureTime: string,
+}
+
+export type ShuttleTimetableViewResponse = {
+    seq: number,
+    period: string,
+    isWeekdays: boolean,
+    routeName: string,
+    stopName: string,
+    routeTag: string,
+    departureTime: string,
+    destinationGroup: string,
 }
 
 export const getShuttlePeriod = async () => {
-    return await client.get('/api/shuttle/period')
+    return await client.get('/api/v1/shuttle/period')
 }
 
-export const createShuttlePeriod = async (data: ShuttlePeriodResponse) => {
-    return await client.post('/api/shuttle/period', data)
+export const createShuttlePeriod = async (data: ShuttlePeriodRequest) => {
+    return await client.post('/api/v1/shuttle/period', data)
 }
 
-export const deleteShuttlePeriod = async (data: ShuttlePeriodResponse) => {
-    return await client.delete(`/api/shuttle/period/${data.type}/${data.start}/${data.end}`)
+export const updateShuttlePeriod = async (seq: number, data: ShuttlePeriodRequest) => {
+    return await client.put(`/api/v1/shuttle/period/${seq}`, data)
+}
+
+export const deleteShuttlePeriod = async (seq: number) => {
+    return await client.delete(`/api/v1/shuttle/period/${seq}`)
 }
 
 export const getShuttleHoliday = async () => {
-    return await client.get('/api/shuttle/holiday')
+    return await client.get('/api/v1/shuttle/holiday')
 }
 
-export const createShuttleHoliday = async (data: ShuttleHolidayResponse) => {
-    return await client.post('/api/shuttle/holiday', data)
+export const createShuttleHoliday = async (data: ShuttleHolidayRequest) => {
+    return await client.post('/api/v1/shuttle/holiday', data)
 }
 
-export const deleteShuttleHoliday = async (data: ShuttleHolidayResponse) => {
-    return await client.delete(`/api/shuttle/holiday/${data.calendar}/${data.date}`)
+export const updateShuttleHoliday = async (seq: number, data: ShuttleHolidayRequest) => {
+    return await client.put(`/api/v1/shuttle/holiday/${seq}`, data)
+}
+
+export const deleteShuttleHoliday = async (seq: number) => {
+    return await client.delete(`/api/v1/shuttle/holiday/${seq}`)
 }
 
 export const getShuttleRoute = async () => {
-    return await client.get('/api/shuttle/route')
+    return await client.get('/api/v1/shuttle/route')
 }
 
-export const createShuttleRoute = async (data: ShuttleRouteResponse) => {
-    return await client.post('/api/shuttle/route', data)
+export const createShuttleRoute = async (data: CreateShuttleRouteRequest) => {
+    return await client.post('/api/v1/shuttle/route', data)
 }
 
 export const updateShuttleRoute = async (name: string, data: UpdateShuttleRouteRequest) => {
-    return await client.put(`/api/shuttle/route/${name}`, data)
+    return await client.put(`/api/v1/shuttle/route/${name}`, data)
 }
 
 export const deleteShuttleRoute = async (name: string) => {
-    return await client.delete(`/api/shuttle/route/${name}`)
+    return await client.delete(`/api/v1/shuttle/route/${name}`)
 }
 
 export const getShuttleStop = async () => {
-    return await client.get('/api/shuttle/stop')
+    return await client.get('/api/v1/shuttle/stop')
 }
 
-export const createShuttleStop = async (data: ShuttleStopResponse) => {
-    return await client.post('/api/shuttle/stop', data)
+export const createShuttleStop = async (data: CreateShuttleStopRequest) => {
+    return await client.post('/api/v1/shuttle/stop', data)
 }
 
 export const updateShuttleStop = async (name: string, data: UpdateShuttleStopRequest) => {
-    return await client.put(`/api/shuttle/stop/${name}`, data)
+    return await client.put(`/api/v1/shuttle/stop/${name}`, data)
 }
 
 export const deleteShuttleStop = async (name: string) => {
-    return await client.delete(`/api/shuttle/stop/${name}`)
+    return await client.delete(`/api/v1/shuttle/stop/${name}`)
 }
 
-export const getShuttleRouteStop = async () => {
-    return await client.get(`/api/shuttle/route-stop`)
+export const getShuttleRouteStop = async (routeName: string) => {
+    return await client.get(`/api/v1/shuttle/route/${routeName}/stop`)
 }
 
 export const createShuttleRouteStop = async (routeName: string, data: CreateRouteStopRequest) => {
-    return await client.post(`/api/shuttle/route/${routeName}/stop`, data)
+    return await client.post(`/api/v1/shuttle/route/${routeName}/stop`, data)
 }
 
 export const updateShuttleRouteStop = async (routeName: string, stopName: string, data: UpdateShuttleRouteStopRequest) => {
-    return await client.put(`/api/shuttle/route/${routeName}/stop/${stopName}`, data)
+    return await client.put(`/api/v1/shuttle/route/${routeName}/stop/${stopName}`, data)
 }
 
 export const deleteShuttleRouteStop = async (routeName: string, stopName: string) => {
-    return await client.delete(`/api/shuttle/route/${routeName}/stop/${stopName}`)
+    return await client.delete(`/api/v1/shuttle/route/${routeName}/stop/${stopName}`)
 }
 
-export const getShuttleTimetable = async () => {
-    return await client.get('/api/shuttle/timetable')
+export const getShuttleAllTimetable = async () => {
+    return await client.get('/api/v1/shuttle/timetable')
 }
 
-export const createShuttleTimetable = async (data: CreateTimetableResponse) => {
-    return await client.post('/api/shuttle/timetable', data)
+export const getShuttleTimetable = async (routeName: string) => {
+    return await client.get(`/api/v1/shuttle/route/${routeName}/timetable`)
 }
 
-export const updateShuttleTimetable = async (sequence: number, data: UpdateShuttleTimetableRequest) => {
-    return await client.put(`/api/shuttle/timetable/${sequence}`, data)
+export const createShuttleTimetable = async (routeName: string, data: CreateTimetableRequest) => {
+    return await client.post(`/api/v1/shuttle/route/${routeName}/timetable`, data)
 }
 
-export const deleteShuttleTimetable = async (sequence: number) => {
-    return await client.delete(`/api/shuttle/timetable/${sequence}`)
+export const updateShuttleTimetable = async (routeName: string, seq: number, data: UpdateShuttleTimetableRequest) => {
+    return await client.put(`/api/v1/shuttle/route/${routeName}/timetable/${seq}`, data)
+}
+
+export const deleteShuttleTimetable = async (routeName: string, seq: number) => {
+    return await client.delete(`/api/v1/shuttle/route/${routeName}/timetable/${seq}`)
 }

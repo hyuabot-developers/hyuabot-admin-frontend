@@ -1,4 +1,8 @@
-import { Alert, Box, Snackbar } from "@mui/material"
+import CancelIcon from '@mui/icons-material/Close'
+import DeleteIcon from '@mui/icons-material/DeleteOutlined'
+import EditIcon from '@mui/icons-material/Edit'
+import SaveIcon from '@mui/icons-material/Save'
+import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
     GridActionsCellItem,
@@ -7,108 +11,106 @@ import {
     GridRowId,
     GridRowModes,
     GridRowModesModel
-} from "@mui/x-data-grid"
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/DeleteOutlined"
-import SaveIcon from "@mui/icons-material/Save"
-import CancelIcon from "@mui/icons-material/Close"
-import { Toolbar } from "./toolbar.tsx"
-import {
-    ShuttleTimetable,
-    useShuttleTimetableStore,
-    useShuttleTimetableGridModelStore,
-} from "../../../../stores/shuttle.ts"
-import { useState } from "react"
+} from '@mui/x-data-grid'
+import { useState } from 'react'
+
+import { GridToolbar } from './toolbar.tsx'
 import {
     createShuttleTimetable,
     deleteShuttleTimetable,
     updateShuttleTimetable,
-} from "../../../../service/network/shuttle.ts"
+} from '../../../../service/network/shuttle.ts'
+import {
+    ShuttleTimetable,
+    useShuttleTimetableStore,
+    useShuttleTimetableGridModelStore,
+} from '../../../../stores/shuttle.ts'
 
 interface GridProps {
     columns: GridColDef[]
 }
 
-export function ShuttleTimetableGrid(props: GridProps) {
+export const ShuttleTimetableGrid = (props: GridProps) => {
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
-    const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>("")
-    const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>("")
+    const [errorSnackbarContent, setErrorSnackbarContent] = useState<string>('')
+    const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
 
-    const rowEditStopped: GridEventListener<"rowEditStop"> = (params, event) => {
+    const rowEditStopped: GridEventListener<'rowEditStop'> = (params, event) => {
         if (event.defaultMuiPrevented) {
             return
         }
-        const editedRow = rowStore.rows.find(row => row.id === params.id)
+        const editedRow = rowStore.rows.find((row) => row.id === params.id)
         return editedRow!
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
-        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.Edit}})
+        rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.Edit } })
     }
     const saveRowButtonClicked = (id: GridRowId) => {
-        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View}})
+        rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View } })
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
-        const rowToDelete = rowStore.rows.find(row => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
-        if (rowToDelete.sequence === null) { setErrorSnackbarContent("데이터 삭제에 실패했습니다."); return }
-        const response = await deleteShuttleTimetable(rowToDelete.sequence)
+        const { rows, selectedRoute } = useShuttleTimetableStore.getState()
+        const rowToDelete = rows.find((row) => row.id === id)
+        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteShuttleTimetable(selectedRoute!, rowToDelete.seq)
         if (response.status !== 204) {
-            setErrorSnackbarContent("데이터 삭제에 실패했습니다.")
+            setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
         }
-        setSuccessSnackbarContent("데이터 삭제에 성공했습니다.")
-        rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
+        setSuccessSnackbarContent('데이터 삭제에 성공했습니다.')
+        rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
     }
     const cancelRowButtonClicked = (id: GridRowId) => {
-        rowModesModelStore.setRowModesModel({...rowModesModelStore.rowModesModel, [id]: {mode: GridRowModes.View, ignoreModifications: true}})
-        const editedRow = rowStore.rows.find(row => row.id === id)
+        rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
+        const editedRow = rowStore.rows.find((row) => row.id === id)
         if (editedRow!.isNew) {
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== id))
+            rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: ShuttleTimetable) => {
-        if (newRow.period === "" || newRow.route === "" || newRow.time === "") {
-            setErrorSnackbarContent("올바른 데이터가 아닙니다.")
-            rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-            return { ...newRow, _action: "delete" }
+        if (newRow.period === '' || newRow.time === '') {
+            setErrorSnackbarContent('올바른 데이터가 아닙니다.')
+            rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+            return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
-            const response = await createShuttleTimetable({
-                period: newRow.period,
-                route: newRow.route,
-                weekdays: newRow.weekdays,
-                time: newRow.time,
-            })
+            const response = await createShuttleTimetable(
+                rowStore.selectedRoute!, {
+                    period: newRow.period,
+                    weekdays: newRow.weekdays,
+                    departureTime: newRow.time,
+                }
+            )
             if (response.status !== 201) {
-                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-                rowStore.setRows(rowStore.rows.filter(row => row.id !== newRow.id))
-                return { ...newRow, _action: "delete" }
+                setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+                rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+                return { ...newRow, _action: 'delete' }
             }
             const responseData = response.data
-            const updatedRow = {...newRow, sequence: responseData.sequence, isNew: false}
-            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
-            rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
+            const updatedRow = { ...newRow, sequence: responseData.sequence, isNew: false }
+            setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
+            rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
             return updatedRow
-        } else if (newRow.sequence !== null) {
-            const response = await updateShuttleTimetable(newRow.sequence, {
+        } else if (newRow.seq !== null) {
+            const response = await updateShuttleTimetable(rowStore.selectedRoute!, newRow.seq, {
                 period: newRow.period,
-                route: newRow.route,
                 weekdays: newRow.weekdays,
-                time: newRow.time,
+                departureTime: newRow.time,
             })
             if (response.status !== 200) {
-                setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-                return { ...newRow, _action: "delete" }
+                setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+                return { ...newRow, _action: 'delete' }
             }
-            setSuccessSnackbarContent("데이터 저장에 성공했습니다.")
-            const updatedRow = {...newRow, isNew: false}
-            rowStore.setRows(rowStore.rows.map(row => row.id === newRow.id ? updatedRow : row))
+            setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
+            const updatedRow = { ...newRow, isNew: false }
+            rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
             return updatedRow
         } else {
-            setErrorSnackbarContent("데이터 저장에 실패했습니다.")
-            return { ...newRow, _action: "delete" }
+            setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+            return { ...newRow, _action: 'delete' }
         }
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
@@ -116,11 +118,11 @@ export function ShuttleTimetableGrid(props: GridProps) {
     }
     // Add action column
     props.columns.push({
-        field: "actions",
-        headerName: "동작",
-        type: "actions",
+        field: 'actions',
+        headerName: '동작',
+        type: 'actions',
         width: 100,
-        cellClassName: "actions",
+        cellClassName: 'actions',
         getActions: ({ id }) => {
             const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
             if (isEditing) {
@@ -142,26 +144,27 @@ export function ShuttleTimetableGrid(props: GridProps) {
     })
     // Render
     return (
-        <Box sx={{height: "100vh", width: "100%"}}>
+        <Box sx={{ height: '90vh', width: '100%' }}>
             <Snackbar
-                anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                open={errorSnackbarContent !== ""}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={errorSnackbarContent !== ''}
                 autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent("")}>
-                <Alert onClose={() => setErrorSnackbarContent("")} severity="error" sx={{width: "100%"}}>
+                onClose={() => setErrorSnackbarContent('')}>
+                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
                     {errorSnackbarContent}
                 </Alert>
             </Snackbar>
             <Snackbar
-                anchorOrigin={{vertical: "bottom", horizontal: "right"}}
-                open={successSnackbarContent !== ""}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={successSnackbarContent !== ''}
                 autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent("")}>
-                <Alert onClose={() => setSuccessSnackbarContent("")} severity="success" sx={{width: "100%"}}>
+                onClose={() => setSuccessSnackbarContent('')}>
+                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
                     {successSnackbarContent}
                 </Alert>
             </Snackbar>
             <DataGrid
+                showToolbar={true}
                 columns={props.columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
@@ -169,9 +172,9 @@ export function ShuttleTimetableGrid(props: GridProps) {
                 onRowModesModelChange={rowModesModelChanged}
                 onRowEditStop={rowEditStopped}
                 processRowUpdate={updateRowProcess}
-                slots={{toolbar: Toolbar}}
+                slots={{ toolbar: GridToolbar }}
                 autoPageSize={true}
-                isCellEditable={(params) => params.colDef.field !== "actions" && (params.colDef.field !== "name" || params.row.isNew)}
+                isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'name' || params.row.isNew)}
             />
         </Box>
     )

@@ -1,87 +1,25 @@
-import { v4 as uuidv4 } from "uuid"
-import { Button } from "@mui/material"
-import { GridRowModes, GridToolbarContainer } from "@mui/x-data-grid"
-
-
-import AddIcon from "@mui/icons-material/Add"
+import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
-import {
-    BusRoute,
-    BusStop,
-    useBusRouteStore,
-    useBusStopStore, useBusTimetableGridModelStore, useBusTimetableStore
-} from "../../../../stores/bus.ts"
-import {
-    BusRouteResponse,
-    BusStopResponse,
-    BusTimetableResponse,
-    getBusRoutes,
-    getBusStops,
-    getBusTimetables
-} from "../../../../service/network/bus.ts"
+import { Autocomplete, TextField } from '@mui/material'
+import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { v4 as uuidv4 } from 'uuid'
 
-export function Toolbar() {
+import { BusTimetableResponse, getBusTimetables } from '../../../../service/network/bus.ts'
+import { useBusTimetableGridModelStore, useBusTimetableStore } from '../../../../stores/bus.ts'
+
+export const GridToolbar = () => {
     const rowStore = useBusTimetableStore()
     const rowModesModelStore = useBusTimetableGridModelStore()
-    const busRouteStore = useBusRouteStore()
-    const busStopStore = useBusStopStore()
-    // Fetch bus data
-    let stopData: BusStop[] = []
-    let routeData: BusRoute[] = []
-    const fetchBusTimetable = async () => {
-        // Fetch bus stop
-        const stopResponse = await getBusStops()
-        if (stopResponse.status === 200) {
-            const responseData = stopResponse.data
-            stopData = responseData.data.map((item: BusStopResponse) => {
-                return {
-                    id: uuidv4(),
-                    stopID: item.id,
-                    name: item.name,
-                    latitude: item.latitude,
-                    longitude: item.longitude,
-                    district: item.district,
-                    mobileNumber: item.mobileNumber,
-                }
-            })
-            busStopStore.setRows(stopData)
-        }
-        // Fetch bus route
-        const routeResponse = await getBusRoutes()
-        if (routeResponse.status === 200) {
-            const responseData = routeResponse.data
-            routeData = responseData.data.map((item: BusRouteResponse) => {
-                const startStop = stopData.find(stop => stop.stopID === item.start)
-                const endStop = stopData.find(stop => stop.stopID === item.end)
-                return {
-                    id: uuidv4(),
-                    routeID: item.id,
-                    name: item.name,
-                    type: item.type,
-                    startStop: `${startStop?.name} (${startStop?.stopID})`,
-                    endStop: `${endStop?.name} (${endStop?.stopID})`,
-                    companyID: item.company.id,
-                    companyName: item.company.name,
-                    companyTelephone: item.company.telephone,
-                    upFirstTime: item.up.first,
-                    upLastTime: item.up.last,
-                    downFirstTime: item.down.first,
-                    downLastTime: item.down.last,
-                }
-            })
-            busRouteStore.setRows(routeData)
-        }
-        const timetableResponse = await getBusTimetables()
+
+    const fetchBusTimetable = async (routeID: number, startStopID: number) => {
+        const timetableResponse = await getBusTimetables(routeID, startStopID)
         if (timetableResponse.status === 200) {
             const responseData = timetableResponse.data
-            rowStore.setRows(responseData.data.map((item: BusTimetableResponse) => {
-                const route = routeData.find(route => route.routeID === item.routeID)
-                const startStop = stopData.find(stop => stop.stopID === item.start)
+            rowStore.setRows(responseData.result.map((item: BusTimetableResponse) => {
                 return {
                     id: uuidv4(),
-                    route: `${route?.name} (${route?.routeID})`,
-                    startStop: `${startStop?.name} (${startStop?.stopID})`,
-                    weekdays: item.weekdays,
+                    seq: item.seq,
+                    dayType: item.dayType,
                     departureTime: item.departureTime,
                 }
             }))
@@ -93,28 +31,81 @@ export function Toolbar() {
         rowStore.setRows([
             {
                 id,
-                route: `${busRouteStore.rows[0].name} (${busRouteStore.rows[0].routeID})`,
-                startStop: `${busStopStore.rows[0].name} (${busStopStore.rows[0].stopID})`,
-                weekdays: "weekdays",
-                departureTime: "00:00:00",
+                seq: null,
+                dayType: 'weekdays',
+                departureTime: '00:00:00',
                 isNew: true,
             },
             ...rowStore.rows,
         ])
         rowModesModelStore.setRowModesModel(({
             ...rowModesModelStore.rowModesModel,
-            [id]: { mode: GridRowModes.Edit, fieldToFocus: "name" },
+            [id]: { mode: GridRowModes.Edit, fieldToFocus: 'dayType' },
         }))
     }
 
+    const onChangeSelectedRoute = (routeID: number) => {
+        if (routeID === 0) {
+            rowStore.setSelectedRouteID(null)
+            rowStore.setSelectedStopID(null)
+            rowStore.setRows([])
+            return
+        }
+        rowStore.setSelectedRouteID(routeID)
+        rowStore.setSelectedStopID(null)
+        const route = rowStore.routes.find((r) => r.routeID === routeID)
+        if (route) {
+            rowStore.setRouteStops(
+                rowStore.stops.filter((stop) => (
+                    stop.stopID === parseInt(route.startStop.split('(')[1].split(')')[0]) ||
+                    stop.stopID === parseInt(route.endStop.split('(')[1].split(')')[0])
+                ))
+            )
+        }
+    }
+
+    const onChangeSelectedStop = (stopSeq: number) => {
+        if (stopSeq === 0) {
+            rowStore.setSelectedStopID(null)
+            rowStore.setRows([])
+            return
+        }
+        rowStore.setSelectedStopID(stopSeq)
+        fetchBusTimetable(rowStore.selectedRouteID || 0, stopSeq).then()
+    }
+
     return (
-        <GridToolbarContainer style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
-            <Button color="primary" variant="outlined" startIcon={<RefreshIcon />} onClick={fetchBusTimetable}>
-                새로고침
-            </Button>
-            <Button color="primary" variant="contained" startIcon={<AddIcon />} onClick={addRowButtonClicked}>
-                항목 추가
-            </Button>
-        </GridToolbarContainer>
+        <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <Autocomplete
+                size="small"
+                disablePortal={true}
+                options={rowStore.routes.map((route) => route.name)}
+                sx={{ width: 300, marginRight: 2 }}
+                renderInput={(params) => <TextField {...params} label="버스 노선" />}
+                onChange={(_, value) => onChangeSelectedRoute(
+                    rowStore.routes.find((route) => route.name === value)?.routeID || 0
+                )}
+            />
+            <Autocomplete
+                size="small"
+                disablePortal={true}
+                options={rowStore.routeStops.map((stop) => stop.name)}
+                sx={{ width: 300, marginRight: 2 }}
+                renderInput={(params) => <TextField {...params} label="버스 정류장" />}
+                onChange={(_, value) => onChangeSelectedStop(
+                    rowStore.routeStops.find((stop) => stop.name === value)?.stopID || 0
+                )}
+            />
+            <ToolbarButton onClick={addRowButtonClicked}>
+                <AddIcon />
+            </ToolbarButton>
+            <ToolbarButton onClick={() => {
+                if (rowStore.selectedRouteID && rowStore.selectedStopID) {
+                    fetchBusTimetable(rowStore.selectedRouteID, rowStore.selectedStopID).then()
+                }
+            }}>
+                <RefreshIcon />
+            </ToolbarButton>
+        </Toolbar>
     )
 }
