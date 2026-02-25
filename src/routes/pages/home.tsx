@@ -1,4 +1,5 @@
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import CampaignIcon from '@mui/icons-material/Campaign'
 import ContactsIcon from '@mui/icons-material/Contacts'
 import DepartureBoardIcon from '@mui/icons-material/DepartureBoard'
 import DiningIcon from '@mui/icons-material/Dining'
@@ -106,7 +107,7 @@ export default function Home() {
     )
     // Drawer
     const navigate = useNavigate()
-    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정']
+    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정', '공지사항']
     const menuIcons = [
         DepartureBoardIcon,
         DirectionsBusIcon,
@@ -115,6 +116,7 @@ export default function Home() {
         LibraryBooksIcon,
         ContactsIcon,
         CalendarMonthIcon,
+        CampaignIcon,
     ]
     const menuItemClicked = (text: string) => {
         switch (text) {
@@ -125,6 +127,7 @@ export default function Home() {
         case '열람실': navigate('/readingRoom'); break
         case '연락처': navigate('/contact'); break
         case '학사일정': navigate('/calendar'); break
+        case '공지사항': navigate('/notice'); break
         }
         drawerOpenedStore.setDrawerOpened(false)
     }

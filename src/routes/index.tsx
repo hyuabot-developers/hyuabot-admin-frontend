@@ -19,6 +19,9 @@ import ERICAContactPage from './pages/contact/erica'
 import SeoulContactPage from './pages/contact/seoul'
 import Home from './pages/home.tsx'
 import Login from './pages/login.tsx'
+import Notice from './pages/notice'
+import NoticeCategoryPage from './pages/notice/category'
+import NoticePage from './pages/notice/notice'
 import ReadingRoom from './pages/readingRoom'
 import ReadingRoomPage from './pages/readingRoom/room'
 import Shuttle from './pages/shuttle'
@@ -81,6 +84,10 @@ const appRouter = createBrowserRouter([
             { path: 'calendar', element: <Calendar />, children: [
                 { path: 'category', element: <CalendarCategoryPage /> },
                 { path: 'event', element: <CalendarEventPage /> }
+            ] },
+            { path: 'notice', element: <Notice />, children: [
+                { path: 'category', element: <NoticeCategoryPage /> },
+                { path: 'notice', element: <NoticePage /> },
             ] },
             { path: '/', element: <Navigate replace to="/shuttle/period" /> },
             { path: '*', element: <Navigate replace to="/shuttle/period" /> },
