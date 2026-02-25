@@ -73,7 +73,9 @@ export const NoticeCategoryGrid = (props: GridProps) => {
     const updateRowProcess = async (newRow: GridNoticeCategoryItem) => {
         if (newRow.name === '') {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
-            rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+            if (newRow.isNew) {
+                rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
+            }
             return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
