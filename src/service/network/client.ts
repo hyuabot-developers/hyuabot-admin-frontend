@@ -32,25 +32,9 @@ client.interceptors.response.use(
             originalRequest._retry = true
             // Refresh token
             try {
-                const response = await refreshToken()
-                if (response.status === 200) {
-                    const cookies = response.headers['Set-Cookie']
-                    if (cookies) {
-                        cookies.forEach((cookie: string) => {
-                            if (cookie.startsWith('access_token=')) {
-                                const accessToken = cookie.split(';')[0].split('=')[1]
-                                localStorage.setItem('accessToken', accessToken)
-                            } else if (cookie.startsWith('refresh_token=')) {
-                                const refreshToken = cookie.split(';')[0].split('=')[1]
-                                localStorage.setItem('refreshToken', refreshToken)
-                            }
-                        })
-                    }
-                    return client(originalRequest)
-                }
+                await refreshToken()
+                return client(originalRequest)
             } catch (refreshError) {
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('refreshToken')
                 window.location.href = '/login'
                 throw refreshError
             }
