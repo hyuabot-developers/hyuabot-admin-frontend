@@ -24,7 +24,7 @@ export default function SubwayRoutePage() {
         }
     }
     useEffect(() => {
-        fetchSubwayRoute().then()
+        fetchSubwayRoute().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

@@ -25,7 +25,7 @@ export default function NoticeCategoryPage() {
         }
     }
     useEffect(() => {
-        fetchNoticeCategory().then()
+        fetchNoticeCategory().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

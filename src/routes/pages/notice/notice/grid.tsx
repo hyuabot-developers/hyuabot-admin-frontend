@@ -88,7 +88,7 @@ export const NoticeGrid = (props: GridProps) => {
             const response = await createNotice(
                 {
                     title: newRow.title,
-                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    categoryID: parseInt(newRow.category.split('(')[1]?.split(')')[0] ?? '0', 10),
                     url: newRow.url,
                     expiredAt: formattedExpiredDate,
                     language: newRow.language,
@@ -106,7 +106,7 @@ export const NoticeGrid = (props: GridProps) => {
                 newRow.seq,
                 {
                     title: newRow.title,
-                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    categoryID: parseInt(newRow.category.split('(')[1]?.split(')')[0] ?? '0', 10),
                     url: newRow.url,
                     expiredAt: formattedExpiredDate,
                     language: newRow.language,

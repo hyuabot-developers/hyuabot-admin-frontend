@@ -77,10 +77,10 @@ export const BusRouteStopGrid = (props: GridProps) => {
             const response = await createBusRouteStop(
                 rowStore.selectedRouteID!,
                 {
-                    stopID: parseInt(newRow.stop.split('(')[1].split(')')[0]),
+                    stopID: parseInt(newRow.stop.split('(')[1]?.split(')')[0] ?? '0', 10),
                     order: newRow.order,
                     travelTime: newRow.travelTime,
-                    startStopID: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
+                    startStopID: parseInt(newRow.startStop.split('(')[1]?.split(')')[0] ?? '0', 10),
                 }
             )
             if (response.status !== 201) {
@@ -94,10 +94,10 @@ export const BusRouteStopGrid = (props: GridProps) => {
                 rowStore.selectedRouteID!,
                 newRow.seq!,
                 {
-                    stopID: parseInt(newRow.stop.split('(')[1].split(')')[0]),
+                    stopID: parseInt(newRow.stop.split('(')[1]?.split(')')[0] ?? '0', 10),
                     order: newRow.order,
                     travelTime: newRow.travelTime,
-                    startStopID: parseInt(newRow.startStop.split('(')[1].split(')')[0]),
+                    startStopID: parseInt(newRow.startStop.split('(')[1]?.split(')')[0] ?? '0', 10),
                 }
             )
             if (response.status !== 200) {

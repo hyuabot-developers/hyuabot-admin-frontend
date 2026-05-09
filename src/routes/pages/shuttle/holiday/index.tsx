@@ -26,7 +26,7 @@ export default function Holiday() {
             }))
         }
     }
-    useEffect(() => { fetchShuttleHoliday().then() }, [])
+    useEffect(() => { fetchShuttleHoliday().catch(console.error) }, [])
     // Configure DataGrid
     const dateValueFormatter = (value: Date) => {
         return dayjs(value).format('YYYY-MM-DD')

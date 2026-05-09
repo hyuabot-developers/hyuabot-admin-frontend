@@ -57,7 +57,7 @@ export const GridToolbar = () => {
             return
         }
         rowStore.setSelectedRouteID(routeID)
-        fetchBusStops(routeID).then()
+        fetchBusStops(routeID).catch(console.error)
     }
 
     const onChangeSelectedStop = (stopSeq: number) => {
@@ -67,7 +67,7 @@ export const GridToolbar = () => {
             return
         }
         rowStore.setSelectedStopID(stopSeq)
-        fetchBusDepartureLog(rowStore.selectedRouteID || 0, stopSeq).then()
+        fetchBusDepartureLog(rowStore.selectedRouteID || 0, stopSeq).catch(console.error)
     }
 
     return (

@@ -41,6 +41,7 @@ export const GridToolbar = () => {
     }
     // Add record button click event
     const addRowButtonClicked = () => {
+        if (!rowStore.routes.length) return
         const id = uuidv4()
         rowStore.setRows([
             {

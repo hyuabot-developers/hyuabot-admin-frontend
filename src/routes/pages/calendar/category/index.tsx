@@ -25,7 +25,7 @@ export default function CalendarCategoryPage() {
         }
     }
     useEffect(() => {
-        fetchCalendarCategory().then()
+        fetchCalendarCategory().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

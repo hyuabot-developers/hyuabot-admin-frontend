@@ -56,8 +56,9 @@ export const GridToolbar = () => {
     }
     // Add record button click event
     const addRowButtonClicked = () => {
-        const id = uuidv4()
         const { stops } = useBusRouteStore.getState()
+        if (!stops.length) return
+        const id = uuidv4()
         rowStore.setRows([
             {
                 id,

@@ -57,7 +57,7 @@ export default function BusDepartureLog() {
         }
     }
     useEffect(() => {
-        fetchBusRouteStops().then()
+        fetchBusRouteStops().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

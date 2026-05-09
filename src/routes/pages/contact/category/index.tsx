@@ -25,7 +25,7 @@ export default function ContactCategoryPage() {
         }
     }
     useEffect(() => {
-        fetchContactCategory().then()
+        fetchContactCategory().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

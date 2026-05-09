@@ -16,17 +16,9 @@ export const login = async (data: { username: string, password: string }) => {
 }
 
 export const refreshToken = async () => {
-    return await client.put('/api/v1/user/token', {
-        headers: {
-            'Cookie': `refresh_token=${localStorage.getItem('refreshToken')}`
-        }
-    })
+    return await client.put('/api/v1/user/token')
 }
 
 export const logout = async () => {
-    return await client.delete('/api/v1/user/token', {
-        headers: {
-            'Cookie': `access_token=${localStorage.getItem('accessToken')}; refresh_token=${localStorage.getItem('refreshToken')}`
-        }
-    })
+    return await client.delete('/api/v1/user/token')
 }

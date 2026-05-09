@@ -46,7 +46,7 @@ export default function NoticePage() {
         return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     }
     useEffect(() => {
-        fetchNotice().then()
+        fetchNotice().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

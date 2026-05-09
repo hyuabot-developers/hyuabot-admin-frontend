@@ -65,7 +65,7 @@ export const GridToolbar = () => {
         }
         rowStore.setSelectedStationID(stationID)
         if (rowStore.selectedDirection && rowStore.selectedWeekday) {
-            fetchSubwayTimetable(stationID, rowStore.selectedDirection, rowStore.selectedWeekday).then()
+            fetchSubwayTimetable(stationID, rowStore.selectedDirection, rowStore.selectedWeekday).catch(console.error)
         }
     }
 
@@ -77,7 +77,7 @@ export const GridToolbar = () => {
         }
         rowStore.setSelectedDirection(direction == '상행' ? 'up' : 'down')
         if (rowStore.selectedStationID && rowStore.selectedWeekday) {
-            fetchSubwayTimetable(rowStore.selectedStationID, direction == '상행' ? 'up' : 'down', rowStore.selectedWeekday).then()
+            fetchSubwayTimetable(rowStore.selectedStationID, direction == '상행' ? 'up' : 'down', rowStore.selectedWeekday).catch(console.error)
         }
     }
 
@@ -89,7 +89,7 @@ export const GridToolbar = () => {
         }
         rowStore.setSelectedWeekday(weekday == '평일' ? 'weekdays' : 'weekends')
         if (rowStore.selectedStationID && rowStore.selectedDirection) {
-            fetchSubwayTimetable(rowStore.selectedStationID, rowStore.selectedDirection, weekday == '평일' ? 'weekdays' : 'weekends').then()
+            fetchSubwayTimetable(rowStore.selectedStationID, rowStore.selectedDirection, weekday == '평일' ? 'weekdays' : 'weekends').catch(console.error)
         }
     }
 
@@ -130,7 +130,7 @@ export const GridToolbar = () => {
             </ToolbarButton>
             <ToolbarButton onClick={() => {
                 if (rowStore.selectedStationID && rowStore.selectedDirection && rowStore.selectedWeekday) {
-                    fetchSubwayTimetable(rowStore.selectedStationID, rowStore.selectedDirection, rowStore.selectedWeekday).then()
+                    fetchSubwayTimetable(rowStore.selectedStationID, rowStore.selectedDirection, rowStore.selectedWeekday).catch(console.error)
                 }
             }}>
                 <RefreshIcon />

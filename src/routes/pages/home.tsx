@@ -51,8 +51,6 @@ export default function Home() {
     const logOutButtonClicked = async () => {
         const response = await logout()
         if (response.status === 200) {
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
             window.location.href = '/login'
         }
     }
@@ -62,11 +60,11 @@ export default function Home() {
     }
     // Fetch user info when the component is mounted
     useEffect(() => {
-        fetchUserInfo().then()
+        fetchUserInfo().catch(console.error)
     }, [])
     useEffect(() => {
         if (isAuthenticatedStore.isAuthenticated === null) {
-            fetchUserInfo().then()
+            fetchUserInfo().catch(console.error)
         }
         else if (!isAuthenticatedStore.isAuthenticated) {
             window.location.href = '/login'

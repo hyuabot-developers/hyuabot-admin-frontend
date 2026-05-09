@@ -57,8 +57,8 @@ export const GridToolbar = () => {
         if (route) {
             rowStore.setRouteStops(
                 rowStore.stops.filter((stop) => (
-                    stop.stopID === parseInt(route.startStop.split('(')[1].split(')')[0]) ||
-                    stop.stopID === parseInt(route.endStop.split('(')[1].split(')')[0])
+                    stop.stopID === parseInt(route.startStop.split('(')[1]?.split(')')[0] ?? '0', 10) ||
+                    stop.stopID === parseInt(route.endStop.split('(')[1]?.split(')')[0] ?? '0', 10)
                 ))
             )
         }
@@ -71,7 +71,7 @@ export const GridToolbar = () => {
             return
         }
         rowStore.setSelectedStopID(stopSeq)
-        fetchBusTimetable(rowStore.selectedRouteID || 0, stopSeq).then()
+        fetchBusTimetable(rowStore.selectedRouteID || 0, stopSeq).catch(console.error)
     }
 
     return (
@@ -101,7 +101,7 @@ export const GridToolbar = () => {
             </ToolbarButton>
             <ToolbarButton onClick={() => {
                 if (rowStore.selectedRouteID && rowStore.selectedStopID) {
-                    fetchBusTimetable(rowStore.selectedRouteID, rowStore.selectedStopID).then()
+                    fetchBusTimetable(rowStore.selectedRouteID, rowStore.selectedStopID).catch(console.error)
                 }
             }}>
                 <RefreshIcon />

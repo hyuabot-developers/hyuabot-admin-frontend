@@ -65,7 +65,7 @@ export default function BusRoute() {
         async function fetchData() {
             await fetchBusRoute()
         }
-        fetchData().then()
+        fetchData().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

@@ -94,13 +94,14 @@ export const GridToolbar = () => {
     const onChangeSelectedRoute = (value: number) => {
         if (value) {
             rowStore.setSelectedRouteID(value)
-            fetchStopsByRoute(value).then()
+            fetchStopsByRoute(value).catch(console.error)
         }
     }
     // Add record button click event
     const addRowButtonClicked = () => {
-        const id = uuidv4()
         const { stops } = useBusRouteStopStore.getState()
+        if (!stops.length) return
+        const id = uuidv4()
         rowStore.setRows([
             {
                 id,
@@ -119,7 +120,7 @@ export const GridToolbar = () => {
         }))
     }
     useEffect(() => {
-        fetchBusRouteStop().then()
+        fetchBusRouteStop().catch(console.error)
     }, [])
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>

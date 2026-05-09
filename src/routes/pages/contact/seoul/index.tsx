@@ -38,7 +38,7 @@ export default function SeoulContactPage() {
         }
     }
     useEffect(() => {
-        fetchContact().then()
+        fetchContact().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

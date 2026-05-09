@@ -54,14 +54,14 @@ export const GridToolbar = () => {
     const refreshMenu = () => {
         const { selectedCafeteriaID } = useCafeteriaMenuStore.getState()
         if (selectedCafeteriaID) {
-            fetchMenuByCafeteria(selectedCafeteriaID).then()
+            fetchMenuByCafeteria(selectedCafeteriaID).catch(console.error)
         }
     }
 
     const onChangeSelectedCafeteria = (value: number) => {
         if (value) {
             rowStore.setSelectedCafeteriaID(value)
-            fetchMenuByCafeteria(value).then()
+            fetchMenuByCafeteria(value).catch(console.error)
         }
     }
 

@@ -72,8 +72,8 @@ export default function SubwayRealtimePage() {
         }
     }
     const headingFormatter = (value: string) => {
-        if (value == 'true') { return '상행' }
-        else if (value == 'false') { return '하행' }
+        if (value == 'up') { return '상행' }
+        else if (value == 'down') { return '하행' }
         else { return '' }
     }
     const statusFormatter = (value: number) => {
@@ -88,7 +88,7 @@ export default function SubwayRealtimePage() {
         return ''
     }
     useEffect(() => {
-        fetchSubwayRealtime().then()
+        fetchSubwayRealtime().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [
@@ -113,7 +113,7 @@ export default function SubwayRealtimePage() {
         {
             field: 'direction',
             headerName: '방향',
-            width: 30,
+            width: 60,
             type: 'string',
             valueFormatter: headingFormatter,
             editable: false,
