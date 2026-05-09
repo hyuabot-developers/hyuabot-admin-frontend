@@ -51,7 +51,7 @@ export default function ShuttleRoute() {
             await fetchShuttleRoute()
             await fetchShuttleStop()
         }
-        fetchData().then()
+        fetchData().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

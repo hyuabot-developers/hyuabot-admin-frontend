@@ -72,7 +72,7 @@ export const ContactGrid = (props: GridProps) => {
                 {
                     name: newRow.name,
                     phone: newRow.phone,
-                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    categoryID: parseInt(newRow.category.split('(')[1]?.split(')')[0] ?? '0', 10),
                     campusID: 1,
                 }
             )
@@ -88,7 +88,7 @@ export const ContactGrid = (props: GridProps) => {
                 {
                     name: newRow.name,
                     phone: newRow.phone,
-                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    categoryID: parseInt(newRow.category.split('(')[1]?.split(')')[0] ?? '0', 10),
                     campusID: 1,
                 }
             )

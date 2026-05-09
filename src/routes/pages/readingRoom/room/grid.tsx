@@ -79,7 +79,7 @@ export const ReadingRoomGrid = (props: GridProps) => {
                 await createReadingRoom({
                     id: newRow.seq,
                     name: newRow.name,
-                    campusID: parseInt(newRow.campus.split('(')[1].split(')')[0]),
+                    campusID: parseInt(newRow.campus.split('(')[1]?.split(')')[0] ?? '0', 10),
                     total: newRow.total,
                 })
                 setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
@@ -92,7 +92,7 @@ export const ReadingRoomGrid = (props: GridProps) => {
             try {
                 await updateReadingRoom(newRow.seq, {
                     name: newRow.name,
-                    campusID: parseInt(newRow.campus.split('(')[1].split(')')[0]),
+                    campusID: parseInt(newRow.campus.split('(')[1]?.split(')')[0] ?? '0', 10),
                     total: newRow.total,
                     active: newRow.active,
                     isActive: newRow.isActive,

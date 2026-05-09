@@ -59,7 +59,7 @@ export default function BusTimetable() {
         }
     }
     useEffect(() => {
-        fetchBusRouteStops().then()
+        fetchBusRouteStops().catch(console.error)
     }, [])
     const busWeekdaysFormatter = (value: string) => {
         switch (value) {

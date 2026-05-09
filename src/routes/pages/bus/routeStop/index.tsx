@@ -63,7 +63,7 @@ export default function BusRouteStop() {
         }
     }
     useEffect(() => {
-        fetchBusRouteStop().then()
+        fetchBusRouteStop().catch(console.error)
         rowStore.setRows([])
         rowModesModelStore.setRowModesModel({})
     }, [])

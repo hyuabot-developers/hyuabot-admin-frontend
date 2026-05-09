@@ -54,7 +54,7 @@ export const GridToolbar = () => {
     const onChangeSelectedRoute = (value: string | null) => {
         if (value) {
             rowStore.setSelectedRoute(value)
-            fetchShuttleTimetable(value).then()
+            fetchShuttleTimetable(value).catch(console.error)
         }
     }
     // Add record button click event
@@ -77,7 +77,7 @@ export const GridToolbar = () => {
         }))
     }
     useEffect(() => {
-        fetchShuttleRoute().then()
+        fetchShuttleRoute().catch(console.error)
     }, [])
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>

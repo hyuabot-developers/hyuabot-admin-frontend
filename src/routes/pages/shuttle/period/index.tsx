@@ -34,7 +34,7 @@ export default function Period() {
             )
         }
     }
-    useEffect(() => { fetchShuttlePeriod().then() }, [])
+    useEffect(() => { fetchShuttlePeriod().catch(console.error) }, [])
     // Configure DataGrid
     const startDateValueFormatter = (value: Date) => {
         return dayjs(value).format('YYYY-MM-DD HH:mm:ss')

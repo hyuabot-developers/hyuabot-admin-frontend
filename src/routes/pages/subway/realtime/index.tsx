@@ -88,7 +88,7 @@ export default function SubwayRealtimePage() {
         return ''
     }
     useEffect(() => {
-        fetchSubwayRealtime().then()
+        fetchSubwayRealtime().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

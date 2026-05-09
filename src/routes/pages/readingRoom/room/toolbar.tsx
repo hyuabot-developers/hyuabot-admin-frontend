@@ -59,7 +59,7 @@ export const GridToolbar = () => {
                 active: 0,
                 available: 0,
                 occupied: 0,
-                updatedAt: Date(),
+                updatedAt: new Date().toISOString(),
                 isNew: true,
             },
             ...rowStore.rows,

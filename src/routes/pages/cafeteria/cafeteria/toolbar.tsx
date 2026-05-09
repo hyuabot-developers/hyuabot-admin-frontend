@@ -25,7 +25,7 @@ export const GridToolbar = () => {
         if (response.status === 200) {
             const responseData = response.data
             rowStore.setRows(responseData.result.map((item: CafeteriaResponse) => {
-                const campus = rowStore.campuses.find((campus) => campus.seq === item.campusID)
+                const campus = useCafeteriaItemStore.getState().campuses.find((campus) => campus.seq === item.campusID)
                 return {
                     id: uuidv4(),
                     seq: item.seq,

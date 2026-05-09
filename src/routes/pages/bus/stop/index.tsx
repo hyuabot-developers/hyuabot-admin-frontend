@@ -28,7 +28,7 @@ export default function BusStop() {
         }
     }
     useEffect(() => {
-        fetchBusStop().then()
+        fetchBusStop().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

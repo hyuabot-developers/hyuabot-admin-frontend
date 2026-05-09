@@ -37,7 +37,7 @@ export default function SubwayStationPage() {
         }
     }
     useEffect(() => {
-        fetchSubwayStation().then()
+        fetchSubwayStation().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

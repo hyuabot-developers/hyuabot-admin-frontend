@@ -87,7 +87,7 @@ export default function BusRealtime() {
         return `${value} 석`
     }
     useEffect(() => {
-        fetchBusRealtime().then()
+        fetchBusRealtime().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

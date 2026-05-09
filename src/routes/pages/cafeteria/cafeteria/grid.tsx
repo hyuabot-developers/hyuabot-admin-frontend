@@ -75,7 +75,7 @@ export const CafeteriaGrid = (props: GridProps) => {
                 await createCafeteria({
                     id: newRow.seq,
                     name: newRow.name,
-                    campusID: parseInt(newRow.campus.split('(')[1].split(')')[0]),
+                    campusID: parseInt(newRow.campus.split('(')[1]?.split(')')[0] ?? '0', 10),
                     latitude: newRow.latitude,
                     longitude: newRow.longitude,
                     breakfastTime: newRow.breakfastTime.length > 0 ? newRow.breakfastTime : null,
@@ -94,7 +94,7 @@ export const CafeteriaGrid = (props: GridProps) => {
                     name: newRow.name,
                     latitude: newRow.latitude,
                     longitude: newRow.longitude,
-                    campusID: parseInt(newRow.campus.split('(')[1].split(')')[0]),
+                    campusID: parseInt(newRow.campus.split('(')[1]?.split(')')[0] ?? '0', 10),
                     breakfastTime: newRow.breakfastTime.length > 0 ? newRow.breakfastTime : null,
                     lunchTime: newRow.lunchTime.length > 0 ? newRow.lunchTime : null,
                     dinnerTime: newRow.dinnerTime.length > 0 ? newRow.dinnerTime : null,

@@ -24,7 +24,7 @@ export default function ShuttleRouteStop() {
         }
     }
     useEffect(() => {
-        fetchShuttleStop().then()
+        fetchShuttleStop().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

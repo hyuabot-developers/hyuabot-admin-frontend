@@ -84,7 +84,7 @@ export const CalendarGrid = (props: GridProps) => {
             const response = await createCalendar(
                 {
                     title: newRow.title,
-                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    categoryID: parseInt(newRow.category.split('(')[1]?.split(')')[0] ?? '0', 10),
                     description: newRow.description,
                     start: formattedStart,
                     end: formattedEnd,
@@ -102,7 +102,7 @@ export const CalendarGrid = (props: GridProps) => {
                 newRow.seq,
                 {
                     title: newRow.title,
-                    categoryID: parseInt(newRow.category.split('(')[1].split(')')[0]),
+                    categoryID: parseInt(newRow.category.split('(')[1]?.split(')')[0] ?? '0', 10),
                     description: newRow.description,
                     start: formattedStart,
                     end: formattedEnd,

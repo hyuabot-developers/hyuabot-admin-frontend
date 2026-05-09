@@ -37,7 +37,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         }
     }
     useEffect(() => {
-        fetchTimetable().then()
+        fetchTimetable().catch(console.error)
     }, [])    // Render
     return (
         <Box sx={{ height: '90vh', width: '100%' }}>

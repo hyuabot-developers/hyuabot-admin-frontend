@@ -44,7 +44,7 @@ export default function CalendarEventPage() {
         return dayjs(value).format('YYYY-MM-DD')
     }
     useEffect(() => {
-        fetchCalendar().then()
+        fetchCalendar().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

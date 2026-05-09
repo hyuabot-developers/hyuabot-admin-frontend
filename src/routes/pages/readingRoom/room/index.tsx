@@ -50,7 +50,7 @@ export default function ReadingRoomPage() {
     }
 
     useEffect(() => {
-        fetchReadingRoom().then()
+        fetchReadingRoom().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

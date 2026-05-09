@@ -16,7 +16,7 @@ export default function SubwayTimetablePage() {
         }
     }
     useEffect(() => {
-        fetchSubwayStations().then()
+        fetchSubwayStations().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

@@ -22,7 +22,7 @@ export default function CafeteriaMenuPage() {
     }
 
     useEffect(() => {
-        fetchCafeteriaMenu().then()
+        fetchCafeteriaMenu().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

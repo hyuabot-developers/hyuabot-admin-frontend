@@ -43,7 +43,7 @@ export default function CafeteriaPage() {
         }
     }
     useEffect(() => {
-        fetchCafeteriaList().then()
+        fetchCafeteriaList().catch(console.error)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [
