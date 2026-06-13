@@ -1,1 +1,3 @@
-export { default } from '../bus/holiday'
+import PublicHolidayPage from '../../bus/holiday/index.tsx'
+
+export default PublicHolidayPage
