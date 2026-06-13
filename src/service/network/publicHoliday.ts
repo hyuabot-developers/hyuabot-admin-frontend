@@ -1,4 +1,4 @@
-import client from './index.ts'
+import client from './client'
 
 export type PublicHolidayResponse = {
     seq: number,
