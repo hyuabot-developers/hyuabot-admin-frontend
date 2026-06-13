@@ -1,8 +1,8 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import Bus from './pages/bus'
-import BusDepartureLog from './pages/bus/log'
 import BusHolidayPage from './pages/bus/holiday'
+import BusDepartureLog from './pages/bus/log'
 import BusRealtime from './pages/bus/realtime'
 import BusRoute from './pages/bus/route'
 import BusRouteStop from './pages/bus/routeStop'
