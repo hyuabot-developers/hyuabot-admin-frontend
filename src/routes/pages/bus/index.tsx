@@ -25,6 +25,7 @@ export default function Bus() {
                     <Tab label="시간표 관리" value="timetable" />
                     <Tab label="실시간 도착 정보" value="realtime" />
                     <Tab label="도착 기록" value="log" />
+                    <Tab label="공휴일 관리" value="holiday" />
                 </Tabs>
             </Box>
             <Outlet />

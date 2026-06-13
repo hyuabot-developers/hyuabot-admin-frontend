@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import Bus from './pages/bus'
+import BusHolidayPage from './pages/bus/holiday'
 import BusDepartureLog from './pages/bus/log'
 import BusRealtime from './pages/bus/realtime'
 import BusRoute from './pages/bus/route'
@@ -33,6 +34,7 @@ import ShuttleStop from './pages/shuttle/stop'
 import ShuttleTimetable from './pages/shuttle/timetable'
 import ShuttleTimetableView from './pages/shuttle/timetableView'
 import Subway from './pages/subway'
+import SubwayHolidayPage from './pages/subway/holiday'
 import SubwayRealtimePage from './pages/subway/realtime'
 import SubwayRoutePage from './pages/subway/route'
 import SubwayStationPage from './pages/subway/station'
@@ -61,6 +63,7 @@ const appRouter = createBrowserRouter([
                 { path: 'timetable', element: <BusTimetable /> },
                 { path: 'realtime', element: <BusRealtime /> },
                 { path: 'log', element: <BusDepartureLog /> },
+                { path: 'holiday', element: <BusHolidayPage /> },
                 { path: '*', element: <Navigate replace to="/bus/route" /> },
             ] },
             { path: 'subway', element: <Subway />, children: [
@@ -68,6 +71,7 @@ const appRouter = createBrowserRouter([
                 { path: 'route', element: <SubwayRoutePage /> },
                 { path: 'timetable', element: <SubwayTimetablePage /> },
                 { path: 'realtime', element: <SubwayRealtimePage /> },
+                { path: 'holiday', element: <SubwayHolidayPage /> },
             ] },
             { path: 'cafeteria', element: <Cafeteria />, children: [
                 { path: 'cafeteria', element: <CafeteriaPage />  },
