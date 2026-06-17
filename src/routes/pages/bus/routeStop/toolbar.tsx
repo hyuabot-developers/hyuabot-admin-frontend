@@ -1,9 +1,11 @@
 import AddIcon from '@mui/icons-material/Add'
+import SearchIcon from '@mui/icons-material/Search'
 import { Autocomplete, TextField } from '@mui/material'
 import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
+import { GbisRouteStopDialog } from './GbisRouteStopDialog.tsx'
 import {
     BusRouteResponse, BusRouteStopResponse,
     BusStopResponse,
@@ -21,6 +23,7 @@ import {
 export const GridToolbar = () => {
     const rowStore = useBusRouteStopStore()
     const rowModesModelStore = useBusRouteStopGridModelStore()
+    const [dialogOpen, setDialogOpen] = useState(false)
     // Fetch bus data
     let stopData: BusStop[] = []
     let routeData: BusRoute[] = []
@@ -134,9 +137,21 @@ export const GridToolbar = () => {
                     rowStore.routes.find((route) => route.name === value)?.routeID || 0
                 )}
             />
+            <ToolbarButton
+                onClick={() => setDialogOpen(true)}
+                disabled={!rowStore.selectedRouteID}
+            >
+                <SearchIcon />
+            </ToolbarButton>
             <ToolbarButton onClick={addRowButtonClicked}>
                 <AddIcon />
             </ToolbarButton>
+            <GbisRouteStopDialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                onSuccess={() => rowStore.selectedRouteID && fetchStopsByRoute(rowStore.selectedRouteID)}
+                routeID={rowStore.selectedRouteID ?? 0}
+            />
         </Toolbar>
     )
 }

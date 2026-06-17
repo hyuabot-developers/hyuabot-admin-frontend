@@ -8,6 +8,7 @@ import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway'
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import LogOutIcon from '@mui/icons-material/Logout'
 import MenuIcon from '@mui/icons-material/Menu'
+import SettingsIcon from '@mui/icons-material/Settings'
 import {
     AppBar,
     Box,
@@ -105,7 +106,7 @@ export default function Home() {
     )
     // Drawer
     const navigate = useNavigate()
-    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정', '공지사항']
+    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정', '공지사항', '설정']
     const menuIcons = [
         DepartureBoardIcon,
         DirectionsBusIcon,
@@ -115,6 +116,7 @@ export default function Home() {
         ContactsIcon,
         CalendarMonthIcon,
         CampaignIcon,
+        SettingsIcon,
     ]
     const menuItemClicked = (text: string) => {
         switch (text) {
@@ -126,6 +128,7 @@ export default function Home() {
         case '연락처': navigate('/contact'); break
         case '학사일정': navigate('/calendar'); break
         case '공지사항': navigate('/notice'); break
+        case '설정': navigate('/settings'); break
         }
         drawerOpenedStore.setDrawerOpened(false)
     }

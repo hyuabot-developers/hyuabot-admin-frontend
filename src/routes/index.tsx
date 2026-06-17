@@ -20,6 +20,7 @@ import ERICAContactPage from './pages/contact/erica'
 import SeoulContactPage from './pages/contact/seoul'
 import Home from './pages/home.tsx'
 import Login from './pages/login.tsx'
+import Settings from './pages/settings/index.tsx'
 import Notice from './pages/notice'
 import NoticeCategoryPage from './pages/notice/category'
 import NoticePage from './pages/notice/notice'
@@ -93,6 +94,7 @@ const appRouter = createBrowserRouter([
                 { path: 'category', element: <NoticeCategoryPage /> },
                 { path: 'notice', element: <NoticePage /> },
             ] },
+            { path: 'settings', element: <Settings /> },
             { path: '/', element: <Navigate replace to="/shuttle/period" /> },
             { path: '*', element: <Navigate replace to="/shuttle/period" /> },
         ]

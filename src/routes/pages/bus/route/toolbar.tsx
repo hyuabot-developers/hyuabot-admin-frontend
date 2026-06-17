@@ -1,16 +1,20 @@
 import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import SearchIcon from '@mui/icons-material/Search'
 import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
+import { GbisRouteDialog } from './GbisRouteDialog.tsx'
 import { BusRouteResponse, BusStopResponse, getBusRoutes, getBusStops } from '../../../../service/network/bus.ts'
 import { BusStop, useBusRouteGridModelStore, useBusRouteStore } from '../../../../stores/bus.ts'
 
 export const GridToolbar = () => {
     const rowStore = useBusRouteStore()
     const rowModesModelStore = useBusRouteGridModelStore()
+    const [dialogOpen, setDialogOpen] = useState(false)
+
     const fetchBusRoute = async () => {
-        // Fetch bus stop
         const stopResponse = await getBusStops()
         let stopData: BusStop[] = []
         if (stopResponse.status === 200) {
@@ -28,7 +32,6 @@ export const GridToolbar = () => {
             })
             rowStore.setStops(stopData)
         }
-        // Fetch bus route
         const routeResponse = await getBusRoutes()
         if (routeResponse.status === 200) {
             const responseData = routeResponse.data
@@ -54,7 +57,7 @@ export const GridToolbar = () => {
             }))
         }
     }
-    // Add record button click event
+
     const addRowButtonClicked = () => {
         const { stops } = useBusRouteStore.getState()
         if (!stops.length) return
@@ -86,12 +89,21 @@ export const GridToolbar = () => {
 
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <ToolbarButton onClick={() => setDialogOpen(true)}>
+                <SearchIcon />
+            </ToolbarButton>
             <ToolbarButton onClick={fetchBusRoute}>
                 <RefreshIcon />
             </ToolbarButton>
             <ToolbarButton onClick={addRowButtonClicked}>
                 <AddIcon />
             </ToolbarButton>
+            <GbisRouteDialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                onSuccess={fetchBusRoute}
+                existingStopIDs={useBusRouteStore.getState().stops.map((s) => s.stopID)}
+            />
         </Toolbar>
     )
 }
