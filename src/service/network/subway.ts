@@ -47,6 +47,22 @@ export type SubwayTimetableRequest = {
     direction: string,
 }
 
+export type BulkSubwayTimetableDeleteRequest = {
+    seqList?: number[],
+    stationIDs?: string[],
+    direction?: string,
+    weekday?: string,
+}
+
+export type BulkSubwayTimetableCreateRequest = {
+    stationID: string,
+    startStationID: string,
+    terminalStationID: string,
+    departureTime: string,
+    weekday: string,
+    direction: string,
+}
+
 export type SubwayRealtime = {
     stationID: string,
     direction: string,
@@ -117,6 +133,14 @@ export const deleteSubwayTimetable = async (stationID: string, seq: number) => {
 
 export const getSubwayTimetable = async () => {
     return await client.get('/api/v1/subway/timetable')
+}
+
+export const bulkDeleteSubwayTimetable = async (data: BulkSubwayTimetableDeleteRequest) => {
+    return await client.delete('/api/v1/subway/timetable', { data })
+}
+
+export const bulkCreateSubwayTimetable = async (data: BulkSubwayTimetableCreateRequest[]) => {
+    return await client.post('/api/v1/subway/timetable/bulk', data)
 }
 
 export const getSubwayRealtime = async () => {

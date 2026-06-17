@@ -25,6 +25,7 @@ import NoticeCategoryPage from './pages/notice/category'
 import NoticePage from './pages/notice/notice'
 import ReadingRoom from './pages/readingRoom'
 import ReadingRoomPage from './pages/readingRoom/room'
+import Settings from './pages/settings/index.tsx'
 import Shuttle from './pages/shuttle'
 import Holiday from './pages/shuttle/holiday'
 import Period from './pages/shuttle/period'
@@ -93,6 +94,7 @@ const appRouter = createBrowserRouter([
                 { path: 'category', element: <NoticeCategoryPage /> },
                 { path: 'notice', element: <NoticePage /> },
             ] },
+            { path: 'settings', element: <Settings /> },
             { path: '/', element: <Navigate replace to="/shuttle/period" /> },
             { path: '*', element: <Navigate replace to="/shuttle/period" /> },
         ]

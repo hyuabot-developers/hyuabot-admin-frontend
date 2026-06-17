@@ -1,15 +1,19 @@
 import AddIcon from '@mui/icons-material/Add'
 import RefreshIcon from '@mui/icons-material/Refresh'
+import SearchIcon from '@mui/icons-material/Search'
 import { GridRowModes, Toolbar, ToolbarButton } from '@mui/x-data-grid'
+import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
+import { GbisStopDialog } from './GbisStopDialog.tsx'
 import { BusStopResponse, getBusStops } from '../../../../service/network/bus.ts'
 import { useBusStopGridModelStore, useBusStopStore } from '../../../../stores/bus.ts'
-
 
 export const GridToolbar = () => {
     const rowStore = useBusStopStore()
     const rowModesModelStore = useBusStopGridModelStore()
+    const [dialogOpen, setDialogOpen] = useState(false)
+
     const fetchBusStop = async () => {
         const response = await getBusStops()
         if (response.status === 200) {
@@ -27,7 +31,7 @@ export const GridToolbar = () => {
             }))
         }
     }
-    // Add record button click event
+
     const addRowButtonClicked = () => {
         const id = uuidv4()
         rowStore.setRows([
@@ -48,14 +52,24 @@ export const GridToolbar = () => {
             [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
         }))
     }
+
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            <ToolbarButton onClick={() => setDialogOpen(true)}>
+                <SearchIcon />
+            </ToolbarButton>
             <ToolbarButton onClick={fetchBusStop}>
                 <RefreshIcon />
             </ToolbarButton>
             <ToolbarButton onClick={addRowButtonClicked}>
                 <AddIcon />
             </ToolbarButton>
+            <GbisStopDialog
+                open={dialogOpen}
+                onClose={() => setDialogOpen(false)}
+                onSuccess={fetchBusStop}
+                existingStopIDs={useBusStopStore.getState().rows.map((r) => r.stopID)}
+            />
         </Toolbar>
     )
 }
