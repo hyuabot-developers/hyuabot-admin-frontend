@@ -34,7 +34,7 @@ export const GbisRouteStopDialog = ({ open, onClose, onSuccess, routeID }: GbisR
     const [submitting, setSubmitting] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
-    const { stops, rows, routes } = useBusRouteStopStore()
+    const { stops, rows } = useBusRouteStopStore()
     const existingStopIDs = new Set(stops.map((s) => s.stopID))
     const routeStopIDs = new Set(
         rows.map((r) => parseInt(r.stop.split('(')[1]?.split(')')[0] ?? '0'))
