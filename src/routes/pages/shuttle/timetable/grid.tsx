@@ -80,7 +80,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
             const response = await createShuttleTimetable(
                 rowStore.selectedRoute!, {
                     period: newRow.period,
-                    weekdays: newRow.weekdays,
+                    weekday: newRow.weekdays,
                     departureTime: newRow.time,
                 }
             )
@@ -90,14 +90,14 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             const responseData = response.data
-            const updatedRow = { ...newRow, sequence: responseData.sequence, isNew: false }
+            const updatedRow = { ...newRow, seq: responseData.seq, isNew: false }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
             rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
             return updatedRow
         } else if (newRow.seq !== null) {
             const response = await updateShuttleTimetable(rowStore.selectedRoute!, newRow.seq, {
                 period: newRow.period,
-                weekdays: newRow.weekdays,
+                weekday: newRow.weekdays,
                 departureTime: newRow.time,
             })
             if (response.status !== 200) {
