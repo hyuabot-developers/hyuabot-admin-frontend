@@ -45,7 +45,7 @@ export const GridToolbar = () => {
                     id: uuidv4(),
                     seq: item.seq,
                     period: item.period,
-                    weekdays: item.weekdays,
+                    weekdays: item.isWeekdays,
                     time: item.departureTime,
                 }
             }))

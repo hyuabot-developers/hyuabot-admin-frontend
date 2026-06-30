@@ -90,20 +90,20 @@ export type UpdateShuttleRouteStopRequest = {
 export type ShuttleTimetableResponse = {
     seq: number,
     period: string,
-    weekdays: boolean,
+    isWeekdays: boolean,
     route: string,
     departureTime: string,
 }
 
 export type CreateTimetableRequest = {
     period: string,
-    weekdays: boolean,
+    weekday: boolean,
     departureTime: string,
 }
 
 export type UpdateShuttleTimetableRequest = {
     period: string,
-    weekdays: boolean,
+    weekday: boolean,
     departureTime: string,
 }
 
