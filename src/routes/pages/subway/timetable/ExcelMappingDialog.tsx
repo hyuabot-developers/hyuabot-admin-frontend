@@ -28,12 +28,55 @@ import {
     SubwayTimetable,
 } from '../../../../service/network/subway.ts'
 
-const SHEET_MAP: Record<string, { weekday: string; direction: string }> = {
-    '평일상행': { weekday: 'weekdays', direction: 'up' },
-    '평일하행': { weekday: 'weekdays', direction: 'down' },
-    '휴일상행': { weekday: 'weekends', direction: 'up' },
-    '휴일하행': { weekday: 'weekends', direction: 'down' },
-}
+const TIMETABLE_SHEET_TYPES = [
+    {
+        key: 'weekdaysUp',
+        label: '평일 상행',
+        defaultSheetName: '평일상행',
+        fallbackSheetNames: [],
+        weekday: 'weekdays',
+        direction: 'up',
+    },
+    {
+        key: 'weekdaysDown',
+        label: '평일 하행',
+        defaultSheetName: '평일하행',
+        fallbackSheetNames: [],
+        weekday: 'weekdays',
+        direction: 'down',
+    },
+    {
+        key: 'weekendsUp',
+        label: '주말 상행',
+        defaultSheetName: '주말상행',
+        fallbackSheetNames: ['휴일상행'],
+        weekday: 'weekends',
+        direction: 'up',
+    },
+    {
+        key: 'weekendsDown',
+        label: '주말 하행',
+        defaultSheetName: '주말하행',
+        fallbackSheetNames: ['휴일하행'],
+        weekday: 'weekends',
+        direction: 'down',
+    },
+] as const
+
+type TimetableSheetKey = typeof TIMETABLE_SHEET_TYPES[number]['key']
+
+type SheetMappings = Record<TimetableSheetKey, string>
+
+const getDefaultSheetMappings = (workbook: XLSX.WorkBook): SheetMappings => Object.fromEntries(
+    TIMETABLE_SHEET_TYPES.map((sheetType) => {
+        const fallbackSheetName = sheetType.fallbackSheetNames.find((sheetName) => workbook.Sheets[sheetName])
+        const sheetName = workbook.Sheets[sheetType.defaultSheetName]
+            ? sheetType.defaultSheetName
+            : fallbackSheetName ?? sheetType.defaultSheetName
+
+        return [sheetType.key, sheetName]
+    })
+) as SheetMappings
 
 const normalizeStationName = (raw: string): string => raw.replace(/^\d+\s*/, '').trim()
 
@@ -105,31 +148,42 @@ const MappingSection = ({ title, names, mappings, stations, prefix, onChange }: 
     )
 }
 
-const parseAllNames = (workbook: XLSX.WorkBook): ParsedNames => {
+const parseAllNames = (workbook: XLSX.WorkBook, sheetMappings: SheetMappings): ParsedNames => {
     const stationNamesSet = new Set<string>()
     const startNamesSet = new Set<string>()
     const terminalNamesSet = new Set<string>()
 
-    for (const sheetName of Object.keys(SHEET_MAP)) {
+    for (const sheetName of Object.values(sheetMappings)) {
         const sheet = workbook.Sheets[sheetName]
         if (!sheet) continue
         const data = XLSX.utils.sheet_to_json<(string | number)[]>(sheet, { header: 1, defval: '' })
 
+        const activeColumns = new Set<number>()
+
+        for (let rowIdx = 3; rowIdx < data.length - 1; rowIdx += 2) {
+            const departureRow = data[rowIdx + 1]
+            if (!departureRow) continue
+
+            const hasDepartureTime = departureRow.some((value, col) => {
+                if (col === 0 || typeof value !== 'number') return false
+                activeColumns.add(col)
+                return true
+            })
+            const name = normalizeStationName(String(data[rowIdx][0]))
+            if (name && hasDepartureTime) stationNamesSet.add(name)
+        }
+
         if (data[0]) {
-            for (let col = 1; col < data[0].length; col++) {
+            for (const col of activeColumns) {
                 const name = normalizeStationName(String(data[0][col]))
                 if (name) startNamesSet.add(name)
             }
         }
         if (data[1]) {
-            for (let col = 1; col < data[1].length; col++) {
+            for (const col of activeColumns) {
                 const name = normalizeStationName(String(data[1][col]))
                 if (name) terminalNamesSet.add(name)
             }
-        }
-        for (let rowIdx = 3; rowIdx < data.length - 1; rowIdx += 2) {
-            const name = normalizeStationName(String(data[rowIdx][0]))
-            if (name) stationNamesSet.add(name)
         }
     }
 
@@ -186,6 +240,25 @@ const parseSheetWithMapping = (
     return results
 }
 
+const getMissingMappings = (names: string[], mappings: Record<string, string>) =>
+    names.filter((name) => !mappings[name])
+
+const formatMissingMappings = (label: string, names: string[]) => {
+    if (names.length === 0) return null
+    const preview = names.slice(0, 5).join(', ')
+    const suffix = names.length > 5 ? ` 외 ${names.length - 5}개` : ''
+    return `${label}: ${preview}${suffix}`
+}
+
+const toCreateRequest = (timetable: SubwayTimetable): BulkSubwayTimetableCreateRequest => ({
+    stationID: timetable.stationID,
+    startStationID: timetable.startStationID,
+    terminalStationID: timetable.terminalStationID,
+    departureTime: timetable.departureTime,
+    weekday: timetable.weekday,
+    direction: timetable.direction,
+})
+
 export type ExcelMappingDialogProps = {
     open: boolean
     onClose: () => void
@@ -207,6 +280,7 @@ export const ExcelMappingDialog = ({
     const [terminalMappings, setTerminalMappings] = useState<Record<string, string>>({})
     const [parsedNames, setParsedNames] = useState<ParsedNames | null>(null)
     const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null)
+    const [sheetMappings, setSheetMappings] = useState<SheetMappings | null>(null)
     const [loading, setLoading] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
@@ -216,8 +290,10 @@ export const ExcelMappingDialog = ({
         const load = async () => {
             const arrayBuffer = await file.arrayBuffer()
             const wb = XLSX.read(new Uint8Array(arrayBuffer))
+            const defaultSheetMappings = getDefaultSheetMappings(wb)
             setWorkbook(wb)
-            setParsedNames(parseAllNames(wb))
+            setSheetMappings(defaultSheetMappings)
+            setParsedNames(parseAllNames(wb, defaultSheetMappings))
             setStationMappings({})
             setStartMappings({})
             setTerminalMappings({})
@@ -225,6 +301,13 @@ export const ExcelMappingDialog = ({
         }
         load()
     }, [file, open])
+
+    const changeSheetMapping = (key: TimetableSheetKey, sheetName: string) => {
+        if (!workbook || !sheetMappings) return
+        const nextSheetMappings = { ...sheetMappings, [key]: sheetName }
+        setSheetMappings(nextSheetMappings)
+        setParsedNames(parseAllNames(workbook, nextSheetMappings))
+    }
 
     const autoMap = () => {
         if (!parsedNames) return
@@ -259,7 +342,29 @@ export const ExcelMappingDialog = ({
     }
 
     const handleSave = async () => {
-        if (!workbook || !parsedNames) return
+        if (!workbook || !parsedNames || !sheetMappings) return
+
+        const missingSheetMappings = TIMETABLE_SHEET_TYPES
+            .filter((sheetType) => !workbook.Sheets[sheetMappings[sheetType.key]])
+            .map((sheetType) => sheetType.label)
+
+        if (missingSheetMappings.length > 0) {
+            setSnackbarMessage(`시트 매핑 누락: ${missingSheetMappings.join(', ')}`)
+            setSnackbarOpen(true)
+            return
+        }
+
+        const missingMessages = [
+            formatMissingMappings('역 매핑 누락', getMissingMappings(parsedNames.stationNames, stationMappings)),
+            formatMissingMappings('시점역 매핑 누락', getMissingMappings(parsedNames.startNames, startMappings)),
+            formatMissingMappings('종점역 매핑 누락', getMissingMappings(parsedNames.terminalNames, terminalMappings)),
+        ].filter((message): message is string => message !== null)
+
+        if (missingMessages.length > 0) {
+            setSnackbarMessage(missingMessages.join(' / '))
+            setSnackbarOpen(true)
+            return
+        }
 
         const mappedStationIDs = [...new Set(
             Object.entries(stationMappings).filter(([, v]) => v).map(([, v]) => v),
@@ -270,34 +375,58 @@ export const ExcelMappingDialog = ({
             return
         }
 
+        const allEntries: BulkSubwayTimetableCreateRequest[] = []
+        for (const sheetType of TIMETABLE_SHEET_TYPES) {
+            const sheetName = sheetMappings[sheetType.key]
+            const sheet = workbook.Sheets[sheetName]
+            if (!sheet) continue
+            const entries = parseSheetWithMapping(
+                sheet,
+                sheetType.weekday,
+                sheetType.direction,
+                stationMappings,
+                startMappings,
+                terminalMappings,
+            )
+            allEntries.push(...entries)
+        }
+
+        if (allEntries.length === 0) {
+            setSnackbarMessage('업로드할 시간표가 없습니다. 엑셀 시트 구조와 시간 값을 확인해주세요.')
+            setSnackbarOpen(true)
+            return
+        }
+
         setLoading(true)
+        let deletedEntries: BulkSubwayTimetableCreateRequest[] = []
+        let didDelete = false
         try {
             const timetableResponse = await getSubwayTimetable()
-            const deletedCount = (timetableResponse.data.result as SubwayTimetable[])
-                .filter((t) => mappedStationIDs.includes(t.stationID)).length
+            deletedEntries = (timetableResponse.data.result as SubwayTimetable[])
+                .filter((t) => mappedStationIDs.includes(t.stationID))
+                .map(toCreateRequest)
+            const deletedCount = deletedEntries.length
 
             await bulkDeleteSubwayTimetable({ stationIDs: mappedStationIDs })
-
-            const allEntries: BulkSubwayTimetableCreateRequest[] = []
-            for (const [sheetName, mapping] of Object.entries(SHEET_MAP)) {
-                const sheet = workbook.Sheets[sheetName]
-                if (!sheet) continue
-                const entries = parseSheetWithMapping(
-                    sheet,
-                    mapping.weekday,
-                    mapping.direction,
-                    stationMappings,
-                    startMappings,
-                    terminalMappings,
-                )
-                allEntries.push(...entries)
-            }
+            didDelete = true
 
             await bulkCreateSubwayTimetable(allEntries)
             onSuccess({ deletedCount, createdCount: allEntries.length })
             onClose()
         } catch (e) {
-            setSnackbarMessage('업로드 실패: ' + (e instanceof Error ? e.message : String(e)))
+            if (didDelete && deletedEntries.length > 0) {
+                try {
+                    await bulkCreateSubwayTimetable(deletedEntries)
+                    setSnackbarMessage('업로드 실패로 기존 시간표를 복구했습니다: ' + (e instanceof Error ? e.message : String(e)))
+                } catch (restoreError) {
+                    setSnackbarMessage(
+                        '업로드 실패 후 기존 시간표 복구도 실패했습니다: '
+                        + (restoreError instanceof Error ? restoreError.message : String(restoreError))
+                    )
+                }
+            } else {
+                setSnackbarMessage('업로드 실패: ' + (e instanceof Error ? e.message : String(e)))
+            }
             setSnackbarOpen(true)
         } finally {
             setLoading(false)
@@ -308,6 +437,33 @@ export const ExcelMappingDialog = ({
         <Dialog open={open} onClose={loading ? undefined : onClose} maxWidth="md" fullWidth>
             <DialogTitle>시간표 매핑 및 업로드</DialogTitle>
             <DialogContent dividers>
+                {workbook && sheetMappings && (
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>시트 매핑</Typography>
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                            gap: 1,
+                        }}>
+                            {TIMETABLE_SHEET_TYPES.map((sheetType) => (
+                                <Autocomplete
+                                    key={sheetType.key}
+                                    size="small"
+                                    options={workbook.SheetNames}
+                                    value={sheetMappings[sheetType.key]}
+                                    onChange={(_, value) => changeSheetMapping(sheetType.key, value ?? '')}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={sheetType.label}
+                                            error={!workbook.Sheets[sheetMappings[sheetType.key]]}
+                                        />
+                                    )}
+                                />
+                            ))}
+                        </Box>
+                    </Box>
+                )}
                 <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
                     <TextField
                         label="노선 접두사 (예: K4, K2)"
