@@ -28,12 +28,55 @@ import {
     SubwayTimetable,
 } from '../../../../service/network/subway.ts'
 
-const SHEET_MAP: Record<string, { weekday: string; direction: string }> = {
-    '평일상행': { weekday: 'weekdays', direction: 'up' },
-    '평일하행': { weekday: 'weekdays', direction: 'down' },
-    '휴일상행': { weekday: 'weekends', direction: 'up' },
-    '휴일하행': { weekday: 'weekends', direction: 'down' },
-}
+const TIMETABLE_SHEET_TYPES = [
+    {
+        key: 'weekdaysUp',
+        label: '평일 상행',
+        defaultSheetName: '평일상행',
+        fallbackSheetNames: [],
+        weekday: 'weekdays',
+        direction: 'up',
+    },
+    {
+        key: 'weekdaysDown',
+        label: '평일 하행',
+        defaultSheetName: '평일하행',
+        fallbackSheetNames: [],
+        weekday: 'weekdays',
+        direction: 'down',
+    },
+    {
+        key: 'weekendsUp',
+        label: '주말 상행',
+        defaultSheetName: '주말상행',
+        fallbackSheetNames: ['휴일상행'],
+        weekday: 'weekends',
+        direction: 'up',
+    },
+    {
+        key: 'weekendsDown',
+        label: '주말 하행',
+        defaultSheetName: '주말하행',
+        fallbackSheetNames: ['휴일하행'],
+        weekday: 'weekends',
+        direction: 'down',
+    },
+] as const
+
+type TimetableSheetKey = typeof TIMETABLE_SHEET_TYPES[number]['key']
+
+type SheetMappings = Record<TimetableSheetKey, string>
+
+const getDefaultSheetMappings = (workbook: XLSX.WorkBook): SheetMappings => Object.fromEntries(
+    TIMETABLE_SHEET_TYPES.map((sheetType) => {
+        const fallbackSheetName = sheetType.fallbackSheetNames.find((sheetName) => workbook.Sheets[sheetName])
+        const sheetName = workbook.Sheets[sheetType.defaultSheetName]
+            ? sheetType.defaultSheetName
+            : fallbackSheetName ?? sheetType.defaultSheetName
+
+        return [sheetType.key, sheetName]
+    })
+) as SheetMappings
 
 const normalizeStationName = (raw: string): string => raw.replace(/^\d+\s*/, '').trim()
 
@@ -105,12 +148,12 @@ const MappingSection = ({ title, names, mappings, stations, prefix, onChange }: 
     )
 }
 
-const parseAllNames = (workbook: XLSX.WorkBook): ParsedNames => {
+const parseAllNames = (workbook: XLSX.WorkBook, sheetMappings: SheetMappings): ParsedNames => {
     const stationNamesSet = new Set<string>()
     const startNamesSet = new Set<string>()
     const terminalNamesSet = new Set<string>()
 
-    for (const sheetName of Object.keys(SHEET_MAP)) {
+    for (const sheetName of Object.values(sheetMappings)) {
         const sheet = workbook.Sheets[sheetName]
         if (!sheet) continue
         const data = XLSX.utils.sheet_to_json<(string | number)[]>(sheet, { header: 1, defval: '' })
@@ -226,6 +269,7 @@ export const ExcelMappingDialog = ({
     const [terminalMappings, setTerminalMappings] = useState<Record<string, string>>({})
     const [parsedNames, setParsedNames] = useState<ParsedNames | null>(null)
     const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null)
+    const [sheetMappings, setSheetMappings] = useState<SheetMappings | null>(null)
     const [loading, setLoading] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
@@ -235,8 +279,10 @@ export const ExcelMappingDialog = ({
         const load = async () => {
             const arrayBuffer = await file.arrayBuffer()
             const wb = XLSX.read(new Uint8Array(arrayBuffer))
+            const defaultSheetMappings = getDefaultSheetMappings(wb)
             setWorkbook(wb)
-            setParsedNames(parseAllNames(wb))
+            setSheetMappings(defaultSheetMappings)
+            setParsedNames(parseAllNames(wb, defaultSheetMappings))
             setStationMappings({})
             setStartMappings({})
             setTerminalMappings({})
@@ -244,6 +290,13 @@ export const ExcelMappingDialog = ({
         }
         load()
     }, [file, open])
+
+    const changeSheetMapping = (key: TimetableSheetKey, sheetName: string) => {
+        if (!workbook || !sheetMappings) return
+        const nextSheetMappings = { ...sheetMappings, [key]: sheetName }
+        setSheetMappings(nextSheetMappings)
+        setParsedNames(parseAllNames(workbook, nextSheetMappings))
+    }
 
     const autoMap = () => {
         if (!parsedNames) return
@@ -278,7 +331,17 @@ export const ExcelMappingDialog = ({
     }
 
     const handleSave = async () => {
-        if (!workbook || !parsedNames) return
+        if (!workbook || !parsedNames || !sheetMappings) return
+
+        const missingSheetMappings = TIMETABLE_SHEET_TYPES
+            .filter((sheetType) => !workbook.Sheets[sheetMappings[sheetType.key]])
+            .map((sheetType) => sheetType.label)
+
+        if (missingSheetMappings.length > 0) {
+            setSnackbarMessage(`시트 매핑 누락: ${missingSheetMappings.join(', ')}`)
+            setSnackbarOpen(true)
+            return
+        }
 
         const missingMessages = [
             formatMissingMappings('역 매핑 누락', getMissingMappings(parsedNames.stationNames, stationMappings)),
@@ -302,13 +365,14 @@ export const ExcelMappingDialog = ({
         }
 
         const allEntries: BulkSubwayTimetableCreateRequest[] = []
-        for (const [sheetName, mapping] of Object.entries(SHEET_MAP)) {
+        for (const sheetType of TIMETABLE_SHEET_TYPES) {
+            const sheetName = sheetMappings[sheetType.key]
             const sheet = workbook.Sheets[sheetName]
             if (!sheet) continue
             const entries = parseSheetWithMapping(
                 sheet,
-                mapping.weekday,
-                mapping.direction,
+                sheetType.weekday,
+                sheetType.direction,
                 stationMappings,
                 startMappings,
                 terminalMappings,
@@ -362,6 +426,33 @@ export const ExcelMappingDialog = ({
         <Dialog open={open} onClose={loading ? undefined : onClose} maxWidth="md" fullWidth>
             <DialogTitle>시간표 매핑 및 업로드</DialogTitle>
             <DialogContent dividers>
+                {workbook && sheetMappings && (
+                    <Box sx={{ mb: 3 }}>
+                        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>시트 매핑</Typography>
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                            gap: 1,
+                        }}>
+                            {TIMETABLE_SHEET_TYPES.map((sheetType) => (
+                                <Autocomplete
+                                    key={sheetType.key}
+                                    size="small"
+                                    options={workbook.SheetNames}
+                                    value={sheetMappings[sheetType.key]}
+                                    onChange={(_, value) => changeSheetMapping(sheetType.key, value ?? '')}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label={sheetType.label}
+                                            error={!workbook.Sheets[sheetMappings[sheetType.key]]}
+                                        />
+                                    )}
+                                />
+                            ))}
+                        </Box>
+                    </Box>
+                )}
                 <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
                     <TextField
                         label="노선 접두사 (예: K4, K2)"
