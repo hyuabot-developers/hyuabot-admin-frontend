@@ -196,6 +196,15 @@ const formatMissingMappings = (label: string, names: string[]) => {
     return `${label}: ${preview}${suffix}`
 }
 
+const toCreateRequest = (timetable: SubwayTimetable): BulkSubwayTimetableCreateRequest => ({
+    stationID: timetable.stationID,
+    startStationID: timetable.startStationID,
+    terminalStationID: timetable.terminalStationID,
+    departureTime: timetable.departureTime,
+    weekday: timetable.weekday,
+    direction: timetable.direction,
+})
+
 export type ExcelMappingDialogProps = {
     open: boolean
     onClose: () => void
@@ -314,18 +323,35 @@ export const ExcelMappingDialog = ({
         }
 
         setLoading(true)
+        let deletedEntries: BulkSubwayTimetableCreateRequest[] = []
+        let didDelete = false
         try {
             const timetableResponse = await getSubwayTimetable()
-            const deletedCount = (timetableResponse.data.result as SubwayTimetable[])
-                .filter((t) => mappedStationIDs.includes(t.stationID)).length
+            deletedEntries = (timetableResponse.data.result as SubwayTimetable[])
+                .filter((t) => mappedStationIDs.includes(t.stationID))
+                .map(toCreateRequest)
+            const deletedCount = deletedEntries.length
 
             await bulkDeleteSubwayTimetable({ stationIDs: mappedStationIDs })
+            didDelete = true
 
             await bulkCreateSubwayTimetable(allEntries)
             onSuccess({ deletedCount, createdCount: allEntries.length })
             onClose()
         } catch (e) {
-            setSnackbarMessage('업로드 실패: ' + (e instanceof Error ? e.message : String(e)))
+            if (didDelete && deletedEntries.length > 0) {
+                try {
+                    await bulkCreateSubwayTimetable(deletedEntries)
+                    setSnackbarMessage('업로드 실패로 기존 시간표를 복구했습니다: ' + (e instanceof Error ? e.message : String(e)))
+                } catch (restoreError) {
+                    setSnackbarMessage(
+                        '업로드 실패 후 기존 시간표 복구도 실패했습니다: '
+                        + (restoreError instanceof Error ? restoreError.message : String(restoreError))
+                    )
+                }
+            } else {
+                setSnackbarMessage('업로드 실패: ' + (e instanceof Error ? e.message : String(e)))
+            }
             setSnackbarOpen(true)
         } finally {
             setLoading(false)
