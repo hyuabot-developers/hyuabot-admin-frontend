@@ -158,21 +158,32 @@ const parseAllNames = (workbook: XLSX.WorkBook, sheetMappings: SheetMappings): P
         if (!sheet) continue
         const data = XLSX.utils.sheet_to_json<(string | number)[]>(sheet, { header: 1, defval: '' })
 
+        const activeColumns = new Set<number>()
+
+        for (let rowIdx = 3; rowIdx < data.length - 1; rowIdx += 2) {
+            const departureRow = data[rowIdx + 1]
+            if (!departureRow) continue
+
+            const hasDepartureTime = departureRow.some((value, col) => {
+                if (col === 0 || typeof value !== 'number') return false
+                activeColumns.add(col)
+                return true
+            })
+            const name = normalizeStationName(String(data[rowIdx][0]))
+            if (name && hasDepartureTime) stationNamesSet.add(name)
+        }
+
         if (data[0]) {
-            for (let col = 1; col < data[0].length; col++) {
+            for (const col of activeColumns) {
                 const name = normalizeStationName(String(data[0][col]))
                 if (name) startNamesSet.add(name)
             }
         }
         if (data[1]) {
-            for (let col = 1; col < data[1].length; col++) {
+            for (const col of activeColumns) {
                 const name = normalizeStationName(String(data[1][col]))
                 if (name) terminalNamesSet.add(name)
             }
-        }
-        for (let rowIdx = 3; rowIdx < data.length - 1; rowIdx += 2) {
-            const name = normalizeStationName(String(data[rowIdx][0]))
-            if (name) stationNamesSet.add(name)
         }
     }
 
