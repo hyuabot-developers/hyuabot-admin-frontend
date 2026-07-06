@@ -186,6 +186,16 @@ const parseSheetWithMapping = (
     return results
 }
 
+const getMissingMappings = (names: string[], mappings: Record<string, string>) =>
+    names.filter((name) => !mappings[name])
+
+const formatMissingMappings = (label: string, names: string[]) => {
+    if (names.length === 0) return null
+    const preview = names.slice(0, 5).join(', ')
+    const suffix = names.length > 5 ? ` 외 ${names.length - 5}개` : ''
+    return `${label}: ${preview}${suffix}`
+}
+
 export type ExcelMappingDialogProps = {
     open: boolean
     onClose: () => void
@@ -260,6 +270,18 @@ export const ExcelMappingDialog = ({
 
     const handleSave = async () => {
         if (!workbook || !parsedNames) return
+
+        const missingMessages = [
+            formatMissingMappings('역 매핑 누락', getMissingMappings(parsedNames.stationNames, stationMappings)),
+            formatMissingMappings('시점역 매핑 누락', getMissingMappings(parsedNames.startNames, startMappings)),
+            formatMissingMappings('종점역 매핑 누락', getMissingMappings(parsedNames.terminalNames, terminalMappings)),
+        ].filter((message): message is string => message !== null)
+
+        if (missingMessages.length > 0) {
+            setSnackbarMessage(missingMessages.join(' / '))
+            setSnackbarOpen(true)
+            return
+        }
 
         const mappedStationIDs = [...new Set(
             Object.entries(stationMappings).filter(([, v]) => v).map(([, v]) => v),
