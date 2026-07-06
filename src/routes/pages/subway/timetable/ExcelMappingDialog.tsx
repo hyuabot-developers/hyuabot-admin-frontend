@@ -292,6 +292,27 @@ export const ExcelMappingDialog = ({
             return
         }
 
+        const allEntries: BulkSubwayTimetableCreateRequest[] = []
+        for (const [sheetName, mapping] of Object.entries(SHEET_MAP)) {
+            const sheet = workbook.Sheets[sheetName]
+            if (!sheet) continue
+            const entries = parseSheetWithMapping(
+                sheet,
+                mapping.weekday,
+                mapping.direction,
+                stationMappings,
+                startMappings,
+                terminalMappings,
+            )
+            allEntries.push(...entries)
+        }
+
+        if (allEntries.length === 0) {
+            setSnackbarMessage('업로드할 시간표가 없습니다. 엑셀 시트 구조와 시간 값을 확인해주세요.')
+            setSnackbarOpen(true)
+            return
+        }
+
         setLoading(true)
         try {
             const timetableResponse = await getSubwayTimetable()
@@ -299,21 +320,6 @@ export const ExcelMappingDialog = ({
                 .filter((t) => mappedStationIDs.includes(t.stationID)).length
 
             await bulkDeleteSubwayTimetable({ stationIDs: mappedStationIDs })
-
-            const allEntries: BulkSubwayTimetableCreateRequest[] = []
-            for (const [sheetName, mapping] of Object.entries(SHEET_MAP)) {
-                const sheet = workbook.Sheets[sheetName]
-                if (!sheet) continue
-                const entries = parseSheetWithMapping(
-                    sheet,
-                    mapping.weekday,
-                    mapping.direction,
-                    stationMappings,
-                    startMappings,
-                    terminalMappings,
-                )
-                allEntries.push(...entries)
-            }
 
             await bulkCreateSubwayTimetable(allEntries)
             onSuccess({ deletedCount, createdCount: allEntries.length })
