@@ -111,32 +111,34 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
     }
-    // Add action column
-    props.columns.push({
-        field: 'actions',
-        headerName: '동작',
-        type: 'actions',
-        width: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
-            const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-            if (isEditing) {
+    const columns = [
+        ...props.columns,
+        {
+            field: 'actions',
+            headerName: '동작',
+            type: 'actions',
+            width: 100,
+            cellClassName: 'actions',
+            getActions: ({ id }) => {
+                const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
+                if (isEditing) {
+                    return [
+                        <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
+                        <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
+                    ]
+                }
                 return [
-                    <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                    <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
+                    <GridActionsCellItem
+                        label="edit"
+                        key="edit"
+                        icon={<EditIcon />}
+                        onClick={() => editRowButtonClicked(id)}
+                    />,
+                    <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
                 ]
-            }
-            return [
-                <GridActionsCellItem
-                    label="edit"
-                    key="edit"
-                    icon={<EditIcon />}
-                    onClick={() => editRowButtonClicked(id)}
-                />,
-                <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-            ]
-        }
-    })
+            },
+        } as GridColDef,
+    ]
     // Render
     return (
         <Box sx={{ height: '90vh', width: '100%' }}>
@@ -160,7 +162,7 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
             </Snackbar>
             <DataGrid
                 showToolbar={true}
-                columns={props.columns}
+                columns={columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
                 editMode="row"
