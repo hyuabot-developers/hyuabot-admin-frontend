@@ -1,5 +1,5 @@
 import { Global } from '@emotion/react'
-import { CssBaseline, ThemeProvider } from '@mui/material'
+import { CssBaseline, InitColorSchemeScript, ThemeProvider } from '@mui/material'
 import { createRoot } from 'react-dom/client'
 
 import Router from './routes'
@@ -11,7 +11,12 @@ if (rootElement === null) {
 }
 
 createRoot(rootElement).render(
-    <ThemeProvider theme={globalTheme}>
+    <ThemeProvider
+        theme={globalTheme}
+        defaultMode='system'
+        modeStorageKey='hyuabot.themeMode'
+        disableTransitionOnChange>
+        <InitColorSchemeScript defaultMode='system' modeStorageKey='hyuabot.themeMode' />
         <CssBaseline />
         <Global styles={globalStyle} />
         <Router />

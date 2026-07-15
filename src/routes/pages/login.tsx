@@ -43,7 +43,7 @@ export default function Login() {
             <Box
                 sx={{
                     width: { xs: '80vw', sm: '400px' },
-                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                    boxShadow: 3,
                     p: 2.5,
                     borderRadius: 2,
                     bgcolor: 'background.paper',

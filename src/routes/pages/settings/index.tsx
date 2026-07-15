@@ -1,3 +1,6 @@
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
+import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightnessOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
@@ -8,16 +11,21 @@ import {
     InputAdornment,
     Paper,
     TextField,
+    ToggleButton,
+    ToggleButtonGroup,
     Typography,
 } from '@mui/material'
+import { useColorScheme } from '@mui/material/styles'
 import { useState } from 'react'
 
 import { AppSnackbar } from '../../components/AppSnackbar.tsx'
 import { PageLayout } from '../../components/PageLayout.tsx'
 
 const GBIS_API_KEY_STORAGE_KEY = 'hyuabot.gbisApiKey'
+type ThemeMode = 'light' | 'dark' | 'system'
 
 export default function Settings() {
+    const { mode, setMode } = useColorScheme()
     const [apiKey, setApiKey] = useState(localStorage.getItem(GBIS_API_KEY_STORAGE_KEY) ?? '')
     const [showKey, setShowKey] = useState(false)
     const [saved, setSaved] = useState(false)
@@ -30,6 +38,11 @@ export default function Settings() {
         }
         setSaved(true)
     }
+    const handleThemeChange = (_event: React.MouseEvent<HTMLElement>, nextMode: ThemeMode | null) => {
+        if (nextMode !== null) {
+            setMode(nextMode)
+        }
+    }
 
     return (
         <PageLayout
@@ -37,6 +50,34 @@ export default function Settings() {
             description='관리 도구에서 사용하는 연결 정보를 관리합니다.'
             icon={<SettingsOutlinedIcon />}
             maxWidth={680}>
+            <Paper sx={{ p: 3, mt: 2 }}>
+                <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
+                    화면 테마
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                    시스템 설정을 선택하면 기기의 화면 모드 변경을 자동으로 따릅니다.
+                </Typography>
+                <ToggleButtonGroup
+                    value={mode ?? 'system'}
+                    onChange={handleThemeChange}
+                    exclusive
+                    fullWidth
+                    aria-label='화면 테마'>
+                    <ToggleButton value='light' aria-label='라이트 테마'>
+                        <LightModeOutlinedIcon sx={{ mr: { xs: 0.75, sm: 1 } }} />
+                        라이트
+                    </ToggleButton>
+                    <ToggleButton value='dark' aria-label='다크 테마'>
+                        <DarkModeOutlinedIcon sx={{ mr: { xs: 0.75, sm: 1 } }} />
+                        다크
+                    </ToggleButton>
+                    <ToggleButton value='system' aria-label='시스템 설정 테마'>
+                        <SettingsBrightnessOutlinedIcon sx={{ mr: { xs: 0.75, sm: 1 } }} />
+                        시스템
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            </Paper>
             <Paper sx={{ p: 3, mt: 2 }}>
                 <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
                     GBIS API 키
