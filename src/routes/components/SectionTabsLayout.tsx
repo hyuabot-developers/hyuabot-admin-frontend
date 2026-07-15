@@ -33,7 +33,6 @@ export function SectionTabsLayout({ basePath, tabs }: SectionTabsLayoutProps) {
                     sm: 'calc(100dvh - 64px)',
                 },
                 minHeight: 484,
-                pt: 2,
             }}>
             <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider', flexShrink: 0 }}>
                 <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable'>
