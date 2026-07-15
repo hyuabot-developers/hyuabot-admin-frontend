@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
+import AccessDenied from './pages/accessDenied.tsx'
+import AdminUsers from './pages/admin/users.tsx'
 import Bus from './pages/bus'
 import BusHolidayPage from './pages/bus/holiday'
 import BusDepartureLog from './pages/bus/log'
@@ -40,6 +42,7 @@ import SubwayRealtimePage from './pages/subway/realtime'
 import SubwayRoutePage from './pages/subway/route'
 import SubwayStationPage from './pages/subway/station'
 import SubwayTimetablePage from './pages/subway/timetable'
+import { PermissionLanding, PermissionRoute } from './permissionRoute.tsx'
 
 const appRouter = createBrowserRouter([
     { path: '*', element: <Navigate replace to="/" /> },
@@ -47,7 +50,7 @@ const appRouter = createBrowserRouter([
         path: '/',
         element: <Home />,
         children: [
-            { path: 'shuttle', element: <Shuttle />, children: [
+            { path: 'shuttle', element: <PermissionRoute permission='SHUTTLE'><Shuttle /></PermissionRoute>, children: [
                 { path: 'period', element: <Period /> },
                 { path: 'holiday', element: <Holiday /> },
                 { path: 'route', element: <ShuttleRoute /> },
@@ -57,7 +60,7 @@ const appRouter = createBrowserRouter([
                 { path: 'timetableView', element: <ShuttleTimetableView /> },
                 { path: '*', element: <Navigate replace to="/shuttle/period" /> },
             ] },
-            { path: 'bus', element: <Bus />, children: [
+            { path: 'bus', element: <PermissionRoute permission='BUS'><Bus /></PermissionRoute>, children: [
                 { path: 'route', element: <BusRoute /> },
                 { path: 'stop', element: <BusStop /> },
                 { path: 'routeStop', element: <BusRouteStop /> },
@@ -67,36 +70,38 @@ const appRouter = createBrowserRouter([
                 { path: 'holiday', element: <BusHolidayPage /> },
                 { path: '*', element: <Navigate replace to="/bus/route" /> },
             ] },
-            { path: 'subway', element: <Subway />, children: [
+            { path: 'subway', element: <PermissionRoute permission='SUBWAY'><Subway /></PermissionRoute>, children: [
                 { path: 'station', element: <SubwayStationPage /> },
                 { path: 'route', element: <SubwayRoutePage /> },
                 { path: 'timetable', element: <SubwayTimetablePage /> },
                 { path: 'realtime', element: <SubwayRealtimePage /> },
                 { path: 'holiday', element: <SubwayHolidayPage /> },
             ] },
-            { path: 'cafeteria', element: <Cafeteria />, children: [
+            { path: 'cafeteria', element: <PermissionRoute permission='CAFETERIA'><Cafeteria /></PermissionRoute>, children: [
                 { path: 'cafeteria', element: <CafeteriaPage />  },
                 { path: 'menu', element: <CafeteriaMenuPage />  },
             ] },
-            { path: 'readingRoom', element: <ReadingRoom />, children: [
+            { path: 'readingRoom', element: <PermissionRoute permission='READING_ROOM'><ReadingRoom /></PermissionRoute>, children: [
                 { path: 'room', element: <ReadingRoomPage /> },
             ] },
-            { path: 'contact', element: <Contact />, children: [
+            { path: 'contact', element: <PermissionRoute permission='CONTACT'><Contact /></PermissionRoute>, children: [
                 { path: 'category', element: <ContactCategoryPage /> },
                 { path: 'seoul', element: <SeoulContactPage /> },
                 { path: 'erica', element: <ERICAContactPage /> },
             ] },
-            { path: 'calendar', element: <Calendar />, children: [
+            { path: 'calendar', element: <PermissionRoute permission='CALENDAR'><Calendar /></PermissionRoute>, children: [
                 { path: 'category', element: <CalendarCategoryPage /> },
                 { path: 'event', element: <CalendarEventPage /> }
             ] },
-            { path: 'notice', element: <Notice />, children: [
+            { path: 'notice', element: <PermissionRoute permission='NOTICE'><Notice /></PermissionRoute>, children: [
                 { path: 'category', element: <NoticeCategoryPage /> },
                 { path: 'notice', element: <NoticePage /> },
             ] },
-            { path: 'settings', element: <Settings /> },
-            { path: '/', element: <Navigate replace to="/shuttle/period" /> },
-            { path: '*', element: <Navigate replace to="/shuttle/period" /> },
+            { path: 'settings', element: <PermissionRoute permission='BUS'><Settings /></PermissionRoute> },
+            { path: 'admin/users', element: <PermissionRoute permission='SUPER_ADMIN'><AdminUsers /></PermissionRoute> },
+            { path: 'access-denied', element: <AccessDenied /> },
+            { index: true, element: <PermissionLanding /> },
+            { path: '*', element: <PermissionLanding /> },
         ]
     },
     { path: '/login', element: <Login /> },

@@ -1,3 +1,4 @@
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CampaignIcon from '@mui/icons-material/Campaign'
 import ContactsIcon from '@mui/icons-material/Contacts'
@@ -24,6 +25,8 @@ import {
 import { createElement, useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 
+import { hasPermission } from '../../security/permissions.ts'
+import type { AdminPermission } from '../../security/permissions.ts'
 import { getUserInfo, logout } from '../../service/network/auth.ts'
 import { useAuthenticatedStore, useUserInfoStore } from '../../stores/auth.ts'
 import { useDrawerOpenedStore } from '../../stores/home.ts'
@@ -37,7 +40,6 @@ export default function Home() {
     // Fetch user info
     const fetchUserInfo = async () => {
         const response = await getUserInfo()
-        isAuthenticatedStore.setIsAuthenticated(response.status === 200)
         if (response.status === 200) {
             const responseData = response.data
             userInfoStore.setUserInfo(
@@ -45,8 +47,10 @@ export default function Home() {
                 responseData.nickname,
                 responseData.email,
                 responseData.phone,
+                responseData.permissions,
             )
         }
+        isAuthenticatedStore.setIsAuthenticated(response.status === 200)
     }
     // Logout
     const logOutButtonClicked = async () => {
@@ -106,30 +110,27 @@ export default function Home() {
     )
     // Drawer
     const navigate = useNavigate()
-    const menuTexts = ['셔틀버스', '노선버스', '전철', '학식', '열람실', '연락처', '학사일정', '공지사항', '설정']
-    const menuIcons = [
-        DepartureBoardIcon,
-        DirectionsBusIcon,
-        DirectionsSubwayIcon,
-        DiningIcon,
-        LibraryBooksIcon,
-        ContactsIcon,
-        CalendarMonthIcon,
-        CampaignIcon,
-        SettingsIcon,
+    const allMenuItems: Array<{
+        text: string,
+        path: string,
+        permission: AdminPermission,
+        icon: typeof DepartureBoardIcon,
+    }> = [
+        { text: '셔틀버스', path: '/shuttle', permission: 'SHUTTLE', icon: DepartureBoardIcon },
+        { text: '노선버스', path: '/bus', permission: 'BUS', icon: DirectionsBusIcon },
+        { text: '전철', path: '/subway', permission: 'SUBWAY', icon: DirectionsSubwayIcon },
+        { text: '학식', path: '/cafeteria', permission: 'CAFETERIA', icon: DiningIcon },
+        { text: '열람실', path: '/readingRoom', permission: 'READING_ROOM', icon: LibraryBooksIcon },
+        { text: '연락처', path: '/contact', permission: 'CONTACT', icon: ContactsIcon },
+        { text: '학사일정', path: '/calendar', permission: 'CALENDAR', icon: CalendarMonthIcon },
+        { text: '공지사항', path: '/notice', permission: 'NOTICE', icon: CampaignIcon },
+        { text: '설정', path: '/settings', permission: 'BUS', icon: SettingsIcon },
+        { text: '사용자 및 권한', path: '/admin/users', permission: 'SUPER_ADMIN', icon: AdminPanelSettingsIcon },
     ]
-    const menuItemClicked = (text: string) => {
-        switch (text) {
-        case '셔틀버스': navigate('/shuttle'); break
-        case '노선버스': navigate('/bus'); break
-        case '전철': navigate('/subway'); break
-        case '학식': navigate('/cafeteria'); break
-        case '열람실': navigate('/readingRoom'); break
-        case '연락처': navigate('/contact'); break
-        case '학사일정': navigate('/calendar'); break
-        case '공지사항': navigate('/notice'); break
-        case '설정': navigate('/settings'); break
-        }
+    const menuItems = allMenuItems.filter((item) =>
+        hasPermission(userInfoStore.permissions, item.permission))
+    const menuItemClicked = (path: string) => {
+        navigate(path)
         drawerOpenedStore.setDrawerOpened(false)
     }
     if (isAuthenticatedStore.isAuthenticated === null) {
@@ -153,13 +154,13 @@ export default function Home() {
                     <Toolbar />
                     <Box sx={{ overflow: 'auto' }}>
                         <List>
-                            {menuTexts.map((text, index) => (
-                                <ListItem key={text} disablePadding>
-                                    <ListItemButton onClick={() => menuItemClicked(text)}>
+                            {menuItems.map((item) => (
+                                <ListItem key={item.path} disablePadding>
+                                    <ListItemButton onClick={() => menuItemClicked(item.path)}>
                                         <ListItemIcon>
-                                            {createElement(menuIcons[index])}
+                                            {createElement(item.icon)}
                                         </ListItemIcon>
-                                        <ListItemText primary={text} />
+                                        <ListItemText primary={item.text} />
                                     </ListItemButton>
                                 </ListItem>
                             ))}
