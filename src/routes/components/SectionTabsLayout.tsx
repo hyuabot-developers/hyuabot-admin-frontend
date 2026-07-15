@@ -23,8 +23,19 @@ export function SectionTabsLayout({ basePath, tabs }: SectionTabsLayoutProps) {
     }
 
     return (
-        <Box sx={{ bgcolor: 'background.paper', minHeight: 'calc(100dvh - 64px)', pt: 2 }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box
+            sx={{
+                bgcolor: 'background.default',
+                display: 'flex',
+                flexDirection: 'column',
+                height: {
+                    xs: 'calc(100dvh - 56px)',
+                    sm: 'calc(100dvh - 64px)',
+                },
+                minHeight: 484,
+                pt: 2,
+            }}>
+            <Box sx={{ bgcolor: 'background.paper', borderBottom: 1, borderColor: 'divider', flexShrink: 0 }}>
                 <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable'>
                     {tabs.map(({ label, path }) => (
                         <Tab key={path} label={label} value={path} />

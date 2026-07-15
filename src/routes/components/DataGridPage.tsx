@@ -9,14 +9,21 @@ export function DataGridPage({ children }: DataGridPageProps) {
     return (
         <Box
             sx={{
-                height: {
-                    xs: 'calc(100dvh - 120px)',
-                    sm: 'calc(100dvh - 128px)',
-                },
+                display: 'flex',
+                flex: 1,
+                flexDirection: 'column',
                 minHeight: 420,
                 width: '100%',
                 minWidth: 0,
-                bgcolor: 'background.paper',
+                bgcolor: 'background.default',
+                '& > :last-child': {
+                    flex: 1,
+                    minHeight: 0,
+                },
+                '& .MuiDataGrid-root': {
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
+                },
             }}>
             {children}
         </Box>
