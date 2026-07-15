@@ -169,7 +169,11 @@ export default function AdminUsers() {
                         return (
                             <Card key={user.username} variant='outlined' sx={{ borderRadius: 3 }}>
                                 <CardHeader
-                                    avatar={<Avatar>{user.nickname.slice(0, 1)}</Avatar>}
+                                    avatar={(
+                                        <Avatar sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+                                            {user.nickname.slice(0, 1)}
+                                        </Avatar>
+                                    )}
                                     title={user.nickname}
                                     subheader={`${user.username} · ${user.email}`}
                                     action={

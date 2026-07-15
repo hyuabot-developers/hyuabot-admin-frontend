@@ -64,5 +64,20 @@ export const globalTheme = createTheme({
                 },
             },
         },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    '&:not(.Mui-disabled) .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#7b8495',
+                    },
+                    '&:not(.Mui-disabled):hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#5d6678',
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#0e4a84',
+                    },
+                },
+            },
+        },
     },
 })

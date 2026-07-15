@@ -7,7 +7,7 @@ export default function AccessDenied() {
             <Paper
                 variant='outlined'
                 sx={{ p: 4, maxWidth: 520, width: '100%', textAlign: 'center', borderRadius: 3 }}>
-                <LockOutlinedIcon color='disabled' sx={{ fontSize: 52, mb: 2 }} />
+                <LockOutlinedIcon sx={{ color: 'text.secondary', fontSize: 52, mb: 2 }} />
                 <Typography variant='h5' fontWeight={700} gutterBottom>
                     관리 권한이 없습니다
                 </Typography>

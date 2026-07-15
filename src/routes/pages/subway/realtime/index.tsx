@@ -1,3 +1,5 @@
+import CheckIcon from '@mui/icons-material/Check'
+import CloseIcon from '@mui/icons-material/Close'
 import { GridColDef } from '@mui/x-data-grid'
 import { useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -193,6 +195,9 @@ export default function SubwayRealtimePage() {
             editable: false,
             headerAlign: 'center',
             align: 'center',
+            renderCell: ({ value }) => value
+                ? <CheckIcon color='primary' titleAccess='급행 열차' />
+                : <CloseIcon sx={{ color: 'text.secondary' }} titleAccess='일반 열차' />,
         },
         {
             field: 'isLast',
@@ -202,6 +207,9 @@ export default function SubwayRealtimePage() {
             editable: false,
             headerAlign: 'center',
             align: 'center',
+            renderCell: ({ value }) => value
+                ? <CheckIcon color='primary' titleAccess='막차' />
+                : <CloseIcon sx={{ color: 'text.secondary' }} titleAccess='막차 아님' />,
         },
         {
             field: 'updateTime',
