@@ -4,11 +4,6 @@ import { create } from 'zustand'
 import { GridModelStore } from './index.ts'
 import { NoticeCategoryResponse } from '../service/network/notice.ts'
 
-type NoticeTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type GridNoticeCategoryItem = {
     id: string
     seq: number | null
@@ -40,11 +35,6 @@ type NoticeStore = {
     setRows: (menuList: Array<GridNoticeItem>) => void,
     setCategories: (categories: Array<NoticeCategoryResponse>) => void,
 }
-
-export const useNoticeTabStore = create<NoticeTabStore>((set) => ({
-    route: 'category',
-    setRoute: (route) => set({ route }),
-}))
 
 export const useNoticeCategoryGridModelStore = create<GridModelStore>((set) => ({
     rowModesModel: {},

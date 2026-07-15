@@ -4,11 +4,6 @@ import { create } from 'zustand'
 import { GridModelStore } from './index.ts'
 import { CalendarCategoryResponse } from '../service/network/calendar.ts'
 
-type CalendarTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type GridCalendarCategoryItem = {
     id: string
     seq: number | null
@@ -39,11 +34,6 @@ type CalendarStore = {
     setRows: (menuList: Array<GridCalendarEventItem>) => void,
     setCategories: (categories: Array<CalendarCategoryResponse>) => void,
 }
-
-export const useCalendarTabStore = create<CalendarTabStore>((set) => ({
-    route: 'category',
-    setRoute: (route) => set({ route }),
-}))
 
 export const useCalendarCategoryGridModelStore = create<GridModelStore>((set) => ({
     rowModesModel: {},

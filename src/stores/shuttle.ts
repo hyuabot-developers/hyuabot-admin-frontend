@@ -71,11 +71,6 @@ export type ShuttleTimetableView = {
     group: string
 }
 
-export type ShuttleTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type ShuttlePeriodStore = {
     rows: Array<ShuttlePeriod>,
     setRows: (periods: Array<ShuttlePeriod>) => void,
@@ -122,17 +117,6 @@ export type ShuttleTimetableViewStore = {
     rows: Array<ShuttleTimetableView>,
     setRows: (timetables: Array<ShuttleTimetableView>) => void,
 }
-
-// Tab Store
-export const useShuttleTabStore = create(
-    devtools<ShuttleTabStore>(
-        (set) => ({
-            route: 'period',
-            setRoute: (route: string) => set({ route }),
-        }),
-        { name: 'ShuttleTabStore' }
-    )
-)
 
 // Period Store
 export const useShuttlePeriodStore = create(
