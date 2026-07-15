@@ -19,7 +19,7 @@ export type PageLoader = () => Promise<{ default: ComponentType }>
 export type NavigationItem = {
     label: string,
     path: string,
-    permission: AdminPermission,
+    permission?: AdminPermission,
     icon: SvgIconComponent,
 }
 
@@ -30,6 +30,7 @@ export type ChildRoute = {
 }
 
 export type ManagementSection = NavigationItem & {
+    permission: AdminPermission,
     defaultPath: string,
     children: ChildRoute[],
 }
@@ -146,7 +147,6 @@ export const standaloneRoutes: StandaloneRoute[] = [
     {
         label: '설정',
         path: '/settings',
-        permission: 'BUS',
         icon: SettingsIcon,
         load: () => import('./pages/settings'),
     },
@@ -168,6 +168,6 @@ export const firstAllowedPath = (permissions: ReadonlyArray<AdminPermission>) =>
     const section = managementSections.find(({ permission }) => hasPermission(permissions, permission))
     if (section) return section.defaultPath
 
-    const standaloneRoute = standaloneRoutes.find(({ permission }) => hasPermission(permissions, permission))
+    const standaloneRoute = standaloneRoutes.find(({ permission }) => !permission || hasPermission(permissions, permission))
     return standaloneRoute?.path ?? '/access-denied'
 }

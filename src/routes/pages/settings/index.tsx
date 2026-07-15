@@ -1,23 +1,32 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined'
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined'
+import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined'
 import SettingsBrightnessOutlinedIcon from '@mui/icons-material/SettingsBrightnessOutlined'
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import {
+    Alert,
+    Box,
     Button,
     Divider,
     IconButton,
     InputAdornment,
     Paper,
+    Stack,
     TextField,
     ToggleButton,
     ToggleButtonGroup,
     Typography,
 } from '@mui/material'
 import { useColorScheme } from '@mui/material/styles'
+import axios from 'axios'
 import { useState } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 
+import { changePassword, updateProfile } from '../../../service/network/auth.ts'
+import { useUserInfoStore } from '../../../stores/auth.ts'
 import { AppSnackbar } from '../../components/AppSnackbar.tsx'
 import { PageLayout } from '../../components/PageLayout.tsx'
 
@@ -26,90 +35,176 @@ type ThemeMode = 'light' | 'dark' | 'system'
 
 export default function Settings() {
     const { mode, setMode } = useColorScheme()
+    const userInfo = useUserInfoStore()
+    const [nickname, setNickname] = useState(userInfo.nickname ?? '')
+    const [email, setEmail] = useState(userInfo.email ?? '')
+    const [phone, setPhone] = useState(userInfo.phone ?? '')
+    const [profileSaving, setProfileSaving] = useState(false)
+    const [currentPassword, setCurrentPassword] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [passwordConfirm, setPasswordConfirm] = useState('')
+    const [passwordSaving, setPasswordSaving] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const [apiKey, setApiKey] = useState(localStorage.getItem(GBIS_API_KEY_STORAGE_KEY) ?? '')
     const [showKey, setShowKey] = useState(false)
-    const [saved, setSaved] = useState(false)
+    const [notice, setNotice] = useState('')
+    const [error, setError] = useState('')
 
-    const handleSave = () => {
-        if (apiKey.trim()) {
-            localStorage.setItem(GBIS_API_KEY_STORAGE_KEY, apiKey.trim())
-        } else {
-            localStorage.removeItem(GBIS_API_KEY_STORAGE_KEY)
+    const handleProfileSave = async () => {
+        setProfileSaving(true)
+        setError('')
+        try {
+            const response = await updateProfile({ nickname, email, phone })
+            const profile = response.data
+            userInfo.setUserInfo(profile.username, profile.nickname, profile.email, profile.phone, profile.permissions)
+            setNickname(profile.nickname)
+            setEmail(profile.email)
+            setPhone(profile.phone)
+            setNotice('내 정보를 저장했습니다.')
+        } catch (requestError: unknown) {
+            const duplicateEmail = axios.isAxiosError<{ message?: string }>(requestError) &&
+                requestError.response?.data?.message === 'DUPLICATE_EMAIL'
+            setError(duplicateEmail ? '이미 등록된 이메일입니다.' : '내 정보를 저장하지 못했습니다.')
+        } finally {
+            setProfileSaving(false)
         }
-        setSaved(true)
     }
-    const handleThemeChange = (_event: React.MouseEvent<HTMLElement>, nextMode: ThemeMode | null) => {
-        if (nextMode !== null) {
-            setMode(nextMode)
+
+    const validNewPassword = newPassword.length >= 15 && new TextEncoder().encode(newPassword).length <= 72
+    const handlePasswordChange = async () => {
+        setPasswordSaving(true)
+        setError('')
+        try {
+            await changePassword(currentPassword, newPassword)
+            window.location.assign('/login')
+        } catch (requestError: unknown) {
+            const wrongPassword = axios.isAxiosError<{ message?: string }>(requestError) &&
+                requestError.response?.data?.message === 'CURRENT_PASSWORD_MISMATCH'
+            setError(wrongPassword ? '현재 비밀번호가 일치하지 않습니다.' : '비밀번호를 변경하지 못했습니다.')
+        } finally {
+            setPasswordSaving(false)
         }
+    }
+
+    const handleApiKeySave = () => {
+        if (apiKey.trim()) localStorage.setItem(GBIS_API_KEY_STORAGE_KEY, apiKey.trim())
+        else localStorage.removeItem(GBIS_API_KEY_STORAGE_KEY)
+        setNotice('API 키를 저장했습니다.')
+    }
+
+    const handleThemeChange = (_event: MouseEvent<HTMLElement>, nextMode: ThemeMode | null) => {
+        if (nextMode !== null) setMode(nextMode)
     }
 
     return (
         <PageLayout
             title='설정'
-            description='관리 도구에서 사용하는 연결 정보를 관리합니다.'
+            description='내 계정과 관리 도구의 화면 및 연결 정보를 관리합니다.'
             icon={<SettingsOutlinedIcon />}
-            maxWidth={680}>
-            <Paper sx={{ p: 3, mt: 2 }}>
-                <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
-                    화면 테마
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
+            maxWidth={760}>
+            {error && <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+
+            <SettingsCard icon={<AccountCircleOutlinedIcon />} title='내 정보'>
+                <Stack spacing={2}>
+                    <TextField label='아이디' value={userInfo.username ?? ''} disabled fullWidth />
+                    <TextField label='이름' required value={nickname} inputProps={{ maxLength: 20 }} onChange={(event) => setNickname(event.target.value)} fullWidth />
+                    <TextField label='이메일' required type='email' value={email} inputProps={{ maxLength: 50 }} onChange={(event) => setEmail(event.target.value)} fullWidth />
+                    <TextField label='전화번호' value={phone} inputProps={{ maxLength: 15 }} onChange={(event) => setPhone(event.target.value)} fullWidth />
+                    <Box><Button variant='contained' disabled={profileSaving || !nickname.trim() || !email.trim()} onClick={handleProfileSave}>{profileSaving ? '저장 중' : '내 정보 저장'}</Button></Box>
+                </Stack>
+            </SettingsCard>
+
+            <SettingsCard icon={<LockResetOutlinedIcon />} title='비밀번호 변경'>
+                <Stack spacing={2}>
+                    <Alert severity='info'>변경 후 모든 기기에서 로그아웃됩니다. 새 비밀번호는 15자 이상이어야 합니다.</Alert>
+                    <TextField
+                        label='현재 비밀번호'
+                        type={showPassword ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(event) => setCurrentPassword(event.target.value)}
+                        autoComplete='current-password'
+                        slotProps={{ input: { endAdornment: <PasswordVisibility show={showPassword} onToggle={() => setShowPassword((value) => !value)} /> } }}
+                    />
+                    <TextField
+                        label='새 비밀번호'
+                        type={showPassword ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(event) => setNewPassword(event.target.value)}
+                        autoComplete='new-password'
+                        error={newPassword.length > 0 && !validNewPassword}
+                        helperText={newPassword.length > 0 && !validNewPassword ? '15자 이상, UTF-8 기준 72바이트 이하로 입력하세요.' : ' '}
+                    />
+                    <TextField
+                        label='새 비밀번호 확인'
+                        type={showPassword ? 'text' : 'password'}
+                        value={passwordConfirm}
+                        onChange={(event) => setPasswordConfirm(event.target.value)}
+                        autoComplete='new-password'
+                        error={passwordConfirm.length > 0 && passwordConfirm !== newPassword}
+                        helperText={passwordConfirm.length > 0 && passwordConfirm !== newPassword ? '새 비밀번호가 일치하지 않습니다.' : ' '}
+                    />
+                    <Box>
+                        <Button
+                            variant='contained'
+                            disabled={passwordSaving || !currentPassword || !validNewPassword || newPassword !== passwordConfirm}
+                            onClick={handlePasswordChange}>
+                            {passwordSaving ? '변경 중' : '비밀번호 변경'}
+                        </Button>
+                    </Box>
+                </Stack>
+            </SettingsCard>
+
+            <SettingsCard title='화면 테마'>
                 <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
                     시스템 설정을 선택하면 기기의 화면 모드 변경을 자동으로 따릅니다.
                 </Typography>
-                <ToggleButtonGroup
-                    value={mode ?? 'system'}
-                    onChange={handleThemeChange}
-                    exclusive
-                    fullWidth
-                    aria-label='화면 테마'>
-                    <ToggleButton value='light' aria-label='라이트 테마'>
-                        <LightModeOutlinedIcon sx={{ mr: { xs: 0.75, sm: 1 } }} />
-                        라이트
-                    </ToggleButton>
-                    <ToggleButton value='dark' aria-label='다크 테마'>
-                        <DarkModeOutlinedIcon sx={{ mr: { xs: 0.75, sm: 1 } }} />
-                        다크
-                    </ToggleButton>
-                    <ToggleButton value='system' aria-label='시스템 설정 테마'>
-                        <SettingsBrightnessOutlinedIcon sx={{ mr: { xs: 0.75, sm: 1 } }} />
-                        시스템
-                    </ToggleButton>
+                <ToggleButtonGroup value={mode ?? 'system'} onChange={handleThemeChange} exclusive fullWidth aria-label='화면 테마'>
+                    <ToggleButton value='light' aria-label='라이트 테마'><LightModeOutlinedIcon sx={{ mr: 1 }} />라이트</ToggleButton>
+                    <ToggleButton value='dark' aria-label='다크 테마'><DarkModeOutlinedIcon sx={{ mr: 1 }} />다크</ToggleButton>
+                    <ToggleButton value='system' aria-label='시스템 설정 테마'><SettingsBrightnessOutlinedIcon sx={{ mr: 1 }} />시스템</ToggleButton>
                 </ToggleButtonGroup>
-            </Paper>
-            <Paper sx={{ p: 3, mt: 2 }}>
-                <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
-                    GBIS API 키
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
+            </SettingsCard>
+
+            <SettingsCard title='GBIS API 키'>
                 <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-                    경기도 버스정보시스템(GBIS) API 키를 입력하세요.
                     키는 브라우저 로컬 스토리지에만 저장되며 서버로 전송되지 않습니다.
                 </Typography>
                 <TextField
                     label='API 키'
                     value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
+                    onChange={(event) => setApiKey(event.target.value)}
                     type={showKey ? 'text' : 'password'}
                     fullWidth
-                    size='small'
                     sx={{ mb: 2 }}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position='end'>
-                                <IconButton onClick={() => setShowKey((v) => !v)} edge='end'>
-                                    {showKey ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    }}
+                    slotProps={{ input: { endAdornment: <PasswordVisibility show={showKey} onToggle={() => setShowKey((value) => !value)} label='API 키 표시 전환' /> } }}
                 />
-                <Button variant='contained' onClick={handleSave}>
-                    저장
-                </Button>
-            </Paper>
-            <AppSnackbar message={saved ? '저장되었습니다.' : ''} onClose={() => setSaved(false)} />
+                <Button variant='contained' onClick={handleApiKeySave}>API 키 저장</Button>
+            </SettingsCard>
+
+            <AppSnackbar message={notice} onClose={() => setNotice('')} />
         </PageLayout>
+    )
+}
+
+function SettingsCard({ icon, title, children }: { icon?: ReactNode, title: string, children: ReactNode }) {
+    return (
+        <Paper variant='outlined' sx={{ p: { xs: 2.5, sm: 3 }, mb: 2.5, borderRadius: 3 }}>
+            <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 1.5 }}>
+                {icon}
+                <Typography variant='subtitle1' fontWeight={750}>{title}</Typography>
+            </Stack>
+            <Divider sx={{ mb: 2.5 }} />
+            {children}
+        </Paper>
+    )
+}
+
+function PasswordVisibility({ show, onToggle, label = '비밀번호 표시 전환' }: { show: boolean, onToggle: () => void, label?: string }) {
+    return (
+        <InputAdornment position='end'>
+            <IconButton aria-label={label} onClick={onToggle} edge='end'>
+                {show ? <VisibilityOff /> : <Visibility />}
+            </IconButton>
+        </InputAdornment>
     )
 }

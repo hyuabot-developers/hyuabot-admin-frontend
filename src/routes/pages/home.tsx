@@ -80,7 +80,7 @@ export default function Home() {
         }
     }, [])
     const menuItems = navigationItems.filter((item) =>
-        hasPermission(userInfoStore.permissions, item.permission))
+        !item.permission || hasPermission(userInfoStore.permissions, item.permission))
     const menuItemClicked = (path: string) => {
         void navigate(path)
         setMobileDrawerOpen(false)
