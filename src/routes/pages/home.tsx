@@ -8,36 +8,40 @@ import {
     List,
     ListItem,
     ListItemButton,
-    ListItemIcon, ListItemText,
+    ListItemIcon,
+    ListItemText,
     Toolbar,
+    Tooltip,
     Typography
 } from '@mui/material'
-import { createElement, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { useTheme } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { createElement, useEffect, useState } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { hasPermission } from '../../security/permissions.ts'
 import { getUserInfo, logout } from '../../service/network/auth.ts'
 import { useAuthenticatedStore, useUserInfoStore } from '../../stores/auth.ts'
-import { useDrawerOpenedStore } from '../../stores/home.ts'
 import { PageState } from '../components/PageState.tsx'
 import { navigationItems } from '../navigation.tsx'
 
+const drawerWidth = 264
 
 export default function Home() {
     // Get the store
     const isAuthenticatedStore = useAuthenticatedStore()
     const userInfoStore = useUserInfoStore()
-    const drawerOpenedStore = useDrawerOpenedStore()
+    const theme = useTheme()
+    const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
+    const [isMobileDrawerOpen, setMobileDrawerOpen] = useState(false)
+    const location = useLocation()
+    const navigate = useNavigate()
     // Logout
     const logOutButtonClicked = async () => {
         const response = await logout()
         if (response.status === 200) {
             window.location.assign('/login')
         }
-    }
-    // Menu button clicked
-    const menuButtonClicked = () => {
-        drawerOpenedStore.setDrawerOpened(true)
     }
     useEffect(() => {
         let active = true
@@ -75,86 +79,105 @@ export default function Home() {
             active = false
         }
     }, [])
-    // Component
-    // App bar
-    const appBar = (
-        <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
-            <Toolbar>
-                <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="menu"
-                    sx={{ mr: 2 }}
-                    onClick={() => drawerOpenedStore.setDrawerOpened(!drawerOpenedStore.isDrawerOpened)}>
-                    <MenuIcon />
-                </IconButton>
-                <Typography
-                    variant="h6"
-                    component="div"
-                    sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-                    휴아봇 서비스 관리자 페이지
-                </Typography>
-                <Typography
-                    variant="h6"
-                    component="div"
-                    style={{ textAlign: 'end' }}
-                    sx={{ flexGrow: 1 }}>
-                    {window.innerWidth > 600 ? userInfoStore.nickname : ''}
-                </Typography>
-                <IconButton size="large" color="inherit" onClick={logOutButtonClicked}>
-                    <LogOutIcon />
-                </IconButton>
-            </Toolbar>
-        </AppBar>
-    )
-    // Drawer
-    const navigate = useNavigate()
     const menuItems = navigationItems.filter((item) =>
         hasPermission(userInfoStore.permissions, item.permission))
     const menuItemClicked = (path: string) => {
-        navigate(path)
-        drawerOpenedStore.setDrawerOpened(false)
+        void navigate(path)
+        setMobileDrawerOpen(false)
     }
+    const navigationList = (
+        <Box component='nav' aria-label='관리 메뉴' sx={{ overflow: 'auto', px: 1, py: 1.5 }}>
+            <List>
+                {menuItems.map((item) => {
+                    const selected = location.pathname === item.path ||
+                        location.pathname.startsWith(`${item.path}/`)
+                    return (
+                        <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
+                            <ListItemButton
+                                selected={selected}
+                                aria-current={selected ? 'page' : undefined}
+                                onClick={() => menuItemClicked(item.path)}>
+                                <ListItemIcon>
+                                    {createElement(item.icon)}
+                                </ListItemIcon>
+                                <ListItemText primary={item.label} />
+                            </ListItemButton>
+                        </ListItem>
+                    )
+                })}
+            </List>
+        </Box>
+    )
     if (isAuthenticatedStore.status === 'checking') {
         return <PageState loading label='관리자 정보 확인 중' />
     } else if (isAuthenticatedStore.status === 'authenticated') {
         return (
-            <div>
-                {appBar}
-                <Drawer
-                    open={drawerOpenedStore.isDrawerOpened}
-                    onClose={menuButtonClicked}
+            <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
+                <AppBar
+                    component='header'
+                    position='fixed'
                     sx={{
-                        width: 240,
-                        flexShrink: 0,
+                        zIndex: (currentTheme) => currentTheme.zIndex.drawer + 1,
+                        width: { md: `calc(100% - ${drawerWidth}px)` },
+                        ml: { md: `${drawerWidth}px` },
+                    }}>
+                    <Toolbar>
+                        {!isDesktop && (
+                            <IconButton
+                                size='large'
+                                edge='start'
+                                color='inherit'
+                                aria-label='관리 메뉴 열기'
+                                sx={{ mr: 2 }}
+                                onClick={() => setMobileDrawerOpen(true)}>
+                                <MenuIcon />
+                            </IconButton>
+                        )}
+                        <Typography
+                            variant='h6'
+                            component='div'
+                            noWrap
+                            sx={{ flexGrow: 1 }}>
+                            휴아봇 관리자
+                        </Typography>
+                        <Typography sx={{ display: { xs: 'none', sm: 'block' }, mr: 1.5 }}>
+                            {userInfoStore.nickname}
+                        </Typography>
+                        <Tooltip title='로그아웃'>
+                            <IconButton
+                                size='large'
+                                color='inherit'
+                                aria-label='로그아웃'
+                                onClick={logOutButtonClicked}>
+                                <LogOutIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </Toolbar>
+                </AppBar>
+                <Drawer
+                    variant={isDesktop ? 'permanent' : 'temporary'}
+                    open={isDesktop || isMobileDrawerOpen}
+                    onClose={() => setMobileDrawerOpen(false)}
+                    ModalProps={{ keepMounted: true }}
+                    sx={{
+                        width: drawerWidth,
+                        flexShrink: { md: 0 },
                         '& .MuiDrawer-paper': {
-                            width: 240,
+                            width: drawerWidth,
                             boxSizing: 'border-box',
                         },
                     }}
-                    anchor="left">
+                    anchor='left'>
                     <Toolbar />
-                    <Box sx={{ overflow: 'auto' }}>
-                        <List>
-                            {menuItems.map((item) => (
-                                <ListItem key={item.path} disablePadding>
-                                    <ListItemButton onClick={() => menuItemClicked(item.path)}>
-                                        <ListItemIcon>
-                                            {createElement(item.icon)}
-                                        </ListItemIcon>
-                                        <ListItemText primary={item.label} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Box>
+                    {navigationList}
                 </Drawer>
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Box
+                    component='main'
+                    sx={{ flexGrow: 1, minWidth: 0, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
                     <Toolbar />
                     <Outlet />
                 </Box>
-            </div>
+            </Box>
         )
     }
 }
