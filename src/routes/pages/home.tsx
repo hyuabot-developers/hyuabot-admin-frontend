@@ -20,7 +20,7 @@ import { createElement, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { hasPermission } from '../../security/permissions.ts'
-import { getUserInfo, logout } from '../../service/network/auth.ts'
+import { getUserInfo, isUserProfile, logout } from '../../service/network/auth.ts'
 import { useAuthenticatedStore, useUserInfoStore } from '../../stores/auth.ts'
 import { PageState } from '../components/PageState.tsx'
 import { navigationItems } from '../navigation.tsx'
@@ -52,7 +52,7 @@ export default function Home() {
                 if (!active) {
                     return
                 }
-                if (response.status !== 200) {
+                if (response.status !== 200 || !isUserProfile(response.data)) {
                     isAuthenticatedStore.setStatus('unauthenticated')
                     window.location.assign('/login')
                     return
