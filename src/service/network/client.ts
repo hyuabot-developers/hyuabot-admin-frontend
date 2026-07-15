@@ -28,7 +28,11 @@ client.interceptors.response.use(
     },
     async (error) => {
         const originalRequest = error.config
-        if (error.response?.status === 403 && !originalRequest._retry) {
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url?.endsWith('/api/v1/user/token')
+        ) {
             originalRequest._retry = true
             // Refresh token
             try {
