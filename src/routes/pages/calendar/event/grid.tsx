@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -13,6 +12,7 @@ import { GridToolbar } from './toolbar.tsx'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../../../service/network/calendar.ts'
 import { GridCalendarEventItem, useCalendarGridModelStore, useCalendarStore } from '../../../../stores/calendar.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
@@ -130,7 +130,7 @@ export const CalendarGrid = (props: GridProps) => {
     ]
     // Render
     return (
-        <Box sx={{ height: '100vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -159,6 +159,6 @@ export const CalendarGrid = (props: GridProps) => {
                     }}
                 />
             </div>
-        </Box>
+        </DataGridPage>
     )
 }

@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -19,6 +18,7 @@ import {
     useSubwayTimetableStore
 } from '../../../../stores/subway.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
@@ -136,7 +136,7 @@ export const SubwayTimetableGrid = (props: GridProps) => {
     ]
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -166,6 +166,6 @@ export const SubwayTimetableGrid = (props: GridProps) => {
                     hideFooterPagination={false}
                 />
             </div>
-        </Box>
+        </DataGridPage>
     )
 }

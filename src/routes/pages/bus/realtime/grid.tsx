@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useState } from 'react'
 
@@ -7,6 +6,7 @@ import {
     useBusRealtimeGridModelStore,
     useBusRealtimeStore,
 } from '../../../../stores/bus.ts'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
@@ -21,7 +21,7 @@ export const BusRealtimeGrid = (props: GridProps) => {
     const [successSnackbarContent, setSuccessSnackbarContent] = useState<string>('')
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -45,6 +45,6 @@ export const BusRealtimeGrid = (props: GridProps) => {
                     hideFooterPagination={false}
                 />
             </div>
-        </Box>
+        </DataGridPage>
     )
 }

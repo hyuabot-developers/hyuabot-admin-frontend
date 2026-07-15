@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -13,6 +12,7 @@ import { GridToolbar } from './toolbar.tsx'
 import { createNotice, deleteNotice, updateNotice } from '../../../../service/network/notice.ts'
 import { GridNoticeItem, useNoticeGridModelStore, useNoticeStore } from '../../../../stores/notice.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
@@ -134,7 +134,7 @@ export const NoticeGrid = (props: GridProps) => {
     ]
     // Render
     return (
-        <Box sx={{ height: '100vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -163,6 +163,6 @@ export const NoticeGrid = (props: GridProps) => {
                     }}
                 />
             </div>
-        </Box>
+        </DataGridPage>
     )
 }

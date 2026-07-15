@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -12,6 +11,7 @@ import {
     useSubwayRealtimeGridModelStore,
     useSubwayRealtimeStore,
 } from '../../../../stores/subway.ts'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
@@ -37,7 +37,7 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
     }
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -58,6 +58,6 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
                     columns: { columnVisibilityModel: { sortableId: false, order: false } },
                 }}
             />
-        </Box>
+        </DataGridPage>
     )
 }

@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -22,6 +21,7 @@ import {
     usePublicHolidayStore,
 } from '../../../../stores/publicHoliday.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
@@ -115,7 +115,7 @@ export const PublicHolidayGrid = (props: GridProps) => {
     ]
 
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -133,6 +133,6 @@ export const PublicHolidayGrid = (props: GridProps) => {
                 processRowUpdate={updateRowProcess}
                 slots={{ toolbar: GridToolbar }}
             />
-        </Box>
+        </DataGridPage>
     )
 }

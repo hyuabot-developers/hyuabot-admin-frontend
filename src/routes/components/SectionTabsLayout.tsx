@@ -23,7 +23,7 @@ export function SectionTabsLayout({ basePath, tabs }: SectionTabsLayoutProps) {
     }
 
     return (
-        <div style={{ backgroundColor: 'white', height: '100%', paddingTop: '1rem' }}>
+        <Box sx={{ bgcolor: 'background.paper', minHeight: 'calc(100dvh - 64px)', pt: 2 }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable'>
                     {tabs.map(({ label, path }) => (
@@ -32,6 +32,6 @@ export function SectionTabsLayout({ basePath, tabs }: SectionTabsLayoutProps) {
                 </Tabs>
             </Box>
             <Outlet />
-        </div>
+        </Box>
     )
 }

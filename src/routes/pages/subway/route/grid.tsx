@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -13,6 +12,7 @@ import { GridToolbar } from './toolbar.tsx'
 import { createSubwayRoute, deleteSubwayRoute, updateSubwayRoute } from '../../../../service/network/subway.ts'
 import { GridSubwayRoute, useSubwayRouteGridModelStore, useSubwayRouteStore } from '../../../../stores/subway.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
@@ -104,7 +104,7 @@ export const SubwayRouteGrid = (props: GridProps) => {
     ]
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -130,6 +130,6 @@ export const SubwayRouteGrid = (props: GridProps) => {
                 }}
                 isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'routeID' || params.row.isNew)}
             />
-        </Box>
+        </DataGridPage>
     )
 }

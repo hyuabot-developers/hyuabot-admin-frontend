@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -17,6 +16,7 @@ import {
     useCafeteriaItemStore
 } from '../../../../stores/cafeteria.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
@@ -121,7 +121,7 @@ export const CafeteriaGrid = (props: GridProps) => {
     ]
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <GridFeedback
                 error={errorSnackbarContent}
                 success={successSnackbarContent}
@@ -140,6 +140,6 @@ export const CafeteriaGrid = (props: GridProps) => {
                 slots={{ toolbar: GridToolbar }}
                 isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'id' || params.row.isNew)}
             />
-        </Box>
+        </DataGridPage>
     )
 }
