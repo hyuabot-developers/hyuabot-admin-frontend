@@ -10,6 +10,7 @@ import {
     getBusStops
 } from '../../../../service/network/bus.ts'
 import { useBusDepartureLogStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function BusDepartureLog() {
     const rowStore = useBusDepartureLogStore()
@@ -57,7 +58,7 @@ export default function BusDepartureLog() {
         }
     }
     useEffect(() => {
-        fetchBusRouteStops().catch(console.error)
+        fetchBusRouteStops().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

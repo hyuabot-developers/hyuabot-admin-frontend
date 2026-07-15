@@ -7,6 +7,7 @@ import { ReadingRoomGrid } from './grid.tsx'
 import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
 import { getReadingRoomList, ReadingRoomResponse } from '../../../../service/network/readingRoom.ts'
 import { useReadingRoomItemStore } from '../../../../stores/readingRoom.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function ReadingRoomPage() {
@@ -50,7 +51,7 @@ export default function ReadingRoomPage() {
     }
 
     useEffect(() => {
-        fetchReadingRoom().catch(console.error)
+        fetchReadingRoom().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

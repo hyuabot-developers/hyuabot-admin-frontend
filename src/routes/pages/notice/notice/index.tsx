@@ -11,6 +11,7 @@ import {
     getNoticeList
 } from '../../../../service/network/notice.ts'
 import { useNoticeStore } from '../../../../stores/notice.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function NoticePage() {
@@ -46,7 +47,7 @@ export default function NoticePage() {
         return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
     }
     useEffect(() => {
-        fetchNotice().catch(console.error)
+        fetchNotice().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

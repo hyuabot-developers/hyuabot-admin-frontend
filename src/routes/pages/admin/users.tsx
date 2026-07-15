@@ -19,10 +19,8 @@ import {
     FormGroup,
     FormLabel,
     InputAdornment,
-    Snackbar,
     Switch,
     TextField,
-    Typography,
 } from '@mui/material'
 import axios from 'axios'
 import { useEffect, useMemo, useState } from 'react'
@@ -36,6 +34,9 @@ import {
     updateAdminUser,
 } from '../../../service/network/adminUsers.ts'
 import type { AdminUser } from '../../../service/network/adminUsers.ts'
+import { AppSnackbar } from '../../components/AppSnackbar.tsx'
+import { PageLayout } from '../../components/PageLayout.tsx'
+import { PageState } from '../../components/PageState.tsx'
 
 type UserDraft = Pick<AdminUser, 'active' | 'permissions'>
 
@@ -125,27 +126,10 @@ export default function AdminUsers() {
     }
 
     return (
-        <Box sx={{
-            p: { xs: 2, md: 3 },
-            width: '100%',
-            maxWidth: 1180,
-            mx: 'auto',
-            boxSizing: 'border-box',
-            minWidth: 0,
-        }}>
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 3 }}>
-                <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
-                    <AdminPanelSettingsOutlinedIcon />
-                </Avatar>
-                <Box>
-                    <Typography variant='h4' component='h1' fontWeight={750}>
-                        사용자 및 권한
-                    </Typography>
-                    <Typography color='text.secondary' sx={{ mt: 0.5 }}>
-                        계정을 활성화하고 담당할 관리 영역을 지정합니다.
-                    </Typography>
-                </Box>
-            </Box>
+        <PageLayout
+            title='사용자 및 권한'
+            description='계정을 활성화하고 담당할 관리 영역을 지정합니다.'
+            icon={<AdminPanelSettingsOutlinedIcon />}>
 
             <Alert severity='info' sx={{ mb: 3 }}>
                 최고 관리자는 모든 영역과 사용자 권한을 관리할 수 있습니다. 일반 관리자에게는 필요한 영역만 부여하세요.
@@ -170,14 +154,12 @@ export default function AdminUsers() {
             />
 
             {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                    <CircularProgress aria-label='관리자 계정 불러오는 중' />
-                </Box>
+                <PageState loading label='관리자 계정 불러오는 중' />
             ) : filteredUsers.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 8, color: 'text.secondary' }}>
-                    <PersonOffOutlinedIcon sx={{ fontSize: 48, mb: 1 }} />
-                    <Typography>검색 결과가 없습니다.</Typography>
-                </Box>
+                <PageState
+                    label='검색 결과가 없습니다.'
+                    icon={<PersonOffOutlinedIcon sx={{ fontSize: 48 }} />}
+                />
             ) : (
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, 1fr)' }, gap: 2.5 }}>
                     {filteredUsers.map((user) => {
@@ -187,7 +169,11 @@ export default function AdminUsers() {
                         return (
                             <Card key={user.username} variant='outlined' sx={{ borderRadius: 3 }}>
                                 <CardHeader
-                                    avatar={<Avatar>{user.nickname.slice(0, 1)}</Avatar>}
+                                    avatar={(
+                                        <Avatar sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+                                            {user.nickname.slice(0, 1)}
+                                        </Avatar>
+                                    )}
                                     title={user.nickname}
                                     subheader={`${user.username} · ${user.email}`}
                                     action={
@@ -268,13 +254,10 @@ export default function AdminUsers() {
                 </Box>
             )}
 
-            <Snackbar
-                open={saved}
-                autoHideDuration={3000}
+            <AppSnackbar
+                message={saved ? '사용자 권한을 저장했습니다.' : ''}
                 onClose={() => setSaved(false)}
-                message='사용자 권한을 저장했습니다.'
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             />
-        </Box>
+        </PageLayout>
     )
 }

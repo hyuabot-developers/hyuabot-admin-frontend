@@ -10,6 +10,7 @@ import {
     ShuttleStopResponse
 } from '../../../../service/network/shuttle.ts'
 import { useShuttleRouteStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function ShuttleRoute() {
     // Get the store
@@ -51,7 +52,7 @@ export default function ShuttleRoute() {
             await fetchShuttleRoute()
             await fetchShuttleStop()
         }
-        fetchData().catch(console.error)
+        fetchData().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

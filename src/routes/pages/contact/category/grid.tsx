@@ -1,10 +1,5 @@
-import CancelIcon from '@mui/icons-material/Close'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
-import { Alert, Box, Snackbar } from '@mui/material'
 import {
-    DataGrid, GridActionsCellItem,
+    DataGrid,
     GridColDef,
     GridEventListener, GridRowId, GridRowModes,
     GridRowModesModel
@@ -18,6 +13,9 @@ import {
     useContactCategoryGridModelStore,
     useContactCategoryStore
 } from '../../../../stores/contact.ts'
+import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
 interface GridProps {
@@ -35,7 +33,7 @@ export const ContactCategoryGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
@@ -63,7 +61,7 @@ export const ContactCategoryGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
@@ -86,51 +84,28 @@ export const ContactCategoryGrid = (props: GridProps) => {
         rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
         return updatedRow
     }
-    // Add action column
-    props.columns.push({
-        field: 'actions',
-        headerName: '동작',
-        type: 'actions',
-        width: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
-            const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-            if (isEditing) {
-                return [
-                    <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                    <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
-                ]
-            }
-            return [
-                <GridActionsCellItem label="edit" key="edit" disabled={true} icon={<EditIcon />} onClick={() => editRowButtonClicked(id)} />,
-                <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-            ]
-        }
-    })
+    const columns = [
+        ...props.columns,
+        createCrudGridActionsColumn({
+            rowModesModel: rowModesModelStore.rowModesModel,
+            onEdit: editRowButtonClicked,
+            onSave: saveRowButtonClicked,
+            onCancel: cancelRowButtonClicked,
+            onDelete: deleteRowButtonClicked,
+        }),
+    ]
     // Render
     return (
-        <Box sx={{ height: '100vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+        <DataGridPage>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <div style={{ width: '100%' }}>
                 <DataGrid
-                    columns={props.columns}
+                    columns={columns}
                     rows={rowStore.rows}
                     rowModesModel={rowModesModelStore.rowModesModel}
                     editMode="row"
@@ -151,6 +126,6 @@ export const ContactCategoryGrid = (props: GridProps) => {
                     }}
                 />
             </div>
-        </Box>
+        </DataGridPage>
     )
 }

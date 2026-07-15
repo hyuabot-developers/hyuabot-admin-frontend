@@ -8,6 +8,7 @@ import {
     ShuttleStopResponse
 } from '../../../../service/network/shuttle.ts'
 import { useShuttleStopStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function ShuttleStop() {
     // Get the store
@@ -27,7 +28,7 @@ export default function ShuttleStop() {
         }
     }
     useEffect(() => {
-        fetchShuttleStop().catch(console.error)
+        fetchShuttleStop().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

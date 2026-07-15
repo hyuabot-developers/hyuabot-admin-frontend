@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ShuttleHolidayGrid } from './grid.tsx'
 import { getShuttleHoliday, ShuttleHolidayResponse } from '../../../../service/network/shuttle.ts'
 import { useShuttleHolidayStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function Holiday() {
     // Get the store
@@ -26,7 +27,7 @@ export default function Holiday() {
             }))
         }
     }
-    useEffect(() => { fetchShuttleHoliday().catch(console.error) }, [])
+    useEffect(() => { fetchShuttleHoliday().catch(reportError) }, [])
     // Configure DataGrid
     const dateValueFormatter = (value: Date) => {
         return dayjs(value).format('YYYY-MM-DD')

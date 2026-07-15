@@ -1,11 +1,5 @@
-import CancelIcon from '@mui/icons-material/Close'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
-import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
-    GridActionsCellItem,
     GridColDef,
     GridEventListener,
     GridRowId,
@@ -22,6 +16,9 @@ import {
     useShuttleHolidayStore,
     useShuttleHolidayGridModelStore
 } from '../../../../stores/shuttle.ts'
+import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
 interface GridProps {
@@ -39,7 +36,7 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.map((row) => {
                 if (row.id === params.id) {
                     return { ...row, isNew: false }
@@ -57,8 +54,8 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteShuttleHoliday(rowToDelete.seq!)
+        if (rowToDelete === undefined || rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteShuttleHoliday(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -69,20 +66,20 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: ShuttleHoliday) => {
-        if (newRow.type === '' || newRow.calendarType === null || newRow.date === null) {
+        if (!newRow.type || !newRow.calendarType || !newRow.date) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
         if (!newRow.isNew && newRow.seq !== null) {
             const response = await updateShuttleHoliday(newRow.seq, {
-                type: newRow.type!,
-                calendarType: newRow.calendarType!,
+                type: newRow.type,
+                calendarType: newRow.calendarType,
                 date: dayjs(newRow.date).format('YYYY-MM-DD'),
             })
             if (response.status !== 200) {
@@ -93,8 +90,8 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
             return newRow
         } else {
             const response = await createShuttleHoliday({
-                type: newRow.type!,
-                calendarType: newRow.calendarType!,
+                type: newRow.type,
+                calendarType: newRow.calendarType,
                 date: dayjs(newRow.date).format('YYYY-MM-DD'),
             })
             if (response.status !== 201) {
@@ -113,53 +110,23 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
     }
     const columns = [
         ...props.columns,
-        {
-            field: 'actions',
-            headerName: '동작',
-            type: 'actions',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-                if (isEditing) {
-                    return [
-                        <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                        <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
-                    ]
-                }
-                return [
-                    <GridActionsCellItem
-                        label="edit"
-                        key="edit"
-                        icon={<EditIcon />}
-                        onClick={() => editRowButtonClicked(id)}
-                    />,
-                    <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-                ]
-            },
-        } as GridColDef,
+        createCrudGridActionsColumn({
+            rowModesModel: rowModesModelStore.rowModesModel,
+            onEdit: editRowButtonClicked,
+            onSave: saveRowButtonClicked,
+            onCancel: cancelRowButtonClicked,
+            onDelete: deleteRowButtonClicked,
+        }),
     ]
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+        <DataGridPage>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <DataGrid
                 showToolbar={true}
                 columns={columns}
@@ -171,6 +138,6 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
                 processRowUpdate={updateRowProcess}
                 slots={{ toolbar: GridToolbar }}
             />
-        </Box>
+        </DataGridPage>
     )
 }

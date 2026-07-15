@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { BusRouteGrid } from './grid.tsx'
 import { BusRouteResponse, BusStopResponse, getBusRoutes, getBusStops } from '../../../../service/network/bus.ts'
 import { BusStop, useBusRouteStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function BusRoute() {
     // Get the store
@@ -65,7 +66,7 @@ export default function BusRoute() {
         async function fetchData() {
             await fetchBusRoute()
         }
-        fetchData().catch(console.error)
+        fetchData().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

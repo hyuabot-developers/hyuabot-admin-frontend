@@ -4,11 +4,6 @@ import { devtools } from 'zustand/middleware'
 
 import { GridModelStore } from './index.ts'
 
-export type BusTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type BusRoute = {
     id: string,
     routeID: number,
@@ -134,14 +129,6 @@ type BusDepartureLogStore = {
     setStops: (stopList: Array<BusStop>) => void,
     setRouteStops: (routeStopList: Array<BusRouteStop>) => void,
 }
-
-export const useBusTabStore = create(
-    devtools<BusTabStore>((set) => ({
-        route: 'route',
-        setRoute: (route: string) => set({ route }),
-    }),
-    { name: 'BusTabStore' })
-)
 
 export const useBusRouteStore = create(
     devtools<BusRouteStore>((set) => ({

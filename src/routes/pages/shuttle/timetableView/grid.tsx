@@ -1,5 +1,4 @@
 
-import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -9,6 +8,8 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { getShuttleAllTimetable, ShuttleTimetableViewResponse } from '../../../../service/network/shuttle.ts'
 import { useShuttleTimetableViewStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
 
 
 interface GridProps {
@@ -37,16 +38,16 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         }
     }
     useEffect(() => {
-        fetchTimetable().catch(console.error)
+        fetchTimetable().catch(reportError)
     }, [])    // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
+        <DataGridPage>
             <DataGrid
                 columns={props.columns}
                 rows={rowStore.rows}
                 editMode="row"
                 autoPageSize={true}
             />
-        </Box>
+        </DataGridPage>
     )
 }

@@ -5,11 +5,6 @@ import { devtools } from 'zustand/middleware'
 import { GridModelStore } from './index.ts'
 import { CampusResponse } from '../service/network/campus.ts'
 
-type ReadingRoomTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type GridReadingRoomItem = {
     id: string
     seq: number | null,
@@ -33,14 +28,6 @@ type ReadingRoomItemStore = {
     setCampuses: (campuses: Array<CampusResponse>) => void,
 }
 
-
-export const useReadingRoomTabStore = create(
-    devtools<ReadingRoomTabStore>((set) => ({
-        route: 'room',
-        setRoute: (route: string) => set({ route }),
-    }),
-    { name: 'ReadingRoomTabStore' })
-)
 
 export const useReadingRoomItemGridModelStore = create(
     devtools<GridModelStore>((set) => ({

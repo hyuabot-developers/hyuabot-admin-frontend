@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { NoticeCategoryGrid } from './grid.tsx'
 import { NoticeCategoryResponse, getNoticeCategoryList } from '../../../../service/network/notice.ts'
 import { useNoticeCategoryStore } from '../../../../stores/notice.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function NoticeCategoryPage() {
@@ -25,7 +26,7 @@ export default function NoticeCategoryPage() {
         }
     }
     useEffect(() => {
-        fetchNoticeCategory().catch(console.error)
+        fetchNoticeCategory().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

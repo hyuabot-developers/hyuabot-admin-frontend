@@ -11,6 +11,7 @@ import {
     getCalendarList
 } from '../../../../service/network/calendar.ts'
 import { useCalendarStore } from '../../../../stores/calendar.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function CalendarEventPage() {
@@ -44,7 +45,7 @@ export default function CalendarEventPage() {
         return dayjs(value).format('YYYY-MM-DD')
     }
     useEffect(() => {
-        fetchCalendar().catch(console.error)
+        fetchCalendar().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

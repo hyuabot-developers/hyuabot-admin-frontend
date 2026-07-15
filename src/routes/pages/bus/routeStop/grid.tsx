@@ -1,11 +1,5 @@
-import CancelIcon from '@mui/icons-material/Close'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
-import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
-    GridActionsCellItem,
     GridColDef,
     GridEventListener,
     GridRowId,
@@ -21,6 +15,9 @@ import {
     useBusRouteStopGridModelStore,
     useBusRouteStopStore,
 } from '../../../../stores/bus.ts'
+import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
 interface GridProps {
@@ -38,7 +35,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -49,8 +46,12 @@ export const BusRouteStopGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteBusRouteStop(rowStore.selectedRouteID!, rowToDelete.seq!)
+        const selectedRouteID = rowStore.selectedRouteID
+        if (rowToDelete === undefined || rowToDelete.seq === null || selectedRouteID === undefined) {
+            setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
+            return
+        }
+        const response = await deleteBusRouteStop(selectedRouteID, rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -61,13 +62,15 @@ export const BusRouteStopGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: BusRouteStop) => {
+        const selectedRouteID = rowStore.selectedRouteID
         if (
-            newRow.stop === '' || newRow.order < 0 || newRow.travelTime < 0 || newRow.startStop === ''
+            newRow.stop === '' || newRow.order < 0 || newRow.travelTime < 0 ||
+            newRow.startStop === '' || selectedRouteID === undefined
         ) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
@@ -75,7 +78,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
         }
         if (newRow.isNew) {
             const response = await createBusRouteStop(
-                rowStore.selectedRouteID!,
+                selectedRouteID,
                 {
                     stopID: parseInt(newRow.stop.split('(')[1]?.split(')')[0] ?? '0', 10),
                     order: newRow.order,
@@ -89,10 +92,10 @@ export const BusRouteStopGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
-        } else {
+        } else if (newRow.seq !== null) {
             const response = await updateBusRouteStop(
-                rowStore.selectedRouteID!,
-                newRow.seq!,
+                selectedRouteID,
+                newRow.seq,
                 {
                     stopID: parseInt(newRow.stop.split('(')[1]?.split(')')[0] ?? '0', 10),
                     order: newRow.order,
@@ -105,6 +108,9 @@ export const BusRouteStopGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
+        } else {
+            setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+            return { ...newRow, _action: 'delete' }
         }
         const updatedRow = { ...newRow, isNew: false }
         rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
@@ -113,57 +119,29 @@ export const BusRouteStopGrid = (props: GridProps) => {
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
     }
-    // Add action column
-    props.columns.push({
-        field: 'actions',
-        headerName: '동작',
-        type: 'actions',
-        width: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
-            const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-            if (isEditing) {
-                return [
-                    <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                    <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
-                ]
-            }
-            return [
-                <GridActionsCellItem
-                    label="edit"
-                    key="edit"
-                    icon={<EditIcon />}
-                    onClick={() => editRowButtonClicked(id)}
-                />,
-                <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-            ]
-        }
-    })
+    const columns = [
+        ...props.columns,
+        createCrudGridActionsColumn({
+            rowModesModel: rowModesModelStore.rowModesModel,
+            onEdit: editRowButtonClicked,
+            onSave: saveRowButtonClicked,
+            onCancel: cancelRowButtonClicked,
+            onDelete: deleteRowButtonClicked,
+        }),
+    ]
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+        <DataGridPage>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <div style={{ height: '100%', width: '100%' }}>
                 <DataGrid
                     showToolbar={true}
-                    columns={props.columns}
+                    columns={columns}
                     rows={rowStore.rows}
                     rowModesModel={rowModesModelStore.rowModesModel}
                     editMode="row"
@@ -182,6 +160,6 @@ export const BusRouteStopGrid = (props: GridProps) => {
                     hideFooterPagination={false}
                 />
             </div>
-        </Box>
+        </DataGridPage>
     )
 }

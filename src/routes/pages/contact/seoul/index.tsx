@@ -10,6 +10,7 @@ import {
     getContactList
 } from '../../../../service/network/contact.ts'
 import { useContactStore } from '../../../../stores/contact.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function SeoulContactPage() {
@@ -38,7 +39,7 @@ export default function SeoulContactPage() {
         }
     }
     useEffect(() => {
-        fetchContact().catch(console.error)
+        fetchContact().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

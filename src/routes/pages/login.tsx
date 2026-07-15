@@ -24,11 +24,12 @@ export default function Login() {
     }
 
     return (
-        <div style={{
+        <Box sx={{
             display: 'grid',
             placeItems: 'center',
             width: '100vw',
-            height: '100vh',
+            minHeight: '100dvh',
+            bgcolor: 'background.default',
         }}>
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
@@ -42,12 +43,10 @@ export default function Login() {
             <Box
                 sx={{
                     width: { xs: '80vw', sm: '400px' },
-                    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-                }}
-                style={{
-                    padding: '20px',
-                    borderRadius: '10px',
-                    backgroundColor: 'white',
+                    boxShadow: 3,
+                    p: 2.5,
+                    borderRadius: 2,
+                    bgcolor: 'background.paper',
                     display: 'flex',
                     justifyContent: 'center',
                     flexDirection: 'column',
@@ -88,6 +87,6 @@ export default function Login() {
                     로그인
                 </Button>
             </Box>
-        </div>
+        </Box>
     )
 }

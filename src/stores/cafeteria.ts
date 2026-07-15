@@ -6,11 +6,6 @@ import { GridModelStore } from './index.ts'
 import { CafeteriaResponse } from '../service/network/cafeteria.ts'
 import { CampusResponse } from '../service/network/campus.ts'
 
-type CafeteriaTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type GridCafeteriaItem = {
     id: string
     seq: number | null,
@@ -51,14 +46,6 @@ type CafeteriaMenuStore = {
     setCafeterias: (cafeteriaList: Array<CafeteriaResponse>) => void,
     setSelectedCafeteriaID: (cafeteriaID: number) => void,
 }
-
-export const useCafeteriaTabStore = create(
-    devtools<CafeteriaTabStore>((set) => ({
-        route: 'cafeteria',
-        setRoute: (route: string) => set({ route }),
-    }),
-    { name: 'CafeteriaTabStore' })
-)
 
 export const useCafeteriaItemGridModelStore = create(
     devtools<GridModelStore>((set) => ({

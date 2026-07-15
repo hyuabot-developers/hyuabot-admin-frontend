@@ -4,11 +4,6 @@ import { create } from 'zustand'
 import { GridModelStore } from './index.ts'
 import { ContactCategoryResponse } from '../service/network/contact.ts'
 
-type ContactTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type GridContactCategoryItem = {
     id: string
     seq: number | null
@@ -37,11 +32,6 @@ type ContactStore = {
     setRows: (menuList: Array<GridContactItem>) => void,
     setCategories: (categories: Array<ContactCategoryResponse>) => void,
 }
-
-export const useContactTabStore = create<ContactTabStore>((set) => ({
-    route: 'category',
-    setRoute: (route) => set({ route }),
-}))
 
 export const useContactCategoryGridModelStore = create<GridModelStore>((set) => ({
     rowModesModel: {},

@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { PublicHolidayGrid } from './grid.tsx'
 import { getPublicHoliday, PublicHolidayResponse } from '../../../../service/network/publicHoliday.ts'
 import { usePublicHolidayStore } from '../../../../stores/publicHoliday.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function PublicHolidayPage() {
     const store = usePublicHolidayStore()
@@ -21,7 +22,7 @@ export default function PublicHolidayPage() {
             })))
         }
     }
-    useEffect(() => { fetchData().catch(console.error) }, [])
+    useEffect(() => { fetchData().catch(reportError) }, [])
 
     const calendarTypeValueFormatter = (value: string) => {
         switch (value) {

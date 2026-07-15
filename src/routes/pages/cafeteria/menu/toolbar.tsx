@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { getCafeteriaMenuList, MenuResponse } from '../../../../service/network/cafeteria.ts'
 import { useCafeteriaMenuGridModelStore, useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export const GridToolbar = () => {
     const rowStore = useCafeteriaMenuStore()
@@ -54,14 +55,14 @@ export const GridToolbar = () => {
     const refreshMenu = () => {
         const { selectedCafeteriaID } = useCafeteriaMenuStore.getState()
         if (selectedCafeteriaID) {
-            fetchMenuByCafeteria(selectedCafeteriaID).catch(console.error)
+            fetchMenuByCafeteria(selectedCafeteriaID).catch(reportError)
         }
     }
 
     const onChangeSelectedCafeteria = (value: number) => {
         if (value) {
             rowStore.setSelectedCafeteriaID(value)
-            fetchMenuByCafeteria(value).catch(console.error)
+            fetchMenuByCafeteria(value).catch(reportError)
         }
     }
 

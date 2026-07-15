@@ -19,6 +19,7 @@ import {
     useBusRouteStopGridModelStore,
     useBusRouteStopStore,
 } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export const GridToolbar = () => {
     const rowStore = useBusRouteStopStore()
@@ -97,7 +98,7 @@ export const GridToolbar = () => {
     const onChangeSelectedRoute = (value: number) => {
         if (value) {
             rowStore.setSelectedRouteID(value)
-            fetchStopsByRoute(value).catch(console.error)
+            fetchStopsByRoute(value).catch(reportError)
         }
     }
     // Add record button click event
@@ -123,7 +124,7 @@ export const GridToolbar = () => {
         }))
     }
     useEffect(() => {
-        fetchBusRouteStop().catch(console.error)
+        fetchBusRouteStop().catch(reportError)
     }, [])
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>

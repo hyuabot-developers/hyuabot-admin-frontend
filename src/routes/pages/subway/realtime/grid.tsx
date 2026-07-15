@@ -1,4 +1,3 @@
-import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -12,6 +11,8 @@ import {
     useSubwayRealtimeGridModelStore,
     useSubwayRealtimeStore,
 } from '../../../../stores/subway.ts'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
 interface GridProps {
@@ -29,32 +30,20 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
     }
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+        <DataGridPage>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <DataGrid
                 columns={props.columns}
                 rows={rowStore.rows}
@@ -69,6 +58,6 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
                     columns: { columnVisibilityModel: { sortableId: false, order: false } },
                 }}
             />
-        </Box>
+        </DataGridPage>
     )
 }

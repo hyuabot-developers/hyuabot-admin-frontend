@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { BusTimetableResponse, getBusTimetables } from '../../../../service/network/bus.ts'
 import { useBusTimetableGridModelStore, useBusTimetableStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export const GridToolbar = () => {
     const rowStore = useBusTimetableStore()
@@ -71,7 +72,7 @@ export const GridToolbar = () => {
             return
         }
         rowStore.setSelectedStopID(stopSeq)
-        fetchBusTimetable(rowStore.selectedRouteID || 0, stopSeq).catch(console.error)
+        fetchBusTimetable(rowStore.selectedRouteID || 0, stopSeq).catch(reportError)
     }
 
     return (
@@ -101,7 +102,7 @@ export const GridToolbar = () => {
             </ToolbarButton>
             <ToolbarButton onClick={() => {
                 if (rowStore.selectedRouteID && rowStore.selectedStopID) {
-                    fetchBusTimetable(rowStore.selectedRouteID, rowStore.selectedStopID).catch(console.error)
+                    fetchBusTimetable(rowStore.selectedRouteID, rowStore.selectedStopID).catch(reportError)
                 }
             }}>
                 <RefreshIcon />

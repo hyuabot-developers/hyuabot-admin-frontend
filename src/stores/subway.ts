@@ -5,11 +5,6 @@ import { devtools } from 'zustand/middleware'
 import { GridModelStore } from './index.ts'
 import { SubwayRoute, SubwayStation } from '../service/network/subway.ts'
 
-type SubwayTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type GridSubwayRoute = {
     id: string,
     routeID: number,
@@ -87,14 +82,6 @@ type SubwayRealtimeStore = {
     setStations: (stationList: Array<SubwayStation>) => void,
     setRoutes: (routeList: Array<SubwayRoute>) => void,
 }
-
-export const useSubwayTabStore = create(
-    devtools<SubwayTabStore>((set) => ({
-        route: 'route',
-        setRoute: (route) => set({ route }),
-    }),
-    { name: 'SubwayTabStore' })
-)
 
 export const useSubwayRouteStore = create(
     devtools<SubwayRouteStore>((set) => ({

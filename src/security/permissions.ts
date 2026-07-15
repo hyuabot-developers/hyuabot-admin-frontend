@@ -30,18 +30,3 @@ export const hasPermission = (
     permissions: ReadonlyArray<AdminPermission>,
     permission: AdminPermission,
 ) => permissions.includes('SUPER_ADMIN') || permissions.includes(permission)
-
-export const firstAllowedPath = (permissions: ReadonlyArray<AdminPermission>) => {
-    const routes: ReadonlyArray<[AdminPermission, string]> = [
-        ['SHUTTLE', '/shuttle/period'],
-        ['BUS', '/bus/route'],
-        ['SUBWAY', '/subway/station'],
-        ['CAFETERIA', '/cafeteria/cafeteria'],
-        ['READING_ROOM', '/readingRoom/room'],
-        ['CONTACT', '/contact/category'],
-        ['CALENDAR', '/calendar/category'],
-        ['NOTICE', '/notice/category'],
-        ['SUPER_ADMIN', '/admin/users'],
-    ]
-    return routes.find(([permission]) => hasPermission(permissions, permission))?.[1] ?? '/access-denied'
-}

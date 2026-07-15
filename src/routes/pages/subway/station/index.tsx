@@ -9,6 +9,7 @@ import {
     SubwayStation
 } from '../../../../service/network/subway.ts'
 import { useSubwayStationStore } from '../../../../stores/subway.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function SubwayStationPage() {
     // Get the store
@@ -37,7 +38,7 @@ export default function SubwayStationPage() {
         }
     }
     useEffect(() => {
-        fetchSubwayStation().catch(console.error)
+        fetchSubwayStation().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

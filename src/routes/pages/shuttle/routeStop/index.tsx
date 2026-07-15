@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ShuttleRouteStopGrid } from './grid.tsx'
 import { getShuttleStop, ShuttleStopResponse } from '../../../../service/network/shuttle.ts'
 import { useShuttleRouteStopStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function ShuttleRouteStop() {
     // Get the store
@@ -24,7 +25,7 @@ export default function ShuttleRouteStop() {
         }
     }
     useEffect(() => {
-        fetchShuttleStop().catch(console.error)
+        fetchShuttleStop().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

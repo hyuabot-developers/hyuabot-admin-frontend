@@ -71,11 +71,6 @@ export type ShuttleTimetableView = {
     group: string
 }
 
-export type ShuttleTabStore = {
-    route: string,
-    setRoute: (route: string) => void,
-}
-
 export type ShuttlePeriodStore = {
     rows: Array<ShuttlePeriod>,
     setRows: (periods: Array<ShuttlePeriod>) => void,
@@ -123,24 +118,13 @@ export type ShuttleTimetableViewStore = {
     setRows: (timetables: Array<ShuttleTimetableView>) => void,
 }
 
-// Tab Store
-export const useShuttleTabStore = create(
-    devtools<ShuttleTabStore>(
-        (set) => ({
-            route: 'period',
-            setRoute: (route: string) => set({ route }),
-        }),
-        { name: 'ShuttleTabStore' }
-    )
-)
-
 // Period Store
 export const useShuttlePeriodStore = create(
     devtools<ShuttlePeriodStore>(
         (set) => ({
             rows: [],
             setRows: (rows: Array<ShuttlePeriod>) => {
-                rows.sort((a, b) => (a.start! < b.start! ? -1 : a.start! > b.start! ? 1 : 0))
+                rows.sort((a, b) => (a.start?.valueOf() ?? Infinity) - (b.start?.valueOf() ?? Infinity))
                 set({ rows })
             },
         }),
@@ -164,7 +148,7 @@ export const useShuttleHolidayStore = create(
         (set) => ({
             rows: [],
             setRows: (rows: Array<ShuttleHoliday>) => {
-                rows.sort((a, b) => (a.date! < b.date! ? -1 : a.date! > b.date! ? 1 : 0))
+                rows.sort((a, b) => (a.date?.valueOf() ?? Infinity) - (b.date?.valueOf() ?? Infinity))
                 set({ rows })
             },
         }),

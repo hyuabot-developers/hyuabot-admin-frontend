@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ContactCategoryGrid } from './grid.tsx'
 import { ContactCategoryResponse, getContactCategoryList } from '../../../../service/network/contact.ts'
 import { useContactCategoryStore } from '../../../../stores/contact.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function ContactCategoryPage() {
@@ -25,7 +26,7 @@ export default function ContactCategoryPage() {
         }
     }
     useEffect(() => {
-        fetchContactCategory().catch(console.error)
+        fetchContactCategory().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

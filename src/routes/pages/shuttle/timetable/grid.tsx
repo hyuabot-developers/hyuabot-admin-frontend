@@ -1,11 +1,5 @@
-import CancelIcon from '@mui/icons-material/Close'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
-import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
-    GridActionsCellItem,
     GridColDef,
     GridEventListener,
     GridRowId,
@@ -25,11 +19,13 @@ import {
     useShuttleTimetableStore,
     useShuttleTimetableGridModelStore,
 } from '../../../../stores/shuttle.ts'
+import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { DataGridPage } from '../../../components/DataGridPage.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
     columns: GridColDef[]
 }
-
 export const ShuttleTimetableGrid = (props: GridProps) => {
     const rowStore = useShuttleTimetableStore()
     const rowModesModelStore = useShuttleTimetableGridModelStore()
@@ -41,7 +37,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -53,9 +49,11 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const { rows, selectedRoute } = useShuttleTimetableStore.getState()
         const rowToDelete = rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        if (rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteShuttleTimetable(selectedRoute!, rowToDelete.seq)
+        if (rowToDelete === undefined || rowToDelete.seq === null || selectedRoute === null) {
+            setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
+            return
+        }
+        const response = await deleteShuttleTimetable(selectedRoute, rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -66,19 +64,20 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: ShuttleTimetable) => {
-        if (newRow.period === '' || newRow.time === '') {
+        const selectedRoute = rowStore.selectedRoute
+        if (newRow.period === '' || newRow.time === '' || selectedRoute === null) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
             const response = await createShuttleTimetable(
-                rowStore.selectedRoute!, {
+                selectedRoute, {
                     period: newRow.period,
                     weekday: newRow.weekdays,
                     departureTime: newRow.time,
@@ -95,7 +94,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
             rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))
             return updatedRow
         } else if (newRow.seq !== null) {
-            const response = await updateShuttleTimetable(rowStore.selectedRoute!, newRow.seq, {
+            const response = await updateShuttleTimetable(selectedRoute, newRow.seq, {
                 period: newRow.period,
                 weekday: newRow.weekdays,
                 departureTime: newRow.time,
@@ -116,56 +115,28 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
     }
-    // Add action column
-    props.columns.push({
-        field: 'actions',
-        headerName: '동작',
-        type: 'actions',
-        width: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
-            const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-            if (isEditing) {
-                return [
-                    <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                    <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
-                ]
-            }
-            return [
-                <GridActionsCellItem
-                    label="edit"
-                    key="edit"
-                    icon={<EditIcon />}
-                    onClick={() => editRowButtonClicked(id)}
-                />,
-                <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-            ]
-        }
-    })
+    const columns = [
+        ...props.columns,
+        createCrudGridActionsColumn({
+            rowModesModel: rowModesModelStore.rowModesModel,
+            onEdit: editRowButtonClicked,
+            onSave: saveRowButtonClicked,
+            onCancel: cancelRowButtonClicked,
+            onDelete: deleteRowButtonClicked,
+        }),
+    ]
     // Render
     return (
-        <Box sx={{ height: '90vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+        <DataGridPage>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <DataGrid
                 showToolbar={true}
-                columns={props.columns}
+                columns={columns}
                 rows={rowStore.rows}
                 rowModesModel={rowModesModelStore.rowModesModel}
                 editMode="row"
@@ -176,6 +147,6 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
                 autoPageSize={true}
                 isCellEditable={(params) => params.colDef.field !== 'actions' && (params.colDef.field !== 'name' || params.row.isNew)}
             />
-        </Box>
+        </DataGridPage>
     )
 }

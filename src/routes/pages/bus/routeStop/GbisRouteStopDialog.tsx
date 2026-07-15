@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react'
 import { createBusRouteStop, createBusStop } from '../../../../service/network/bus.ts'
 import { GbisRouteStation, getGbisRouteStations } from '../../../../service/network/gbis.ts'
 import { useBusRouteStopStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 interface GbisRouteStopDialogProps {
     open: boolean
@@ -99,7 +100,7 @@ export const GbisRouteStopDialog = ({ open, onClose, onSuccess, routeID }: GbisR
             onSuccess()
             onClose()
         } catch (e) {
-            console.error(e)
+            reportError(e)
             setError('저장 중 오류가 발생했습니다.')
         } finally {
             setSubmitting(false)

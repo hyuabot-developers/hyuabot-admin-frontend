@@ -44,6 +44,7 @@ export default tseslint.config(
             'object-curly-spacing': ['error', 'always'],
             /** 코드 안전/품질 */
             'no-console': 'warn',
+            '@typescript-eslint/no-non-null-assertion': 'error',
             'prefer-const': 'error',
         },
     },

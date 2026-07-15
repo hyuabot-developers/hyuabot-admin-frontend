@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { BusStopGrid } from './grid.tsx'
 import { BusStopResponse, getBusStops } from '../../../../service/network/bus.ts'
 import { useBusStopStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function BusStop() {
     // Get the store
@@ -28,7 +29,7 @@ export default function BusStop() {
         }
     }
     useEffect(() => {
-        fetchBusStop().catch(console.error)
+        fetchBusStop().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

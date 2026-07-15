@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { ShuttlePeriodGrid } from './grid.tsx'
 import { getShuttlePeriod, ShuttlePeriodResponse } from '../../../../service/network/shuttle.ts'
 import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function Period() {
     // Get the store
@@ -34,7 +35,7 @@ export default function Period() {
             )
         }
     }
-    useEffect(() => { fetchShuttlePeriod().catch(console.error) }, [])
+    useEffect(() => { fetchShuttlePeriod().catch(reportError) }, [])
     // Configure DataGrid
     const startDateValueFormatter = (value: Date) => {
         return dayjs(value).format('YYYY-MM-DD HH:mm:ss')
