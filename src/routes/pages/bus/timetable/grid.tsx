@@ -35,7 +35,7 @@ export const BusTimetableGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -58,13 +58,15 @@ export const BusTimetableGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: BusTimetable) => {
+        const { selectedRouteID, selectedStopID } = rowStore
         if (
-            newRow.dayType === '' || newRow.departureTime === ''
+            newRow.dayType === '' || newRow.departureTime === '' ||
+            selectedRouteID === null || selectedStopID === null
         ) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
@@ -73,8 +75,8 @@ export const BusTimetableGrid = (props: GridProps) => {
         if (newRow.isNew) {
             const response = await createBusTimetable(
                 {
-                    routeID: rowStore.selectedRouteID!,
-                    startStopID: rowStore.selectedStopID!,
+                    routeID: selectedRouteID,
+                    startStopID: selectedStopID,
                     dayType: newRow.dayType,
                     departureTime: newRow.departureTime,
                 }
@@ -84,12 +86,12 @@ export const BusTimetableGrid = (props: GridProps) => {
                 rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
                 return { ...newRow, _action: 'delete' }
             }
-        } else {
+        } else if (newRow.seq !== null) {
             const response = await updateBusTimetable(
-                newRow.seq!,
+                newRow.seq,
                 {
-                    routeID: rowStore.selectedRouteID!,
-                    startStopID: rowStore.selectedStopID!,
+                    routeID: selectedRouteID,
+                    startStopID: selectedStopID,
                     dayType: newRow.dayType,
                     departureTime: newRow.departureTime,
                 }
@@ -98,6 +100,9 @@ export const BusTimetableGrid = (props: GridProps) => {
                 setErrorSnackbarContent('데이터 저장에 실패했습니다.')
                 return { ...newRow, _action: 'delete' }
             }
+        } else {
+            setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+            return { ...newRow, _action: 'delete' }
         }
         setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         const updatedRow = { ...newRow, isNew: false }

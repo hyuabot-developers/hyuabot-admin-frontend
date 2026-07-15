@@ -10,6 +10,7 @@ import {
     getBusRouteStops
 } from '../../../../service/network/bus.ts'
 import { useBusDepartureLogStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export const GridToolbar = () => {
     const rowStore = useBusDepartureLogStore()
@@ -57,7 +58,7 @@ export const GridToolbar = () => {
             return
         }
         rowStore.setSelectedRouteID(routeID)
-        fetchBusStops(routeID).catch(console.error)
+        fetchBusStops(routeID).catch(reportError)
     }
 
     const onChangeSelectedStop = (stopSeq: number) => {
@@ -67,7 +68,7 @@ export const GridToolbar = () => {
             return
         }
         rowStore.setSelectedStopID(stopSeq)
-        fetchBusDepartureLog(rowStore.selectedRouteID || 0, stopSeq).catch(console.error)
+        fetchBusDepartureLog(rowStore.selectedRouteID || 0, stopSeq).catch(reportError)
     }
 
     return (

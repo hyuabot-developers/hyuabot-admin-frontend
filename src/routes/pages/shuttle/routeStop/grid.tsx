@@ -38,7 +38,7 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -50,8 +50,8 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const { rows, selectedRoute } = useShuttleRouteStopStore.getState()
         const rowToDelete = rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteShuttleRouteStop(selectedRoute!, rowToDelete.stop)
+        if (rowToDelete === undefined || selectedRoute === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteShuttleRouteStop(selectedRoute, rowToDelete.stop)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -62,18 +62,19 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: ShuttleRouteStop) => {
-        if (newRow.stop === '' || newRow.order < 0) {
+        const selectedRoute = rowStore.selectedRoute
+        if (newRow.stop === '' || newRow.order < 0 || selectedRoute === null) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
         if (newRow.isNew) {
-            const response = await createShuttleRouteStop(rowStore.selectedRoute!, {
+            const response = await createShuttleRouteStop(selectedRoute, {
                 stopName: newRow.stop,
                 order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
@@ -85,7 +86,7 @@ export const ShuttleRouteStopGrid = (props: GridProps) => {
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
         } else {
-            const response = await updateShuttleRouteStop(rowStore.selectedRoute!, newRow.stop, {
+            const response = await updateShuttleRouteStop(selectedRoute, newRow.stop, {
                 order: newRow.order,
                 cumulativeTime: newRow.cumulativeTime,
             })

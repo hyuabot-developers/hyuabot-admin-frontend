@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { SubwayRouteGrid } from './grid.tsx'
 import { SubwayRoute, getSubwayRoutes } from '../../../../service/network/subway.ts'
 import { useSubwayRouteStore } from '../../../../stores/subway.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function SubwayRoutePage() {
     // Get the store
@@ -24,7 +25,7 @@ export default function SubwayRoutePage() {
         }
     }
     useEffect(() => {
-        fetchSubwayRoute().catch(console.error)
+        fetchSubwayRoute().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

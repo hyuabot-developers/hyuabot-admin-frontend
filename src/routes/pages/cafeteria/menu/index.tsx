@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { CafeteriaMenuGrid } from './grid.tsx'
 import { getCafeteriaList } from '../../../../service/network/cafeteria.ts'
 import { useCafeteriaMenuStore } from '../../../../stores/cafeteria.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function CafeteriaMenuPage() {
@@ -22,7 +23,7 @@ export default function CafeteriaMenuPage() {
     }
 
     useEffect(() => {
-        fetchCafeteriaMenu().catch(console.error)
+        fetchCafeteriaMenu().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

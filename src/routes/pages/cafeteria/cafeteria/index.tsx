@@ -6,6 +6,7 @@ import { CafeteriaGrid } from './grid.tsx'
 import { CafeteriaResponse, getCafeteriaList } from '../../../../service/network/cafeteria.ts'
 import { CampusResponse, getCampusList } from '../../../../service/network/campus.ts'
 import { useCafeteriaItemStore } from '../../../../stores/cafeteria.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function CafeteriaPage() {
     // Get the store
@@ -43,7 +44,7 @@ export default function CafeteriaPage() {
         }
     }
     useEffect(() => {
-        fetchCafeteriaList().catch(console.error)
+        fetchCafeteriaList().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

@@ -33,7 +33,7 @@ export const CafeteriaMenuGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -46,7 +46,8 @@ export const CafeteriaMenuGrid = (props: GridProps) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
         if (rowToDelete === undefined || rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
         const { selectedCafeteriaID } = useCafeteriaMenuStore.getState()
-        const response = await deleteCafeteriaMenu(selectedCafeteriaID!, rowToDelete.seq)
+        if (selectedCafeteriaID === undefined) { setErrorSnackbarContent('식당을 먼저 선택해 주세요.'); return }
+        const response = await deleteCafeteriaMenu(selectedCafeteriaID, rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -57,7 +58,7 @@ export const CafeteriaMenuGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
@@ -68,10 +69,14 @@ export const CafeteriaMenuGrid = (props: GridProps) => {
             return { ...newRow, _action: 'delete' }
         }
         const { selectedCafeteriaID } = useCafeteriaMenuStore.getState()
+        if (selectedCafeteriaID === undefined) {
+            setErrorSnackbarContent('식당을 먼저 선택해 주세요.')
+            return { ...newRow, _action: 'delete' }
+        }
         if (newRow.isNew) {
             try {
                 await createCafeteriaMenu(
-                    selectedCafeteriaID!,
+                    selectedCafeteriaID,
                     {
                         date: newRow.date,
                         type: newRow.type,
@@ -88,8 +93,8 @@ export const CafeteriaMenuGrid = (props: GridProps) => {
         } else if (newRow.seq != null) {
             try {
                 await updateCafeteriaMenu(
-                    selectedCafeteriaID!,
-                    newRow.seq!,
+                    selectedCafeteriaID,
+                    newRow.seq,
                     {
                         date: newRow.date,
                         type: newRow.type,

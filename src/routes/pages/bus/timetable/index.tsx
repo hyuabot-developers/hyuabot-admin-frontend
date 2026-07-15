@@ -10,6 +10,7 @@ import {
     getBusStops,
 } from '../../../../service/network/bus.ts'
 import { useBusTimetableStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function BusTimetable() {
     // Get the store
@@ -59,7 +60,7 @@ export default function BusTimetable() {
         }
     }
     useEffect(() => {
-        fetchBusRouteStops().catch(console.error)
+        fetchBusRouteStops().catch(reportError)
     }, [])
     const busWeekdaysFormatter = (value: string) => {
         switch (value) {

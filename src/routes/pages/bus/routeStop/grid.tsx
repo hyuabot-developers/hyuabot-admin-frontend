@@ -35,7 +35,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     // Button click event
     const editRowButtonClicked = (id: GridRowId) => {
@@ -46,8 +46,12 @@ export const BusRouteStopGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteBusRouteStop(rowStore.selectedRouteID!, rowToDelete.seq!)
+        const selectedRouteID = rowStore.selectedRouteID
+        if (rowToDelete === undefined || rowToDelete.seq === null || selectedRouteID === undefined) {
+            setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
+            return
+        }
+        const response = await deleteBusRouteStop(selectedRouteID, rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -58,13 +62,15 @@ export const BusRouteStopGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: BusRouteStop) => {
+        const selectedRouteID = rowStore.selectedRouteID
         if (
-            newRow.stop === '' || newRow.order < 0 || newRow.travelTime < 0 || newRow.startStop === ''
+            newRow.stop === '' || newRow.order < 0 || newRow.travelTime < 0 ||
+            newRow.startStop === '' || selectedRouteID === undefined
         ) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
@@ -72,7 +78,7 @@ export const BusRouteStopGrid = (props: GridProps) => {
         }
         if (newRow.isNew) {
             const response = await createBusRouteStop(
-                rowStore.selectedRouteID!,
+                selectedRouteID,
                 {
                     stopID: parseInt(newRow.stop.split('(')[1]?.split(')')[0] ?? '0', 10),
                     order: newRow.order,
@@ -86,10 +92,10 @@ export const BusRouteStopGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
-        } else {
+        } else if (newRow.seq !== null) {
             const response = await updateBusRouteStop(
-                rowStore.selectedRouteID!,
-                newRow.seq!,
+                selectedRouteID,
+                newRow.seq,
                 {
                     stopID: parseInt(newRow.stop.split('(')[1]?.split(')')[0] ?? '0', 10),
                     order: newRow.order,
@@ -102,6 +108,9 @@ export const BusRouteStopGrid = (props: GridProps) => {
                 return { ...newRow, _action: 'delete' }
             }
             setSuccessSnackbarContent('데이터 저장에 성공했습니다.')
+        } else {
+            setErrorSnackbarContent('데이터 저장에 실패했습니다.')
+            return { ...newRow, _action: 'delete' }
         }
         const updatedRow = { ...newRow, isNew: false }
         rowStore.setRows(rowStore.rows.map((row) => row.id === newRow.id ? updatedRow : row))

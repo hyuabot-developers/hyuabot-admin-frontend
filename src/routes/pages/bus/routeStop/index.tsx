@@ -10,6 +10,7 @@ import {
     getBusStops
 } from '../../../../service/network/bus.ts'
 import { BusRoute, BusStop, useBusRouteStopGridModelStore, useBusRouteStopStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function BusRouteStop() {
     const rowStore = useBusRouteStopStore()
@@ -63,7 +64,7 @@ export default function BusRouteStop() {
         }
     }
     useEffect(() => {
-        fetchBusRouteStop().catch(console.error)
+        fetchBusRouteStop().catch(reportError)
         rowStore.setRows([])
         rowModesModelStore.setRowModesModel({})
     }, [])

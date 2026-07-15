@@ -36,7 +36,7 @@ export const PublicHolidayGrid = (props: GridProps) => {
     const rowEditStopped: GridEventListener<'rowEditStop'> = (params, event) => {
         if (event.defaultMuiPrevented) return
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.map((row) =>
                 row.id === params.id ? { ...row, isNew: false } : row
             ))
@@ -51,8 +51,8 @@ export const PublicHolidayGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deletePublicHoliday(rowToDelete.seq!)
+        if (rowToDelete === undefined || rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deletePublicHoliday(rowToDelete.seq)
         if (response.status !== 204) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
         setSuccessSnackbarContent('데이터 삭제에 성공했습니다.')
         rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
@@ -63,7 +63,7 @@ export const PublicHolidayGrid = (props: GridProps) => {
             [id]: { mode: GridRowModes.View, ignoreModifications: true },
         })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
@@ -75,8 +75,8 @@ export const PublicHolidayGrid = (props: GridProps) => {
         }
         if (!newRow.isNew && newRow.seq !== null) {
             const response = await updatePublicHoliday(newRow.seq, {
-                name: newRow.name!,
-                calendarType: newRow.calendarType!,
+                name: newRow.name,
+                calendarType: newRow.calendarType,
                 date: dayjs(newRow.date).format('YYYY-MM-DD'),
             })
             if (response.status !== 200) { setErrorSnackbarContent('데이터 저장에 실패했습니다.'); return { ...newRow, _action: 'revert' } }
@@ -84,8 +84,8 @@ export const PublicHolidayGrid = (props: GridProps) => {
             return newRow
         } else {
             const response = await createPublicHoliday({
-                name: newRow.name!,
-                calendarType: newRow.calendarType!,
+                name: newRow.name,
+                calendarType: newRow.calendarType,
                 date: dayjs(newRow.date).format('YYYY-MM-DD'),
             })
             if (response.status !== 201) {

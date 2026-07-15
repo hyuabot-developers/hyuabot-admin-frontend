@@ -14,9 +14,9 @@ export function GridFeedback({
     onSuccessClose,
 }: GridFeedbackProps) {
     return (
-        <>
+        <div>
             <AppSnackbar message={error} severity='error' onClose={onErrorClose} />
             <AppSnackbar message={success} onClose={onSuccessClose} />
-        </>
+        </div>
     )
 }

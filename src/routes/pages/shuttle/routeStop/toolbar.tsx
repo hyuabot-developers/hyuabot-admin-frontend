@@ -14,7 +14,7 @@ import {
     useShuttleRouteStopStore,
     useShuttleRouteStopGridModelStore,
 } from '../../../../stores/shuttle.ts'
-
+import { reportError } from '../../../../utility/reportError.ts'
 
 export const GridToolbar = () => {
     const rowStore = useShuttleRouteStopStore()
@@ -54,7 +54,7 @@ export const GridToolbar = () => {
     const onChangeSelectedRoute = (value: string | null) => {
         if (value) {
             rowStore.setSelectedRoute(value)
-            fetchShuttleStop(value).catch(console.error)
+            fetchShuttleStop(value).catch(reportError)
         }
     }
     // Add record button click event
@@ -77,7 +77,7 @@ export const GridToolbar = () => {
         }))
     }
     useEffect(() => {
-        fetchShuttleRoute().catch(console.error)
+        fetchShuttleRoute().catch(reportError)
     }, [])
     return (
         <Toolbar style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>

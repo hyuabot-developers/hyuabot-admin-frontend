@@ -32,7 +32,7 @@ export const ShuttlePeriodGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.map((row) => {
                 if (row.id === params.id) {
                     return { ...row, isNew: false }
@@ -50,8 +50,8 @@ export const ShuttlePeriodGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteShuttlePeriod(rowToDelete.seq!)
+        if (rowToDelete === undefined || rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteShuttlePeriod(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -62,7 +62,7 @@ export const ShuttlePeriodGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
@@ -77,7 +77,7 @@ export const ShuttlePeriodGrid = (props: GridProps) => {
                 setErrorSnackbarContent('날짜 범위가 올바르지 않습니다.')
                 return { ...newRow, _action: 'revert' }
             }
-            const response = await updateShuttlePeriod(newRow.seq!, {
+            const response = await updateShuttlePeriod(newRow.seq, {
                 type: newRow.type,
                 start: dayjs(newRow.start).format('YYYY-MM-DD HH:mm:ss'),
                 end: dayjs(newRow.end).format('YYYY-MM-DD HH:mm:ss'),

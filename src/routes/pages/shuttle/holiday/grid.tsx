@@ -36,7 +36,7 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.map((row) => {
                 if (row.id === params.id) {
                     return { ...row, isNew: false }
@@ -54,8 +54,8 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
     }
     const deleteRowButtonClicked = async (id: GridRowId) => {
         const rowToDelete = rowStore.rows.find((row) => row.id === id)
-        if (rowToDelete === undefined) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
-        const response = await deleteShuttleHoliday(rowToDelete.seq!)
+        if (rowToDelete === undefined || rowToDelete.seq === null) { setErrorSnackbarContent('데이터 삭제에 실패했습니다.'); return }
+        const response = await deleteShuttleHoliday(rowToDelete.seq)
         if (response.status !== 204) {
             setErrorSnackbarContent('데이터 삭제에 실패했습니다.')
             return
@@ -66,20 +66,20 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
     const cancelRowButtonClicked = (id: GridRowId) => {
         rowModesModelStore.setRowModesModel({ ...rowModesModelStore.rowModesModel, [id]: { mode: GridRowModes.View, ignoreModifications: true } })
         const editedRow = rowStore.rows.find((row) => row.id === id)
-        if (editedRow!.isNew) {
+        if (editedRow?.isNew) {
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== id))
         }
     }
     const updateRowProcess = async (newRow: ShuttleHoliday) => {
-        if (newRow.type === '' || newRow.calendarType === null || newRow.date === null) {
+        if (!newRow.type || !newRow.calendarType || !newRow.date) {
             setErrorSnackbarContent('올바른 데이터가 아닙니다.')
             rowStore.setRows(rowStore.rows.filter((row) => row.id !== newRow.id))
             return { ...newRow, _action: 'delete' }
         }
         if (!newRow.isNew && newRow.seq !== null) {
             const response = await updateShuttleHoliday(newRow.seq, {
-                type: newRow.type!,
-                calendarType: newRow.calendarType!,
+                type: newRow.type,
+                calendarType: newRow.calendarType,
                 date: dayjs(newRow.date).format('YYYY-MM-DD'),
             })
             if (response.status !== 200) {
@@ -90,8 +90,8 @@ export const ShuttleHolidayGrid = (props: GridProps) => {
             return newRow
         } else {
             const response = await createShuttleHoliday({
-                type: newRow.type!,
-                calendarType: newRow.calendarType!,
+                type: newRow.type,
+                calendarType: newRow.calendarType,
                 date: dayjs(newRow.date).format('YYYY-MM-DD'),
             })
             if (response.status !== 201) {

@@ -12,6 +12,7 @@ import {
     getBusStops
 } from '../../../../service/network/bus.ts'
 import { BusRoute, BusStop, useBusRealtimeStore } from '../../../../stores/bus.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function BusRealtime() {
     const rowStore = useBusRealtimeStore()
@@ -87,7 +88,7 @@ export default function BusRealtime() {
         return `${value} 석`
     }
     useEffect(() => {
-        fetchBusRealtime().catch(console.error)
+        fetchBusRealtime().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

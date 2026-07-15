@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { CalendarCategoryGrid } from './grid.tsx'
 import { CalendarCategoryResponse, getCalendarCategoryList } from '../../../../service/network/calendar.ts'
 import { useCalendarCategoryStore } from '../../../../stores/calendar.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 
 export default function CalendarCategoryPage() {
@@ -25,7 +26,7 @@ export default function CalendarCategoryPage() {
         }
     }
     useEffect(() => {
-        fetchCalendarCategory().catch(console.error)
+        fetchCalendarCategory().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

@@ -19,6 +19,7 @@ import { useState } from 'react'
 
 import { createBusStop } from '../../../../service/network/bus.ts'
 import { GbisStop, searchGbisStops } from '../../../../service/network/gbis.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 interface GbisStopDialogProps {
     open: boolean
@@ -44,7 +45,7 @@ export const GbisStopDialog = ({ open, onClose, onSuccess, existingStopIDs }: Gb
             const results = await searchGbisStops(keyword.trim())
             setSearchResults(results)
         } catch (e) {
-            console.error(e)
+            reportError(e)
             setError('정류장 검색 중 오류가 발생했습니다.')
         } finally {
             setSearching(false)
@@ -83,7 +84,7 @@ export const GbisStopDialog = ({ open, onClose, onSuccess, existingStopIDs }: Gb
             onSuccess()
             onClose()
         } catch (e) {
-            console.error(e)
+            reportError(e)
             setError('정류장 저장 중 오류가 발생했습니다.')
         } finally {
             setSubmitting(false)

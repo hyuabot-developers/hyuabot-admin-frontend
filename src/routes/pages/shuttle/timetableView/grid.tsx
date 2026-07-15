@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { getShuttleAllTimetable, ShuttleTimetableViewResponse } from '../../../../service/network/shuttle.ts'
 import { useShuttleTimetableViewStore } from '../../../../stores/shuttle.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 import { DataGridPage } from '../../../components/DataGridPage.tsx'
 
 
@@ -37,7 +38,7 @@ export const ShuttleTimetableGrid = (props: GridProps) => {
         }
     }
     useEffect(() => {
-        fetchTimetable().catch(console.error)
+        fetchTimetable().catch(reportError)
     }, [])    // Render
     return (
         <DataGridPage>

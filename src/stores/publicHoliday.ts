@@ -23,7 +23,7 @@ export const usePublicHolidayStore = create(
         (set) => ({
             rows: [],
             setRows: (rows: Array<PublicHoliday>) => {
-                rows.sort((a, b) => (a.date! < b.date! ? -1 : a.date! > b.date! ? 1 : 0))
+                rows.sort((a, b) => (a.date?.valueOf() ?? Infinity) - (b.date?.valueOf() ?? Infinity))
                 set({ rows })
             },
         }),

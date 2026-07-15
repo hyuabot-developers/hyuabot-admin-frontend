@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { SubwayTimetableGrid } from './grid.tsx'
 import { getSubwayStations } from '../../../../service/network/subway.ts'
 import { useSubwayTimetableStore } from '../../../../stores/subway.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function SubwayTimetablePage() {
     // Get the store
@@ -16,7 +17,7 @@ export default function SubwayTimetablePage() {
         }
     }
     useEffect(() => {
-        fetchSubwayStations().catch(console.error)
+        fetchSubwayStations().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

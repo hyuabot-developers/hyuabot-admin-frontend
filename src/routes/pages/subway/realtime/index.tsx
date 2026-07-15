@@ -12,6 +12,7 @@ import {
     getSubwayStations
 } from '../../../../service/network/subway.ts'
 import { useSubwayRealtimeStore } from '../../../../stores/subway.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 export default function SubwayRealtimePage() {
     // Get the store
@@ -88,7 +89,7 @@ export default function SubwayRealtimePage() {
         return ''
     }
     useEffect(() => {
-        fetchSubwayRealtime().catch(console.error)
+        fetchSubwayRealtime().catch(reportError)
     }, [])
     // Configure DataGrid
     const columns: GridColDef[] = [

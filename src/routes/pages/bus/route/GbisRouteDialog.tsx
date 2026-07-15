@@ -25,6 +25,7 @@ import {
     getGbisRouteStations,
     searchGbisRoutes,
 } from '../../../../service/network/gbis.ts'
+import { reportError } from '../../../../utility/reportError.ts'
 
 interface GbisRouteDialogProps {
     open: boolean
@@ -53,7 +54,7 @@ export const GbisRouteDialog = ({ open, onClose, onSuccess, existingStopIDs }: G
             const results = await searchGbisRoutes(keyword.trim())
             setSearchResults(results)
         } catch (e) {
-            console.error(e)
+            reportError(e)
             setError('노선 검색 중 오류가 발생했습니다.')
         } finally {
             setSearching(false)
@@ -73,7 +74,7 @@ export const GbisRouteDialog = ({ open, onClose, onSuccess, existingStopIDs }: G
             setSelectedDetail(detail)
             setSelectedStations(stations)
         } catch (e) {
-            console.error(e)
+            reportError(e)
             setError('노선 상세 정보를 불러오는 중 오류가 발생했습니다.')
         } finally {
             setLoadingDetail(false)
@@ -122,7 +123,7 @@ export const GbisRouteDialog = ({ open, onClose, onSuccess, existingStopIDs }: G
             onSuccess()
             onClose()
         } catch (e) {
-            console.error(e)
+            reportError(e)
             setError('데이터 저장 중 오류가 발생했습니다.')
         } finally {
             setSubmitting(false)

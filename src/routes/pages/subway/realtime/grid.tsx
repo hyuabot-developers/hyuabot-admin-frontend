@@ -30,7 +30,7 @@ export const SubwayRealtimeGrid = (props: GridProps) => {
             return
         }
         const editedRow = rowStore.rows.find((row) => row.id === params.id)
-        return editedRow!
+        return editedRow
     }
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)

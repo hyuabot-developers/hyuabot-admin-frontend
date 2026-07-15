@@ -124,7 +124,7 @@ export const useShuttlePeriodStore = create(
         (set) => ({
             rows: [],
             setRows: (rows: Array<ShuttlePeriod>) => {
-                rows.sort((a, b) => (a.start! < b.start! ? -1 : a.start! > b.start! ? 1 : 0))
+                rows.sort((a, b) => (a.start?.valueOf() ?? Infinity) - (b.start?.valueOf() ?? Infinity))
                 set({ rows })
             },
         }),
@@ -148,7 +148,7 @@ export const useShuttleHolidayStore = create(
         (set) => ({
             rows: [],
             setRows: (rows: Array<ShuttleHoliday>) => {
-                rows.sort((a, b) => (a.date! < b.date! ? -1 : a.date! > b.date! ? 1 : 0))
+                rows.sort((a, b) => (a.date?.valueOf() ?? Infinity) - (b.date?.valueOf() ?? Infinity))
                 set({ rows })
             },
         }),
