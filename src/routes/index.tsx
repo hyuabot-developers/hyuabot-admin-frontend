@@ -6,6 +6,7 @@ import { SectionTabsLayout } from './components/SectionTabsLayout.tsx'
 import type { PageLoader } from './navigation.tsx'
 import { managementSections, standaloneRoutes } from './navigation.tsx'
 import AccessDenied from './pages/accessDenied.tsx'
+import AccountSetup from './pages/accountSetup.tsx'
 import Home from './pages/home.tsx'
 import Login from './pages/login.tsx'
 import { PermissionLanding, PermissionRoute } from './permissionRoute.tsx'
@@ -45,7 +46,9 @@ const appRouter = createBrowserRouter([
             })),
             ...standaloneRoutes.map(({ path, permission, load }) => ({
                 path: path.slice(1),
-                element: <PermissionRoute permission={permission}>{lazyElement(load)}</PermissionRoute>,
+                element: permission
+                    ? <PermissionRoute permission={permission}>{lazyElement(load)}</PermissionRoute>
+                    : lazyElement(load),
             })),
             { path: 'access-denied', element: <AccessDenied /> },
             { index: true, element: <PermissionLanding /> },
@@ -53,6 +56,7 @@ const appRouter = createBrowserRouter([
         ]
     },
     { path: '/login', element: <Login /> },
+    { path: '/account-setup', element: <AccountSetup /> },
 ])
 
 export default function AppRouter() {

@@ -1,5 +1,6 @@
 import client from './client.ts'
-import { ADMIN_PERMISSIONS, AdminPermission } from '../../security/permissions.ts'
+import { ADMIN_PERMISSIONS } from '../../security/permissions.ts'
+import type { AdminPermission } from '../../security/permissions.ts'
 
 export type UserProfile = {
     username: string,
@@ -49,3 +50,15 @@ export const refreshToken = async () => {
 export const logout = async () => {
     return await client.delete('/api/v1/user/token')
 }
+
+export const validateInvitation = async (token: string) =>
+    client.post<{ valid: boolean, expiresAt: string | null }>('/api/v1/user/account-setup/validate', { token })
+
+export const completeInvitation = async (token: string, password: string) =>
+    client.post('/api/v1/user/account-setup/complete', { token, password })
+
+export const updateProfile = async (data: Pick<UserProfile, 'nickname' | 'email' | 'phone'>) =>
+    client.patch<UserProfile>('/api/v1/user/profile', data)
+
+export const changePassword = async (currentPassword: string, newPassword: string) =>
+    client.put('/api/v1/user/password', { currentPassword, newPassword })
