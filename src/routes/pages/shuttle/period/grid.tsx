@@ -1,11 +1,6 @@
-import CancelIcon from '@mui/icons-material/Close'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
 import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
-    GridActionsCellItem,
     GridColDef,
     GridEventListener,
     GridRowId,
@@ -18,6 +13,7 @@ import { useState } from 'react'
 import { GridToolbar } from './toolbar.tsx'
 import { createShuttlePeriod, deleteShuttlePeriod, updateShuttlePeriod } from '../../../../service/network/shuttle.ts'
 import { ShuttlePeriod, useShuttlePeriodGridModelStore, useShuttlePeriodStore } from '../../../../stores/shuttle.ts'
+import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
 
 
 interface GridProps {
@@ -118,31 +114,13 @@ export const ShuttlePeriodGrid = (props: GridProps) => {
     }
     const columns = [
         ...props.columns,
-        {
-            field: 'actions',
-            headerName: '동작',
-            type: 'actions',
-            width: 100,
-            cellClassName: 'actions',
-            getActions: ({ id }) => {
-                const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-                if (isEditing) {
-                    return [
-                        <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                        <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
-                    ]
-                }
-                return [
-                    <GridActionsCellItem
-                        label="edit"
-                        key="edit"
-                        icon={<EditIcon />}
-                        onClick={() => editRowButtonClicked(id)}
-                    />,
-                    <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-                ]
-            },
-        } as GridColDef,
+        createCrudGridActionsColumn({
+            rowModesModel: rowModesModelStore.rowModesModel,
+            onEdit: editRowButtonClicked,
+            onSave: saveRowButtonClicked,
+            onCancel: cancelRowButtonClicked,
+            onDelete: deleteRowButtonClicked,
+        }),
     ]
     // Render
     return (

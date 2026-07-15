@@ -1,11 +1,6 @@
-import CancelIcon from '@mui/icons-material/Close'
-import DeleteIcon from '@mui/icons-material/DeleteOutlined'
-import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
 import { Alert, Box, Snackbar } from '@mui/material'
 import {
     DataGrid,
-    GridActionsCellItem,
     GridColDef,
     GridEventListener,
     GridRowId,
@@ -17,6 +12,7 @@ import { useState } from 'react'
 import { GridToolbar } from './toolbar.tsx'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../../../service/network/calendar.ts'
 import { GridCalendarEventItem, useCalendarGridModelStore, useCalendarStore } from '../../../../stores/calendar.ts'
+import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
 
 interface GridProps {
     columns: GridColDef[]
@@ -121,32 +117,16 @@ export const CalendarGrid = (props: GridProps) => {
     const rowModesModelChanged = (newRowModesModel: GridRowModesModel) => {
         rowModesModelStore.setRowModesModel(newRowModesModel)
     }
-    // Add action column
-    props.columns.push({
-        field: 'actions',
-        headerName: '동작',
-        type: 'actions',
-        width: 100,
-        cellClassName: 'actions',
-        getActions: ({ id }) => {
-            const isEditing = rowModesModelStore.rowModesModel[id]?.mode === GridRowModes.Edit
-            if (isEditing) {
-                return [
-                    <GridActionsCellItem label="save" key="save" icon={<SaveIcon />} onClick={() => saveRowButtonClicked(id)} />,
-                    <GridActionsCellItem label="cancel" key="cancel" icon={<CancelIcon />} onClick={() => cancelRowButtonClicked(id)} />,
-                ]
-            }
-            return [
-                <GridActionsCellItem
-                    label="edit"
-                    key="edit"
-                    icon={<EditIcon />}
-                    onClick={() => editRowButtonClicked(id)}
-                />,
-                <GridActionsCellItem label="delete" key="delete" icon={<DeleteIcon />} onClick={() => deleteRowButtonClicked(id)} />,
-            ]
-        }
-    })
+    const columns = [
+        ...props.columns,
+        createCrudGridActionsColumn({
+            rowModesModel: rowModesModelStore.rowModesModel,
+            onEdit: editRowButtonClicked,
+            onSave: saveRowButtonClicked,
+            onCancel: cancelRowButtonClicked,
+            onDelete: deleteRowButtonClicked,
+        }),
+    ]
     // Render
     return (
         <Box sx={{ height: '100vh', width: '100%' }}>
@@ -170,7 +150,7 @@ export const CalendarGrid = (props: GridProps) => {
             </Snackbar>
             <div style={{ width: '100%' }}>
                 <DataGrid
-                    columns={props.columns}
+                    columns={columns}
                     rows={rowStore.rows}
                     rowModesModel={rowModesModelStore.rowModesModel}
                     editMode="row"
