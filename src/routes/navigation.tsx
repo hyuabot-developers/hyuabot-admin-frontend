@@ -11,47 +11,10 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import SettingsIcon from '@mui/icons-material/Settings'
 import type { ComponentType } from 'react'
 
-import AdminUsers from './pages/admin/users.tsx'
-import Bus from './pages/bus'
 import type { AdminPermission } from '../security/permissions.ts'
-import BusHolidayPage from './pages/bus/holiday'
-import BusDepartureLog from './pages/bus/log'
-import BusRealtime from './pages/bus/realtime'
-import BusRoute from './pages/bus/route'
-import BusRouteStop from './pages/bus/routeStop'
-import BusStop from './pages/bus/stop'
-import BusTimetable from './pages/bus/timetable'
-import Cafeteria from './pages/cafeteria'
-import CafeteriaPage from './pages/cafeteria/cafeteria'
-import CafeteriaMenuPage from './pages/cafeteria/menu'
-import Calendar from './pages/calendar'
-import CalendarCategoryPage from './pages/calendar/category'
-import CalendarEventPage from './pages/calendar/event'
-import Contact from './pages/contact'
-import ContactCategoryPage from './pages/contact/category'
-import ERICAContactPage from './pages/contact/erica'
-import SeoulContactPage from './pages/contact/seoul'
-import Notice from './pages/notice'
-import NoticeCategoryPage from './pages/notice/category'
-import NoticePage from './pages/notice/notice'
-import ReadingRoom from './pages/readingRoom'
 import { hasPermission } from '../security/permissions.ts'
-import ReadingRoomPage from './pages/readingRoom/room'
-import Settings from './pages/settings/index.tsx'
-import Shuttle from './pages/shuttle'
-import Holiday from './pages/shuttle/holiday'
-import Period from './pages/shuttle/period'
-import ShuttleRoute from './pages/shuttle/route'
-import ShuttleRouteStop from './pages/shuttle/routeStop'
-import ShuttleStop from './pages/shuttle/stop'
-import ShuttleTimetable from './pages/shuttle/timetable'
-import ShuttleTimetableView from './pages/shuttle/timetableView'
-import Subway from './pages/subway'
-import SubwayHolidayPage from './pages/subway/holiday'
-import SubwayRealtimePage from './pages/subway/realtime'
-import SubwayRoutePage from './pages/subway/route'
-import SubwayStationPage from './pages/subway/station'
-import SubwayTimetablePage from './pages/subway/timetable'
+
+export type PageLoader = () => Promise<{ default: ComponentType }>
 
 export type NavigationItem = {
     label: string,
@@ -61,18 +24,18 @@ export type NavigationItem = {
 }
 
 export type ChildRoute = {
+    label: string,
     path: string,
-    Component: ComponentType,
+    load: PageLoader,
 }
 
 export type ManagementSection = NavigationItem & {
     defaultPath: string,
-    Layout: ComponentType,
     children: ChildRoute[],
 }
 
 export type StandaloneRoute = NavigationItem & {
-    Component: ComponentType,
+    load: PageLoader,
 }
 
 export const managementSections: ManagementSection[] = [
@@ -82,15 +45,14 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/shuttle/period',
         permission: 'SHUTTLE',
         icon: DepartureBoardIcon,
-        Layout: Shuttle,
         children: [
-            { path: 'period', Component: Period },
-            { path: 'holiday', Component: Holiday },
-            { path: 'route', Component: ShuttleRoute },
-            { path: 'stop', Component: ShuttleStop },
-            { path: 'routeStop', Component: ShuttleRouteStop },
-            { path: 'timetable', Component: ShuttleTimetable },
-            { path: 'timetableView', Component: ShuttleTimetableView },
+            { label: '운행 기간 관리', path: 'period', load: () => import('./pages/shuttle/period') },
+            { label: '휴일 관리', path: 'holiday', load: () => import('./pages/shuttle/holiday') },
+            { label: '노선 관리', path: 'route', load: () => import('./pages/shuttle/route') },
+            { label: '정류장 관리', path: 'stop', load: () => import('./pages/shuttle/stop') },
+            { label: '노선별 정류장 관리', path: 'routeStop', load: () => import('./pages/shuttle/routeStop') },
+            { label: '시간표 관리', path: 'timetable', load: () => import('./pages/shuttle/timetable') },
+            { label: '시간표 (뷰)', path: 'timetableView', load: () => import('./pages/shuttle/timetableView') },
         ],
     },
     {
@@ -99,15 +61,14 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/bus/route',
         permission: 'BUS',
         icon: DirectionsBusIcon,
-        Layout: Bus,
         children: [
-            { path: 'route', Component: BusRoute },
-            { path: 'stop', Component: BusStop },
-            { path: 'routeStop', Component: BusRouteStop },
-            { path: 'timetable', Component: BusTimetable },
-            { path: 'realtime', Component: BusRealtime },
-            { path: 'log', Component: BusDepartureLog },
-            { path: 'holiday', Component: BusHolidayPage },
+            { label: '노선 관리', path: 'route', load: () => import('./pages/bus/route') },
+            { label: '정류장 관리', path: 'stop', load: () => import('./pages/bus/stop') },
+            { label: '노선별 정류장 관리', path: 'routeStop', load: () => import('./pages/bus/routeStop') },
+            { label: '시간표 관리', path: 'timetable', load: () => import('./pages/bus/timetable') },
+            { label: '실시간 도착 정보', path: 'realtime', load: () => import('./pages/bus/realtime') },
+            { label: '도착 기록', path: 'log', load: () => import('./pages/bus/log') },
+            { label: '공휴일 관리', path: 'holiday', load: () => import('./pages/bus/holiday') },
         ],
     },
     {
@@ -116,13 +77,12 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/subway/station',
         permission: 'SUBWAY',
         icon: DirectionsSubwayIcon,
-        Layout: Subway,
         children: [
-            { path: 'station', Component: SubwayStationPage },
-            { path: 'route', Component: SubwayRoutePage },
-            { path: 'timetable', Component: SubwayTimetablePage },
-            { path: 'realtime', Component: SubwayRealtimePage },
-            { path: 'holiday', Component: SubwayHolidayPage },
+            { label: '노선 관리', path: 'route', load: () => import('./pages/subway/route') },
+            { label: '전철역 관리', path: 'station', load: () => import('./pages/subway/station') },
+            { label: '시간표 관리', path: 'timetable', load: () => import('./pages/subway/timetable') },
+            { label: '실시간 도착 정보', path: 'realtime', load: () => import('./pages/subway/realtime') },
+            { label: '공휴일 관리', path: 'holiday', load: () => import('./pages/subway/holiday') },
         ],
     },
     {
@@ -131,10 +91,9 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/cafeteria/cafeteria',
         permission: 'CAFETERIA',
         icon: DiningIcon,
-        Layout: Cafeteria,
         children: [
-            { path: 'cafeteria', Component: CafeteriaPage },
-            { path: 'menu', Component: CafeteriaMenuPage },
+            { label: '식당 관리', path: 'cafeteria', load: () => import('./pages/cafeteria/cafeteria') },
+            { label: '메뉴 관리', path: 'menu', load: () => import('./pages/cafeteria/menu') },
         ],
     },
     {
@@ -143,9 +102,8 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/readingRoom/room',
         permission: 'READING_ROOM',
         icon: LibraryBooksIcon,
-        Layout: ReadingRoom,
         children: [
-            { path: 'room', Component: ReadingRoomPage },
+            { label: '열람실 관리', path: 'room', load: () => import('./pages/readingRoom/room') },
         ],
     },
     {
@@ -154,11 +112,10 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/contact/category',
         permission: 'CONTACT',
         icon: ContactsIcon,
-        Layout: Contact,
         children: [
-            { path: 'category', Component: ContactCategoryPage },
-            { path: 'seoul', Component: SeoulContactPage },
-            { path: 'erica', Component: ERICAContactPage },
+            { label: '분류 관리', path: 'category', load: () => import('./pages/contact/category') },
+            { label: '서울캠퍼스', path: 'seoul', load: () => import('./pages/contact/seoul') },
+            { label: 'ERICA 캠퍼스', path: 'erica', load: () => import('./pages/contact/erica') },
         ],
     },
     {
@@ -167,10 +124,9 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/calendar/category',
         permission: 'CALENDAR',
         icon: CalendarMonthIcon,
-        Layout: Calendar,
         children: [
-            { path: 'category', Component: CalendarCategoryPage },
-            { path: 'event', Component: CalendarEventPage },
+            { label: '분류 관리', path: 'category', load: () => import('./pages/calendar/category') },
+            { label: '학사 일정 관리', path: 'event', load: () => import('./pages/calendar/event') },
         ],
     },
     {
@@ -179,10 +135,9 @@ export const managementSections: ManagementSection[] = [
         defaultPath: '/notice/category',
         permission: 'NOTICE',
         icon: CampaignIcon,
-        Layout: Notice,
         children: [
-            { path: 'category', Component: NoticeCategoryPage },
-            { path: 'notice', Component: NoticePage },
+            { label: '분류 관리', path: 'category', load: () => import('./pages/notice/category') },
+            { label: '공지사항 관리', path: 'notice', load: () => import('./pages/notice/notice') },
         ],
     },
 ]
@@ -193,14 +148,14 @@ export const standaloneRoutes: StandaloneRoute[] = [
         path: '/settings',
         permission: 'BUS',
         icon: SettingsIcon,
-        Component: Settings,
+        load: () => import('./pages/settings'),
     },
     {
         label: '사용자 및 권한',
         path: '/admin/users',
         permission: 'SUPER_ADMIN',
         icon: AdminPanelSettingsIcon,
-        Component: AdminUsers,
+        load: () => import('./pages/admin/users.tsx'),
     },
 ]
 
