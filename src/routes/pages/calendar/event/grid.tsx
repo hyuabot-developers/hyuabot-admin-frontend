@@ -1,4 +1,4 @@
-import { Alert, Box, Snackbar } from '@mui/material'
+import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -13,6 +13,7 @@ import { GridToolbar } from './toolbar.tsx'
 import { createCalendar, deleteCalendar, updateCalendar } from '../../../../service/network/calendar.ts'
 import { GridCalendarEventItem, useCalendarGridModelStore, useCalendarStore } from '../../../../stores/calendar.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
     columns: GridColDef[]
@@ -130,24 +131,12 @@ export const CalendarGrid = (props: GridProps) => {
     // Render
     return (
         <Box sx={{ height: '100vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <div style={{ width: '100%' }}>
                 <DataGrid
                     columns={columns}

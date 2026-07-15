@@ -19,6 +19,7 @@ import { hasPermission } from '../../security/permissions.ts'
 import { getUserInfo, logout } from '../../service/network/auth.ts'
 import { useAuthenticatedStore, useUserInfoStore } from '../../stores/auth.ts'
 import { useDrawerOpenedStore } from '../../stores/home.ts'
+import { PageState } from '../components/PageState.tsx'
 import { navigationItems } from '../navigation.tsx'
 
 
@@ -116,7 +117,7 @@ export default function Home() {
         drawerOpenedStore.setDrawerOpened(false)
     }
     if (isAuthenticatedStore.status === 'checking') {
-        return
+        return <PageState loading label='관리자 정보 확인 중' />
     } else if (isAuthenticatedStore.status === 'authenticated') {
         return (
             <div>

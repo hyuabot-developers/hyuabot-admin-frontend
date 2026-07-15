@@ -1,4 +1,4 @@
-import { Alert, Box, Snackbar } from '@mui/material'
+import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -22,6 +22,7 @@ import {
     usePublicHolidayStore,
 } from '../../../../stores/publicHoliday.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 interface GridProps {
     columns: GridColDef[]
@@ -115,24 +116,12 @@ export const PublicHolidayGrid = (props: GridProps) => {
 
     return (
         <Box sx={{ height: '90vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <DataGrid
                 showToolbar={true}
                 columns={columns}

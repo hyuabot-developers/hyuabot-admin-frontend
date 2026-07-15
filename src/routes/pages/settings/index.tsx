@@ -1,18 +1,19 @@
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import {
-    Alert,
-    Box,
     Button,
     Divider,
     IconButton,
     InputAdornment,
     Paper,
-    Snackbar,
     TextField,
     Typography,
 } from '@mui/material'
 import { useState } from 'react'
+
+import { AppSnackbar } from '../../components/AppSnackbar.tsx'
+import { PageLayout } from '../../components/PageLayout.tsx'
 
 const GBIS_API_KEY_STORAGE_KEY = 'hyuabot.gbisApiKey'
 
@@ -31,8 +32,11 @@ export default function Settings() {
     }
 
     return (
-        <Box sx={{ p: 3, maxWidth: 600 }}>
-            <Typography variant='h5' gutterBottom>설정</Typography>
+        <PageLayout
+            title='설정'
+            description='관리 도구에서 사용하는 연결 정보를 관리합니다.'
+            icon={<SettingsOutlinedIcon />}
+            maxWidth={680}>
             <Paper sx={{ p: 3, mt: 2 }}>
                 <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
                     GBIS API 키
@@ -64,16 +68,7 @@ export default function Settings() {
                     저장
                 </Button>
             </Paper>
-            <Snackbar
-                open={saved}
-                autoHideDuration={3000}
-                onClose={() => setSaved(false)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-                <Alert severity='success' onClose={() => setSaved(false)}>
-                    저장되었습니다.
-                </Alert>
-            </Snackbar>
-        </Box>
+            <AppSnackbar message={saved ? '저장되었습니다.' : ''} onClose={() => setSaved(false)} />
+        </PageLayout>
     )
 }

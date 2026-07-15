@@ -1,4 +1,4 @@
-import { Alert, Box, Snackbar } from '@mui/material'
+import { Box } from '@mui/material'
 import {
     DataGrid,
     GridColDef,
@@ -13,6 +13,7 @@ import { GridToolbar } from './toolbar.tsx'
 import { createSubwayRoute, deleteSubwayRoute, updateSubwayRoute } from '../../../../service/network/subway.ts'
 import { GridSubwayRoute, useSubwayRouteGridModelStore, useSubwayRouteStore } from '../../../../stores/subway.ts'
 import { createCrudGridActionsColumn } from '../../../components/CrudGridActions.tsx'
+import { GridFeedback } from '../../../components/GridFeedback.tsx'
 
 
 interface GridProps {
@@ -104,24 +105,12 @@ export const SubwayRouteGrid = (props: GridProps) => {
     // Render
     return (
         <Box sx={{ height: '90vh', width: '100%' }}>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={errorSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setErrorSnackbarContent('')}>
-                <Alert onClose={() => setErrorSnackbarContent('')} severity="error" sx={{ width: '100%' }}>
-                    {errorSnackbarContent}
-                </Alert>
-            </Snackbar>
-            <Snackbar
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                open={successSnackbarContent !== ''}
-                autoHideDuration={3000}
-                onClose={() => setSuccessSnackbarContent('')}>
-                <Alert onClose={() => setSuccessSnackbarContent('')} severity="success" sx={{ width: '100%' }}>
-                    {successSnackbarContent}
-                </Alert>
-            </Snackbar>
+            <GridFeedback
+                error={errorSnackbarContent}
+                success={successSnackbarContent}
+                onErrorClose={() => setErrorSnackbarContent('')}
+                onSuccessClose={() => setSuccessSnackbarContent('')}
+            />
             <DataGrid
                 columns={columns}
                 rows={rowStore.rows}
