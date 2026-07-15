@@ -1,7 +1,8 @@
 import { PropsWithChildren } from 'react'
 import { Navigate } from 'react-router-dom'
 
-import { AdminPermission, firstAllowedPath, hasPermission } from '../security/permissions.ts'
+import { firstAllowedPath } from './navigation.tsx'
+import { AdminPermission, hasPermission } from '../security/permissions.ts'
 import { useUserInfoStore } from '../stores/auth.ts'
 
 export function PermissionRoute({
