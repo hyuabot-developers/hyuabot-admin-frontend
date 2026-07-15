@@ -13,14 +13,16 @@ const client = axios.create({
     withCredentials: true,
 })
 
-client.interceptors.request.use(
-    (config) => {
-        return config
-    },
-    (error) => {
-        throw error
+let refreshRequest: ReturnType<typeof refreshToken> | null = null
+
+const refreshAccessToken = () => {
+    if (refreshRequest === null) {
+        refreshRequest = refreshToken().finally(() => {
+            refreshRequest = null
+        })
     }
-)
+    return refreshRequest
+}
 
 client.interceptors.response.use(
     (response) => {
@@ -30,16 +32,16 @@ client.interceptors.response.use(
         const originalRequest = error.config
         if (
             error.response?.status === 401 &&
+            originalRequest &&
             !originalRequest._retry &&
             !originalRequest.url?.endsWith('/api/v1/user/token')
         ) {
             originalRequest._retry = true
-            // Refresh token
             try {
-                await refreshToken()
+                await refreshAccessToken()
                 return client(originalRequest)
             } catch (refreshError) {
-                window.location.href = '/login'
+                window.location.assign('/login')
                 throw refreshError
             }
         }

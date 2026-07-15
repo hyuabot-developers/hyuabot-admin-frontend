@@ -27,44 +27,53 @@ export default function Home() {
     const isAuthenticatedStore = useAuthenticatedStore()
     const userInfoStore = useUserInfoStore()
     const drawerOpenedStore = useDrawerOpenedStore()
-    // Fetch user info
-    const fetchUserInfo = async () => {
-        const response = await getUserInfo()
-        if (response.status === 200) {
-            const responseData = response.data
-            userInfoStore.setUserInfo(
-                responseData.username,
-                responseData.nickname,
-                responseData.email,
-                responseData.phone,
-                responseData.permissions,
-            )
-        }
-        isAuthenticatedStore.setIsAuthenticated(response.status === 200)
-    }
     // Logout
     const logOutButtonClicked = async () => {
         const response = await logout()
         if (response.status === 200) {
-            window.location.href = '/login'
+            window.location.assign('/login')
         }
     }
     // Menu button clicked
     const menuButtonClicked = () => {
         drawerOpenedStore.setDrawerOpened(true)
     }
-    // Fetch user info when the component is mounted
     useEffect(() => {
-        fetchUserInfo().catch(console.error)
+        let active = true
+
+        const initializeSession = async () => {
+            try {
+                const response = await getUserInfo()
+                if (!active) {
+                    return
+                }
+                if (response.status !== 200) {
+                    isAuthenticatedStore.setStatus('unauthenticated')
+                    window.location.assign('/login')
+                    return
+                }
+                const responseData = response.data
+                userInfoStore.setUserInfo(
+                    responseData.username,
+                    responseData.nickname,
+                    responseData.email,
+                    responseData.phone,
+                    responseData.permissions,
+                )
+                isAuthenticatedStore.setStatus('authenticated')
+            } catch {
+                if (active) {
+                    isAuthenticatedStore.setStatus('unauthenticated')
+                    window.location.assign('/login')
+                }
+            }
+        }
+
+        void initializeSession()
+        return () => {
+            active = false
+        }
     }, [])
-    useEffect(() => {
-        if (isAuthenticatedStore.isAuthenticated === null) {
-            fetchUserInfo().catch(console.error)
-        }
-        else if (!isAuthenticatedStore.isAuthenticated) {
-            window.location.href = '/login'
-        }
-    }, [isAuthenticatedStore.isAuthenticated])
     // Component
     // App bar
     const appBar = (
@@ -106,9 +115,9 @@ export default function Home() {
         navigate(path)
         drawerOpenedStore.setDrawerOpened(false)
     }
-    if (isAuthenticatedStore.isAuthenticated === null) {
+    if (isAuthenticatedStore.status === 'checking') {
         return
-    } else if (isAuthenticatedStore.isAuthenticated) {
+    } else if (isAuthenticatedStore.status === 'authenticated') {
         return (
             <div>
                 {appBar}

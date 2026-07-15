@@ -3,8 +3,8 @@ import { create } from 'zustand'
 import { AdminPermission } from '../security/permissions.ts'
 
 type AuthenticatedStore = {
-    isAuthenticated: boolean | null,
-    setIsAuthenticated: (isAuthenticated: boolean) => void,
+    status: 'checking' | 'authenticated' | 'unauthenticated',
+    setStatus: (status: AuthenticatedStore['status']) => void,
 }
 
 type UserInfoStore = {
@@ -23,8 +23,8 @@ type UserInfoStore = {
 }
 
 export const useAuthenticatedStore = create<AuthenticatedStore>((set) => ({
-    isAuthenticated: null,
-    setIsAuthenticated: (isAuthenticated: boolean) => set({ isAuthenticated }),
+    status: 'checking',
+    setStatus: (status) => set({ status }),
 }))
 
 export const useUserInfoStore = create<UserInfoStore>((set) => ({
