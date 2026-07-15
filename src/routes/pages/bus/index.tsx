@@ -1,34 +1,18 @@
-import { Box, Tab, Tabs } from '@mui/material'
-import { SyntheticEvent, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
-
-import { useBusTabStore } from '../../../stores/bus.ts'
+import { SectionTabsLayout } from '../../components/SectionTabsLayout.tsx'
 
 export default function Bus() {
-    // Get the store
-    const busTabStore = useBusTabStore()
-    const navigate = useNavigate()
-    const tabClicked = (_: SyntheticEvent, newValue: string) => {
-        busTabStore.setRoute(newValue)
-    }
-    useEffect(() => {
-        navigate(`/bus/${busTabStore.route}`)
-    }, [busTabStore.route])
-
     return (
-        <div style={{ backgroundColor: 'white', height: '100%', paddingTop: '1rem' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={busTabStore.route} onChange={tabClicked} variant="scrollable">
-                    <Tab label="노선 관리" value="route" />
-                    <Tab label="정류장 관리" value="stop" />
-                    <Tab label="노선별 정류장 관리" value="routeStop" />
-                    <Tab label="시간표 관리" value="timetable" />
-                    <Tab label="실시간 도착 정보" value="realtime" />
-                    <Tab label="도착 기록" value="log" />
-                    <Tab label="공휴일 관리" value="holiday" />
-                </Tabs>
-            </Box>
-            <Outlet />
-        </div>
+        <SectionTabsLayout
+            basePath='/bus'
+            tabs={[
+                { label: '노선 관리', path: 'route' },
+                { label: '정류장 관리', path: 'stop' },
+                { label: '노선별 정류장 관리', path: 'routeStop' },
+                { label: '시간표 관리', path: 'timetable' },
+                { label: '실시간 도착 정보', path: 'realtime' },
+                { label: '도착 기록', path: 'log' },
+                { label: '공휴일 관리', path: 'holiday' },
+            ]}
+        />
     )
 }

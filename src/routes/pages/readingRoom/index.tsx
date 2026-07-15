@@ -1,28 +1,10 @@
-import { Box, Tab, Tabs } from '@mui/material'
-import { SyntheticEvent, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
-
-import { useReadingRoomTabStore } from '../../../stores/readingRoom.ts'
+import { SectionTabsLayout } from '../../components/SectionTabsLayout.tsx'
 
 export default function ReadingRoom() {
-    // Get the store
-    const readingRoomTabStore = useReadingRoomTabStore()
-    const navigate = useNavigate()
-    const tabClicked = (_: SyntheticEvent, newValue: string) => {
-        readingRoomTabStore.setRoute(newValue)
-    }
-    useEffect(() => {
-        navigate(`/readingRoom/${readingRoomTabStore.route}`)
-    }, [readingRoomTabStore.route])
-
     return (
-        <div style={{ backgroundColor: 'white', height: '100%', paddingTop: '1rem' }}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs value={readingRoomTabStore.route} onChange={tabClicked} variant="scrollable">
-                    <Tab label="열람실 관리" value="room" />
-                </Tabs>
-            </Box>
-            <Outlet />
-        </div>
+        <SectionTabsLayout
+            basePath='/readingRoom'
+            tabs={[{ label: '열람실 관리', path: 'room' }]}
+        />
     )
 }

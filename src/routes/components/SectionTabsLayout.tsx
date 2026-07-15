@@ -1,0 +1,37 @@
+import { Box, Tab, Tabs } from '@mui/material'
+import type { SyntheticEvent } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+
+type SectionTab = {
+    label: string,
+    path: string,
+}
+
+type SectionTabsLayoutProps = {
+    basePath: string,
+    tabs: SectionTab[],
+}
+
+export function SectionTabsLayout({ basePath, tabs }: SectionTabsLayoutProps) {
+    const location = useLocation()
+    const navigate = useNavigate()
+    const currentPath = location.pathname.slice(basePath.length + 1).split('/')[0]
+    const selectedTab = tabs.some(({ path }) => path === currentPath) ? currentPath : false
+
+    const handleTabChange = (_: SyntheticEvent, path: string) => {
+        void navigate(`${basePath}/${path}`)
+    }
+
+    return (
+        <div style={{ backgroundColor: 'white', height: '100%', paddingTop: '1rem' }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={selectedTab} onChange={handleTabChange} variant='scrollable'>
+                    {tabs.map(({ label, path }) => (
+                        <Tab key={path} label={label} value={path} />
+                    ))}
+                </Tabs>
+            </Box>
+            <Outlet />
+        </div>
+    )
+}
