@@ -22,11 +22,14 @@ import * as XLSX from 'xlsx'
 
 import {
     BulkSubwayTimetableCreateRequest,
-    bulkCreateSubwayTimetable,
-    bulkDeleteSubwayTimetable,
-    getSubwayTimetable,
-    SubwayTimetable,
 } from '../../../../service/network/subway.ts'
+import {
+    applySubwayTimetableImport,
+    previewSubwayTimetableImport,
+    TimetableImportPreview,
+    TimetableImportResult,
+} from '../../../../service/network/timetableImport.ts'
+import { TimetableImportPreviewPanel } from '../../../components/TimetableImportPreview.tsx'
 
 const TIMETABLE_SHEET_TYPES = [
     {
@@ -250,21 +253,12 @@ const formatMissingMappings = (label: string, names: string[]) => {
     return `${label}: ${preview}${suffix}`
 }
 
-const toCreateRequest = (timetable: SubwayTimetable): BulkSubwayTimetableCreateRequest => ({
-    stationID: timetable.stationID,
-    startStationID: timetable.startStationID,
-    terminalStationID: timetable.terminalStationID,
-    departureTime: timetable.departureTime,
-    weekday: timetable.weekday,
-    direction: timetable.direction,
-})
-
 export type ExcelMappingDialogProps = {
     open: boolean
     onClose: () => void
     file: File | null
     stations: StationOption[]
-    onSuccess: (result: { deletedCount: number; createdCount: number }) => void
+    onSuccess: (result: TimetableImportResult) => void
 }
 
 export const ExcelMappingDialog = ({
@@ -284,6 +278,7 @@ export const ExcelMappingDialog = ({
     const [loading, setLoading] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMessage, setSnackbarMessage] = useState('')
+    const [preview, setPreview] = useState<TimetableImportPreview | null>(null)
 
     useEffect(() => {
         if (!file || !open) return
@@ -298,6 +293,7 @@ export const ExcelMappingDialog = ({
             setStartMappings({})
             setTerminalMappings({})
             setPrefix('')
+            setPreview(null)
         }
         load()
     }, [file, open])
@@ -342,6 +338,21 @@ export const ExcelMappingDialog = ({
     }
 
     const handleSave = async () => {
+        if (preview?.previewID) {
+            setLoading(true)
+            try {
+                const response = await applySubwayTimetableImport(preview.previewID)
+                onSuccess(response.data)
+                onClose()
+            } catch (error) {
+                setSnackbarMessage('시간표 적용에 실패했습니다. 다시 미리보기를 생성해주세요: ' + (error instanceof Error ? error.message : String(error)))
+                setPreview(null)
+                setSnackbarOpen(true)
+            } finally {
+                setLoading(false)
+            }
+            return
+        }
         if (!workbook || !parsedNames || !sheetMappings) return
 
         const missingSheetMappings = TIMETABLE_SHEET_TYPES
@@ -398,35 +409,11 @@ export const ExcelMappingDialog = ({
         }
 
         setLoading(true)
-        let deletedEntries: BulkSubwayTimetableCreateRequest[] = []
-        let didDelete = false
         try {
-            const timetableResponse = await getSubwayTimetable()
-            deletedEntries = (timetableResponse.data.result as SubwayTimetable[])
-                .filter((t) => mappedStationIDs.includes(t.stationID))
-                .map(toCreateRequest)
-            const deletedCount = deletedEntries.length
-
-            await bulkDeleteSubwayTimetable({ stationIDs: mappedStationIDs })
-            didDelete = true
-
-            await bulkCreateSubwayTimetable(allEntries)
-            onSuccess({ deletedCount, createdCount: allEntries.length })
-            onClose()
-        } catch (e) {
-            if (didDelete && deletedEntries.length > 0) {
-                try {
-                    await bulkCreateSubwayTimetable(deletedEntries)
-                    setSnackbarMessage('업로드 실패로 기존 시간표를 복구했습니다: ' + (e instanceof Error ? e.message : String(e)))
-                } catch (restoreError) {
-                    setSnackbarMessage(
-                        '업로드 실패 후 기존 시간표 복구도 실패했습니다: '
-                        + (restoreError instanceof Error ? restoreError.message : String(restoreError))
-                    )
-                }
-            } else {
-                setSnackbarMessage('업로드 실패: ' + (e instanceof Error ? e.message : String(e)))
-            }
+            const response = await previewSubwayTimetableImport(mappedStationIDs, allEntries)
+            setPreview(response.data)
+        } catch (error) {
+            setSnackbarMessage('시간표 검증에 실패했습니다: ' + (error instanceof Error ? error.message : String(error)))
             setSnackbarOpen(true)
         } finally {
             setLoading(false)
@@ -437,83 +424,90 @@ export const ExcelMappingDialog = ({
         <Dialog open={open} onClose={loading ? undefined : onClose} maxWidth="md" fullWidth>
             <DialogTitle>시간표 매핑 및 업로드</DialogTitle>
             <DialogContent dividers>
-                {workbook && sheetMappings && (
-                    <Box sx={{ mb: 3 }}>
-                        <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>시트 매핑</Typography>
-                        <Box sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
-                            gap: 1,
-                        }}>
-                            {TIMETABLE_SHEET_TYPES.map((sheetType) => (
-                                <Autocomplete
-                                    key={sheetType.key}
-                                    size="small"
-                                    options={workbook.SheetNames}
-                                    value={sheetMappings[sheetType.key]}
-                                    onChange={(_, value) => changeSheetMapping(sheetType.key, value ?? '')}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label={sheetType.label}
-                                            error={!workbook.Sheets[sheetMappings[sheetType.key]]}
-                                        />
-                                    )}
-                                />
-                            ))}
+                {preview && <TimetableImportPreviewPanel preview={preview} />}
+                <Box sx={{ display: preview ? 'none' : 'block' }}>
+                    {workbook && sheetMappings && (
+                        <Box sx={{ mb: 3 }}>
+                            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 600 }}>시트 매핑</Typography>
+                            <Box sx={{
+                                display: 'grid',
+                                gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+                                gap: 1,
+                            }}>
+                                {TIMETABLE_SHEET_TYPES.map((sheetType) => (
+                                    <Autocomplete
+                                        key={sheetType.key}
+                                        size="small"
+                                        options={workbook.SheetNames}
+                                        value={sheetMappings[sheetType.key]}
+                                        onChange={(_, value) => changeSheetMapping(sheetType.key, value ?? '')}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label={sheetType.label}
+                                                error={!workbook.Sheets[sheetMappings[sheetType.key]]}
+                                            />
+                                        )}
+                                    />
+                                ))}
+                            </Box>
                         </Box>
+                    )}
+                    <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <TextField
+                            label="노선 접두사 (예: K4, K2)"
+                            value={prefix}
+                            onChange={(e) => setPrefix(e.target.value)}
+                            size="small"
+                            sx={{ width: 220 }}
+                        />
+                        <Button onClick={autoMap} variant="outlined" size="small">
+                            자동 매핑
+                        </Button>
                     </Box>
-                )}
-                <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <TextField
-                        label="노선 접두사 (예: K4, K2)"
-                        value={prefix}
-                        onChange={(e) => setPrefix(e.target.value)}
-                        size="small"
-                        sx={{ width: 220 }}
-                    />
-                    <Button onClick={autoMap} variant="outlined" size="small">
-                        자동 매핑
-                    </Button>
+                    {parsedNames && (
+                        <Box>
+                            <MappingSection
+                                title={`역 매핑 (${parsedNames.stationNames.length}개)`}
+                                names={parsedNames.stationNames}
+                                mappings={stationMappings}
+                                stations={stations}
+                                prefix={prefix}
+                                onChange={setStationMappings}
+                            />
+                            <MappingSection
+                                title={`시점역 매핑 (${parsedNames.startNames.length}개)`}
+                                names={parsedNames.startNames}
+                                mappings={startMappings}
+                                stations={stations}
+                                prefix={prefix}
+                                onChange={setStartMappings}
+                            />
+                            <MappingSection
+                                title={`종점역 매핑 (${parsedNames.terminalNames.length}개)`}
+                                names={parsedNames.terminalNames}
+                                mappings={terminalMappings}
+                                stations={stations}
+                                prefix={prefix}
+                                onChange={setTerminalMappings}
+                            />
+                        </Box>
+                    )}
                 </Box>
-                {parsedNames && (
-                    <Box>
-                        <MappingSection
-                            title={`역 매핑 (${parsedNames.stationNames.length}개)`}
-                            names={parsedNames.stationNames}
-                            mappings={stationMappings}
-                            stations={stations}
-                            prefix={prefix}
-                            onChange={setStationMappings}
-                        />
-                        <MappingSection
-                            title={`시점역 매핑 (${parsedNames.startNames.length}개)`}
-                            names={parsedNames.startNames}
-                            mappings={startMappings}
-                            stations={stations}
-                            prefix={prefix}
-                            onChange={setStartMappings}
-                        />
-                        <MappingSection
-                            title={`종점역 매핑 (${parsedNames.terminalNames.length}개)`}
-                            names={parsedNames.terminalNames}
-                            mappings={terminalMappings}
-                            stations={stations}
-                            prefix={prefix}
-                            onChange={setTerminalMappings}
-                        />
-                    </Box>
-                )}
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} disabled={loading}>취소</Button>
+                {preview && (
+                    <Button onClick={() => setPreview(null)} disabled={loading}>매핑 수정</Button>
+                )}
                 <Button
                     onClick={handleSave}
                     variant="contained"
-                    disabled={loading || !parsedNames}
+                    color={preview?.deleteCount ? 'error' : 'primary'}
+                    disabled={loading || (!parsedNames && !preview) || (preview !== null && !preview.previewID)}
                     startIcon={loading ? <CircularProgress size={16} /> : undefined}
                 >
-                    저장
+                    {preview ? '변경사항 적용' : '변경사항 검토'}
                 </Button>
             </DialogActions>
             <Snackbar open={snackbarOpen} autoHideDuration={4000} onClose={() => setSnackbarOpen(false)}>
