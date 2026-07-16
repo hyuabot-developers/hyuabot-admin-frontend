@@ -36,11 +36,14 @@ const statusPresentation = {
     UNKNOWN: { label: '확인 불가', color: 'default' as const, icon: <ScheduleRoundedIcon color="disabled" /> },
 }
 
+const dateTimeFormatter = new Intl.DateTimeFormat('ko-KR', {
+    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit',
+})
+
 const formatDateTime = (value: string | null) => {
     if (!value) return '기록 없음'
-    return new Intl.DateTimeFormat('ko-KR', {
-        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit',
-    }).format(new Date(value))
+    const timestamp = Date.parse(value.replace(/\[[^\]]+]$/, ''))
+    return Number.isFinite(timestamp) ? dateTimeFormatter.format(timestamp) : '시각 확인 불가'
 }
 
 function ServiceCard({ service }: { service: AdminServiceStatus }) {
