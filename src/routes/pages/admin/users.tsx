@@ -1,6 +1,7 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined'
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import PersonOffOutlinedIcon from '@mui/icons-material/PersonOffOutlined'
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
@@ -40,6 +41,7 @@ import { MANAGEMENT_PERMISSIONS } from '../../../security/permissions.ts'
 import type { AdminPermission } from '../../../security/permissions.ts'
 import {
     createAdminUser,
+    deleteAdminUser,
     getAdminUsers,
     reissueAdminUserInvitation,
     updateAdminUser,
@@ -49,6 +51,7 @@ import type {
     AdminUserInvitation,
     CreateAdminUser,
 } from '../../../service/network/adminUsers.ts'
+import { useUserInfoStore } from '../../../stores/auth.ts'
 import { AppSnackbar } from '../../components/AppSnackbar.tsx'
 import { PageLayout } from '../../components/PageLayout.tsx'
 import { PageState } from '../../components/PageState.tsx'
@@ -69,6 +72,7 @@ const sameDraft = (user: AdminUser, draft: UserDraft) =>
 
 const statusPresentation = (status: AdminUser['status']) => {
     switch (status) {
+    case 'DELETED': return { label: '삭제됨', color: 'error' as const }
     case 'PENDING_SETUP': return { label: '가입 대기', color: 'warning' as const }
     case 'INVITATION_EXPIRED': return { label: '초대 만료', color: 'default' as const }
     case 'ACTIVE': return { label: '활성', color: 'success' as const }
@@ -81,6 +85,7 @@ const invitationLink = (token: string) =>
 
 export default function AdminUsers() {
     const theme = useTheme()
+    const currentUsername = useUserInfoStore((state) => state.username)
     const fullScreenDialog = useMediaQuery(theme.breakpoints.down('sm'))
     const [users, setUsers] = useState<AdminUser[]>([])
     const [drafts, setDrafts] = useState<Record<string, UserDraft>>({})
@@ -94,6 +99,8 @@ export default function AdminUsers() {
     const [creating, setCreating] = useState(false)
     const [newUser, setNewUser] = useState<CreateAdminUser>(emptyUser)
     const [invitation, setInvitation] = useState<AdminUserInvitation | null>(null)
+    const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null)
+    const [deleting, setDeleting] = useState(false)
 
     const syncUsers = (result: AdminUser[]) => {
         setUsers(result)
@@ -232,6 +239,29 @@ export default function AdminUsers() {
         }
     }
 
+    const handleDelete = async () => {
+        if (!deleteTarget) return
+        setDeleting(true)
+        try {
+            await deleteAdminUser(deleteTarget.username)
+            await loadUsers()
+            setDeleteTarget(null)
+            setError(null)
+            setNotice('사용자를 삭제했습니다. 기존 작성 기록은 유지됩니다.')
+        } catch (requestError: unknown) {
+            const messageCode = axios.isAxiosError<{ message?: string }>(requestError)
+                ? requestError.response?.data?.message
+                : undefined
+            setError(messageCode === 'LAST_SUPER_ADMIN_REQUIRED'
+                ? '활성화된 최고 관리자는 최소 한 명 이상 필요합니다.'
+                : messageCode === 'SELF_DELETION_NOT_ALLOWED'
+                    ? '현재 로그인한 계정은 삭제할 수 없습니다.'
+                    : '사용자를 삭제하지 못했습니다.')
+        } finally {
+            setDeleting(false)
+        }
+    }
+
     const canCreate = Boolean(newUser.userID.trim() && newUser.nickname.trim() && newUser.email.trim())
 
     return (
@@ -263,67 +293,21 @@ export default function AdminUsers() {
                 <PageState label='검색 결과가 없습니다.' icon={<PersonOffOutlinedIcon sx={{ fontSize: 48 }} />} />
             ) : (
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, 1fr)' }, gap: 2.5 }}>
-                    {filteredUsers.map((user) => {
-                        const draft = drafts[user.username]
-                        const pendingSetup = user.status === 'PENDING_SETUP' || user.status === 'INVITATION_EXPIRED'
-                        const status = statusPresentation(user.status)
-                        return (
-                            <Card key={user.username} variant='outlined' sx={{ borderRadius: 3 }}>
-                                <CardHeader
-                                    avatar={<Avatar sx={{ bgcolor: 'primary.main' }}>{user.nickname.slice(0, 1)}</Avatar>}
-                                    title={user.nickname}
-                                    subheader={`${user.username} · ${user.email}`}
-                                    action={<Chip label={status.label} color={status.color} size='small' sx={{ mt: 1 }} />}
-                                />
-                                <CardContent sx={{ pt: 0 }}>
-                                    {pendingSetup ? (
-                                        <Stack spacing={1.5} sx={{ mb: 2 }}>
-                                            <Typography variant='body2' color='text.secondary'>
-                                                비밀번호 설정 전에는 로그인하거나 계정을 활성화할 수 없습니다.
-                                            </Typography>
-                                            <Button
-                                                variant='outlined'
-                                                startIcon={reissuingUser === user.username
-                                                    ? <CircularProgress size={18} color='inherit' />
-                                                    : <RefreshOutlinedIcon />}
-                                                disabled={reissuingUser === user.username}
-                                                onClick={() => handleReissue(user)}>
-                                                초대 링크 재발급
-                                            </Button>
-                                        </Stack>
-                                    ) : (
-                                        <FormControlLabel
-                                            sx={{ minHeight: 48, mx: 0, width: '100%' }}
-                                            control={(
-                                                <Switch
-                                                    checked={draft.active}
-                                                    onChange={(event) => updateDraft(user.username, { active: event.target.checked })}
-                                                    slotProps={{ input: { 'aria-label': `${user.nickname} 계정 활성화` } }}
-                                                />
-                                            )}
-                                            label='로그인 및 관리 기능 사용 허용'
-                                        />
-                                    )}
-                                    <Divider sx={{ my: 2 }} />
-                                    <PermissionFields
-                                        permissions={draft.permissions}
-                                        onToggle={(permission) => togglePermission(user.username, permission)}
-                                    />
-                                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                                        <Button
-                                            variant='contained'
-                                            startIcon={savingUser === user.username
-                                                ? <CircularProgress size={18} color='inherit' />
-                                                : <SaveOutlinedIcon />}
-                                            disabled={savingUser === user.username || sameDraft(user, draft)}
-                                            onClick={() => saveUser(user)}>
-                                            저장
-                                        </Button>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-                        )
-                    })}
+                    {filteredUsers.map((user) => (
+                        <AdminUserCard
+                            key={user.username}
+                            user={user}
+                            draft={drafts[user.username]}
+                            currentUser={user.username === currentUsername}
+                            saving={savingUser === user.username}
+                            reissuing={reissuingUser === user.username}
+                            onActiveChange={(active) => updateDraft(user.username, { active })}
+                            onPermissionToggle={(permission) => togglePermission(user.username, permission)}
+                            onReissue={() => void handleReissue(user)}
+                            onSave={() => void saveUser(user)}
+                            onDelete={() => setDeleteTarget(user)}
+                        />
+                    ))}
                 </Box>
             )}
 
@@ -368,8 +352,176 @@ export default function AdminUsers() {
                 </DialogActions>
             </Dialog>
 
+            <Dialog
+                fullScreen={fullScreenDialog}
+                open={deleteTarget !== null}
+                onClose={() => !deleting && setDeleteTarget(null)}
+                fullWidth
+                maxWidth='xs'>
+                <DialogTitle>사용자 삭제</DialogTitle>
+                <DialogContent dividers>
+                    <Stack spacing={2}>
+                        <Alert severity='error'>이 계정은 다시 활성화할 수 없으며 같은 아이디를 재사용할 수 없습니다.</Alert>
+                        <Box>
+                            <Typography fontWeight={750}>{deleteTarget?.nickname}</Typography>
+                            <Typography color='text.secondary'>{deleteTarget?.username}</Typography>
+                        </Box>
+                        <Typography variant='body2' color='text.secondary'>
+                            로그인 정보, 권한과 개인정보는 제거됩니다. 이 사용자가 작성한 공지 등 기존 데이터의 작성자 기록은 유지됩니다.
+                        </Typography>
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button autoFocus onClick={() => setDeleteTarget(null)} disabled={deleting}>취소</Button>
+                    <Button
+                        color='error'
+                        variant='contained'
+                        startIcon={deleting ? <CircularProgress size={18} color='inherit' /> : <DeleteOutlineOutlinedIcon />}
+                        onClick={() => void handleDelete()}
+                        disabled={deleting}>
+                        {deleting ? '삭제 중' : '사용자 삭제'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <AppSnackbar message={notice} onClose={() => setNotice('')} />
         </PageLayout>
+    )
+}
+
+function AdminUserCard({
+    user,
+    draft,
+    currentUser,
+    saving,
+    reissuing,
+    onActiveChange,
+    onPermissionToggle,
+    onReissue,
+    onSave,
+    onDelete,
+}: {
+    user: AdminUser,
+    draft: UserDraft,
+    currentUser: boolean,
+    saving: boolean,
+    reissuing: boolean,
+    onActiveChange: (active: boolean) => void,
+    onPermissionToggle: (permission: AdminPermission) => void,
+    onReissue: () => void,
+    onSave: () => void,
+    onDelete: () => void,
+}) {
+    const pendingSetup = user.status === 'PENDING_SETUP' || user.status === 'INVITATION_EXPIRED'
+    const deleted = user.status === 'DELETED'
+    const status = statusPresentation(user.status)
+    let accountControl
+
+    if (deleted) {
+        accountControl = (
+            <Alert severity='info'>
+                로그인 정보와 개인정보는 제거되었으며, 기존 작성 데이터의 작성자 기록만 유지됩니다.
+            </Alert>
+        )
+    } else if (pendingSetup) {
+        accountControl = (
+            <Stack spacing={1.5} sx={{ mb: 2 }}>
+                <Typography variant='body2' color='text.secondary'>
+                    비밀번호 설정 전에는 로그인하거나 계정을 활성화할 수 없습니다.
+                </Typography>
+                <Button
+                    variant='outlined'
+                    startIcon={reissuing ? <CircularProgress size={18} color='inherit' /> : <RefreshOutlinedIcon />}
+                    disabled={reissuing}
+                    onClick={onReissue}>
+                    초대 링크 재발급
+                </Button>
+            </Stack>
+        )
+    } else {
+        accountControl = (
+            <FormControlLabel
+                sx={{ minHeight: 48, mx: 0, width: '100%' }}
+                control={(
+                    <Switch
+                        checked={draft.active}
+                        onChange={(event) => onActiveChange(event.target.checked)}
+                        slotProps={{ input: { 'aria-label': `${user.nickname} 계정 활성화` } }}
+                    />
+                )}
+                label='로그인 및 관리 기능 사용 허용'
+            />
+        )
+    }
+
+    return (
+        <Card variant='outlined' sx={{ borderRadius: 3, bgcolor: deleted ? 'action.hover' : 'background.paper' }}>
+            <CardHeader
+                avatar={<Avatar sx={{ bgcolor: deleted ? 'action.disabledBackground' : 'primary.main' }}>{user.nickname.slice(0, 1)}</Avatar>}
+                title={user.nickname}
+                subheader={deleted ? `${user.username} · 작성 기록 보존` : `${user.username} · ${user.email}`}
+                action={<Chip label={status.label} color={status.color} size='small' sx={{ mt: 1 }} />}
+            />
+            <CardContent sx={{ pt: 0 }}>
+                {accountControl}
+                <EditableUserControls
+                    deleted={deleted}
+                    user={user}
+                    draft={draft}
+                    currentUser={currentUser}
+                    saving={saving}
+                    onPermissionToggle={onPermissionToggle}
+                    onSave={onSave}
+                    onDelete={onDelete}
+                />
+            </CardContent>
+        </Card>
+    )
+}
+
+function EditableUserControls({
+    deleted,
+    user,
+    draft,
+    currentUser,
+    saving,
+    onPermissionToggle,
+    onSave,
+    onDelete,
+}: {
+    deleted: boolean,
+    user: AdminUser,
+    draft: UserDraft,
+    currentUser: boolean,
+    saving: boolean,
+    onPermissionToggle: (permission: AdminPermission) => void,
+    onSave: () => void,
+    onDelete: () => void,
+}) {
+    if (deleted) return null
+
+    return (
+        <Box>
+            <Divider sx={{ my: 2 }} />
+            <PermissionFields permissions={draft.permissions} onToggle={onPermissionToggle} />
+            <Stack direction={{ xs: 'column-reverse', sm: 'row' }} justifyContent='space-between' gap={1.5} sx={{ mt: 2 }}>
+                <Button
+                    color='error'
+                    variant='outlined'
+                    startIcon={<DeleteOutlineOutlinedIcon />}
+                    disabled={currentUser}
+                    onClick={onDelete}>
+                    {currentUser ? '내 계정은 삭제할 수 없음' : '사용자 삭제'}
+                </Button>
+                <Button
+                    variant='contained'
+                    startIcon={saving ? <CircularProgress size={18} color='inherit' /> : <SaveOutlinedIcon />}
+                    disabled={saving || sameDraft(user, draft)}
+                    onClick={onSave}>
+                    저장
+                </Button>
+            </Stack>
+        </Box>
     )
 }
 

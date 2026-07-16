@@ -7,7 +7,7 @@ export type AdminUser = {
     email: string,
     phone: string,
     active: boolean,
-    status: 'PENDING_SETUP' | 'INVITATION_EXPIRED' | 'ACTIVE' | 'INACTIVE',
+    status: 'DELETED' | 'PENDING_SETUP' | 'INVITATION_EXPIRED' | 'ACTIVE' | 'INACTIVE',
     invitationExpiresAt: string | null,
     permissions: AdminPermission[],
 }
@@ -38,3 +38,6 @@ export const createAdminUser = async (data: CreateAdminUser) =>
 
 export const reissueAdminUserInvitation = async (username: string) =>
     client.post<AdminUserInvitation>(`/api/v1/admin/users/${encodeURIComponent(username)}/invitation`)
+
+export const deleteAdminUser = async (username: string) =>
+    client.delete(`/api/v1/admin/users/${encodeURIComponent(username)}`)

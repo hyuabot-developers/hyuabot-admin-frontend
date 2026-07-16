@@ -25,6 +25,7 @@ import axios from 'axios'
 import { useState } from 'react'
 import type { MouseEvent, ReactNode } from 'react'
 
+import { isValidPassword, PASSWORD_REQUIREMENTS } from '../../../security/password.ts'
 import { changePassword, updateProfile } from '../../../service/network/auth.ts'
 import { useUserInfoStore } from '../../../stores/auth.ts'
 import { AppSnackbar } from '../../components/AppSnackbar.tsx'
@@ -70,7 +71,7 @@ export default function Settings() {
         }
     }
 
-    const validNewPassword = newPassword.length >= 15 && new TextEncoder().encode(newPassword).length <= 72
+    const validNewPassword = isValidPassword(newPassword)
     const handlePasswordChange = async () => {
         setPasswordSaving(true)
         setError('')
@@ -116,7 +117,7 @@ export default function Settings() {
 
             <SettingsCard icon={<LockResetOutlinedIcon />} title='비밀번호 변경'>
                 <Stack spacing={2}>
-                    <Alert severity='info'>변경 후 모든 기기에서 로그아웃됩니다. 새 비밀번호는 15자 이상이어야 합니다.</Alert>
+                    <Alert severity='info'>변경 후 모든 기기에서 로그아웃됩니다. {PASSWORD_REQUIREMENTS}</Alert>
                     <TextField
                         label='현재 비밀번호'
                         type={showPassword ? 'text' : 'password'}
@@ -132,7 +133,7 @@ export default function Settings() {
                         onChange={(event) => setNewPassword(event.target.value)}
                         autoComplete='new-password'
                         error={newPassword.length > 0 && !validNewPassword}
-                        helperText={newPassword.length > 0 && !validNewPassword ? '15자 이상, UTF-8 기준 72바이트 이하로 입력하세요.' : ' '}
+                        helperText={newPassword.length > 0 && !validNewPassword ? PASSWORD_REQUIREMENTS : ' '}
                     />
                     <TextField
                         label='새 비밀번호 확인'
