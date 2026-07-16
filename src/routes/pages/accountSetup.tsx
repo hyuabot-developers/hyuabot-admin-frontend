@@ -17,6 +17,7 @@ import {
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 
+import { isValidPassword, PASSWORD_REQUIREMENTS } from '../../security/password.ts'
 import { completeInvitation, validateInvitation } from '../../service/network/auth.ts'
 
 type SetupState = 'validating' | 'ready' | 'invalid' | 'submitting' | 'complete'
@@ -40,7 +41,7 @@ export default function AccountSetup() {
             .catch(() => setState('invalid'))
     }, [token])
 
-    const validPassword = password.length >= 15 && new TextEncoder().encode(password).length <= 72
+    const validPassword = isValidPassword(password)
     const canSubmit = validPassword && password === passwordConfirm && state === 'ready'
     const submitting = state === 'submitting'
 
@@ -84,7 +85,7 @@ export default function AccountSetup() {
 
                     {(state === 'ready' || state === 'submitting') && (
                         <Stack spacing={2} component='form' onSubmit={(event) => { event.preventDefault(); void handleSubmit() }}>
-                            <Alert severity='info'>15자 이상, UTF-8 기준 72바이트 이하로 입력하세요.</Alert>
+                            <Alert severity='info'>{PASSWORD_REQUIREMENTS}</Alert>
                             <TextField
                                 autoFocus
                                 label='새 비밀번호'
@@ -92,7 +93,7 @@ export default function AccountSetup() {
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
                                 error={password.length > 0 && !validPassword}
-                                helperText={password.length > 0 && !validPassword ? '비밀번호 길이 조건을 확인하세요.' : ' '}
+                                helperText={password.length > 0 && !validPassword ? PASSWORD_REQUIREMENTS : ' '}
                                 autoComplete='new-password'
                                 slotProps={{
                                     input: {
