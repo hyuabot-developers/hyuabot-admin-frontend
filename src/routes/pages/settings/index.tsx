@@ -10,10 +10,8 @@ import {
     Alert,
     Box,
     Button,
-    Divider,
     IconButton,
     InputAdornment,
-    Paper,
     Stack,
     TextField,
     ToggleButton,
@@ -23,8 +21,10 @@ import {
 import { useColorScheme } from '@mui/material/styles'
 import axios from 'axios'
 import { useState } from 'react'
-import type { MouseEvent, ReactNode } from 'react'
+import type { MouseEvent } from 'react'
 
+import { OperationalAlerts } from './OperationalAlerts.tsx'
+import { SettingsCard } from './SettingsCard.tsx'
 import { isValidPassword, PASSWORD_REQUIREMENTS } from '../../../security/password.ts'
 import { changePassword, updateProfile } from '../../../service/network/auth.ts'
 import { useUserInfoStore } from '../../../stores/auth.ts'
@@ -166,6 +166,8 @@ export default function Settings() {
                 </ToggleButtonGroup>
             </SettingsCard>
 
+            {userInfo.permissions.includes('SUPER_ADMIN') && <OperationalAlerts />}
+
             <SettingsCard title='GBIS API 키'>
                 <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
                     키는 브라우저 로컬 스토리지에만 저장되며 서버로 전송되지 않습니다.
@@ -184,19 +186,6 @@ export default function Settings() {
 
             <AppSnackbar message={notice} onClose={() => setNotice('')} />
         </PageLayout>
-    )
-}
-
-function SettingsCard({ icon, title, children }: { icon?: ReactNode, title: string, children: ReactNode }) {
-    return (
-        <Paper variant='outlined' sx={{ p: { xs: 2.5, sm: 3 }, mb: 2.5, borderRadius: 3 }}>
-            <Stack direction='row' alignItems='center' spacing={1} sx={{ mb: 1.5 }}>
-                {icon}
-                <Typography variant='subtitle1' fontWeight={750}>{title}</Typography>
-            </Stack>
-            <Divider sx={{ mb: 2.5 }} />
-            {children}
-        </Paper>
     )
 }
 
