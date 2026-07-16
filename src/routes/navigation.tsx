@@ -3,6 +3,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import CampaignIcon from '@mui/icons-material/Campaign'
 import ContactsIcon from '@mui/icons-material/Contacts'
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined'
 import DepartureBoardIcon from '@mui/icons-material/DepartureBoard'
 import DiningIcon from '@mui/icons-material/Dining'
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'
@@ -145,6 +146,12 @@ export const managementSections: ManagementSection[] = [
 
 export const standaloneRoutes: StandaloneRoute[] = [
     {
+        label: '운영 요약',
+        path: '/dashboard',
+        icon: DashboardOutlinedIcon,
+        load: () => import('./pages/dashboard.tsx'),
+    },
+    {
         label: '설정',
         path: '/settings',
         icon: SettingsIcon,
@@ -165,6 +172,7 @@ export const navigationItems: NavigationItem[] = [
 ]
 
 export const firstAllowedPath = (permissions: ReadonlyArray<AdminPermission>) => {
+    if (permissions.length > 0) return '/dashboard'
     const section = managementSections.find(({ permission }) => hasPermission(permissions, permission))
     if (section) return section.defaultPath
 

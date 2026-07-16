@@ -119,8 +119,8 @@ export const GridToolbar = () => {
         event.target.value = ''
     }
 
-    const handleUploadSuccess = ({ deletedCount, createdCount }: { deletedCount: number; createdCount: number }) => {
-        setSnackbarMessage(`${deletedCount}건 삭제, ${createdCount}건 생성 완료`)
+    const handleUploadSuccess = ({ deleteCount, createCount, updateCount }: { deleteCount: number; createCount: number; updateCount: number }) => {
+        setSnackbarMessage(`${createCount}건 추가, ${updateCount}건 변경, ${deleteCount}건 삭제 완료`)
         setSnackbarSeverity('success')
         setSnackbarOpen(true)
         const { selectedStationID, selectedDirection, selectedWeekday } = useSubwayTimetableStore.getState()
