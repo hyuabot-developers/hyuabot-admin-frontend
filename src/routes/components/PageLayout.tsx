@@ -30,13 +30,13 @@ export function PageLayout({
                 minWidth: 0,
             }}>
             <Box sx={{ display: 'flex', alignItems: { xs: 'stretch', sm: 'flex-start' }, gap: 2, mb: 3, flexDirection: { xs: 'column', sm: 'row' } }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flex: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flex: 1, minWidth: 0 }}>
                     {icon && (
                         <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
                             {icon}
                         </Avatar>
                     )}
-                    <Box>
+                    <Box sx={{ minWidth: 0 }}>
                         <Typography variant='h4' component='h1' fontWeight={750}>
                             {title}
                         </Typography>

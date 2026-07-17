@@ -10,9 +10,25 @@ export function PermissionRoute({
     children,
 }: PropsWithChildren<{ permission: AdminPermission }>) {
     const permissions = useUserInfoStore((state) => state.permissions)
-    return hasPermission(permissions, permission)
-        ? children
-        : <Navigate replace to={firstAllowedPath(permissions)} />
+    return hasPermission(permissions, permission) ? (
+        children
+    ) : (
+        <Navigate replace to={firstAllowedPath(permissions)} />
+    )
+}
+
+export function AnyPermissionRoute({
+    permissions: requiredPermissions,
+    children,
+}: PropsWithChildren<{ permissions: AdminPermission[] }>) {
+    const permissions = useUserInfoStore((state) => state.permissions)
+    return requiredPermissions.some((permission) =>
+        hasPermission(permissions, permission),
+    ) ? (
+            children
+        ) : (
+            <Navigate replace to={firstAllowedPath(permissions)} />
+        )
 }
 
 export function PermissionLanding() {
