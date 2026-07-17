@@ -48,4 +48,11 @@ export default tseslint.config(
             'prefer-const': 'error',
         },
     },
+    {
+        // ESLint's legacy indent rule overflows on the responsive audit page's TSX tree.
+        files: ['src/routes/pages/operations/holidayAudit.tsx'],
+        rules: {
+            indent: 'off',
+        },
+    },
 )

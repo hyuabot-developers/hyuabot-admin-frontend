@@ -12,18 +12,21 @@ import {
     ListItemText,
     Toolbar,
     Tooltip,
-    Typography
+    Typography,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { createElement, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 
-import { hasPermission } from '../../security/permissions.ts'
-import { getUserInfo, isUserProfile, logout } from '../../service/network/auth.ts'
+import {
+    getUserInfo,
+    isUserProfile,
+    logout,
+} from '../../service/network/auth.ts'
 import { useAuthenticatedStore, useUserInfoStore } from '../../stores/auth.ts'
 import { PageState } from '../components/PageState.tsx'
-import { navigationItems } from '../navigation.tsx'
+import { canAccessNavigationItem, navigationItems } from '../navigation.tsx'
 
 const drawerWidth = 264
 
@@ -80,23 +83,34 @@ export default function Home() {
         }
     }, [])
     const menuItems = navigationItems.filter((item) =>
-        !item.permission || hasPermission(userInfoStore.permissions, item.permission))
+        canAccessNavigationItem(userInfoStore.permissions, item),
+    )
     const menuItemClicked = (path: string) => {
         void navigate(path)
         setMobileDrawerOpen(false)
     }
     const navigationList = (
-        <Box component='nav' aria-label='관리 메뉴' sx={{ overflow: 'auto', px: 1, py: 1.5 }}>
+        <Box
+            component="nav"
+            aria-label="관리 메뉴"
+            sx={{ overflow: 'auto', px: 1, py: 1.5 }}
+        >
             <List>
                 {menuItems.map((item) => {
-                    const selected = location.pathname === item.path ||
+                    const selected =
+                        location.pathname === item.path ||
                         location.pathname.startsWith(`${item.path}/`)
                     return (
-                        <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
+                        <ListItem
+                            key={item.path}
+                            disablePadding
+                            sx={{ mb: 0.5 }}
+                        >
                             <ListItemButton
                                 selected={selected}
                                 aria-current={selected ? 'page' : undefined}
-                                onClick={() => menuItemClicked(item.path)}>
+                                onClick={() => menuItemClicked(item.path)}
+                            >
                                 <ListItemIcon>
                                     {createElement(item.icon)}
                                 </ListItemIcon>
@@ -109,46 +123,56 @@ export default function Home() {
         </Box>
     )
     if (isAuthenticatedStore.status === 'checking') {
-        return <PageState loading label='관리자 정보 확인 중' />
+        return <PageState loading label="관리자 정보 확인 중" />
     } else if (isAuthenticatedStore.status === 'authenticated') {
         return (
             <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
                 <AppBar
-                    component='header'
-                    position='fixed'
+                    component="header"
+                    position="fixed"
                     sx={{
-                        zIndex: (currentTheme) => currentTheme.zIndex.drawer + 1,
+                        zIndex: (currentTheme) =>
+                            currentTheme.zIndex.drawer + 1,
                         width: { md: `calc(100% - ${drawerWidth}px)` },
                         ml: { md: `${drawerWidth}px` },
-                    }}>
+                    }}
+                >
                     <Toolbar>
                         {!isDesktop && (
                             <IconButton
-                                size='large'
-                                edge='start'
-                                color='inherit'
-                                aria-label='관리 메뉴 열기'
+                                size="large"
+                                edge="start"
+                                color="inherit"
+                                aria-label="관리 메뉴 열기"
                                 sx={{ mr: 2 }}
-                                onClick={() => setMobileDrawerOpen(true)}>
+                                onClick={() => setMobileDrawerOpen(true)}
+                            >
                                 <MenuIcon />
                             </IconButton>
                         )}
                         <Typography
-                            variant='h6'
-                            component='div'
+                            variant="h6"
+                            component="div"
                             noWrap
-                            sx={{ flexGrow: 1 }}>
+                            sx={{ flexGrow: 1 }}
+                        >
                             휴아봇 관리자
                         </Typography>
-                        <Typography sx={{ display: { xs: 'none', sm: 'block' }, mr: 1.5 }}>
+                        <Typography
+                            sx={{
+                                display: { xs: 'none', sm: 'block' },
+                                mr: 1.5,
+                            }}
+                        >
                             {userInfoStore.nickname}
                         </Typography>
-                        <Tooltip title='로그아웃'>
+                        <Tooltip title="로그아웃">
                             <IconButton
-                                size='large'
-                                color='inherit'
-                                aria-label='로그아웃'
-                                onClick={logOutButtonClicked}>
+                                size="large"
+                                color="inherit"
+                                aria-label="로그아웃"
+                                onClick={logOutButtonClicked}
+                            >
                                 <LogOutIcon />
                             </IconButton>
                         </Tooltip>
@@ -167,13 +191,19 @@ export default function Home() {
                             boxSizing: 'border-box',
                         },
                     }}
-                    anchor='left'>
+                    anchor="left"
+                >
                     <Toolbar />
                     {navigationList}
                 </Drawer>
                 <Box
-                    component='main'
-                    sx={{ flexGrow: 1, minWidth: 0, width: { md: `calc(100% - ${drawerWidth}px)` } }}>
+                    component="main"
+                    sx={{
+                        flexGrow: 1,
+                        minWidth: 0,
+                        width: { md: `calc(100% - ${drawerWidth}px)` },
+                    }}
+                >
                     <Toolbar />
                     <Outlet />
                 </Box>
