@@ -1,5 +1,5 @@
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import {
     Alert,
@@ -41,7 +41,9 @@ export function TimetableImportPreviewPanel({ preview }: { preview: TimetableImp
                 ].map(([label, count, color]) => (
                     <Paper key={String(label)} variant="outlined" sx={{ p: 1.5, textAlign: 'center' }}>
                         <Typography variant="h5" sx={{ color, fontWeight: 700 }}>{count}</Typography>
-                        <Typography variant="caption" color="text.secondary">{label}</Typography>
+                        <Typography variant="caption" sx={{
+                            color: 'text.secondary'
+                        }}>{label}</Typography>
                     </Paper>
                 ))}
             </Box>
@@ -64,7 +66,9 @@ export function TimetableImportPreviewPanel({ preview }: { preview: TimetableImp
                                     <ListItem alignItems="flex-start">
                                         <ListItemIcon sx={{ minWidth: 38, mt: 0.5 }}>{presentation.icon}</ListItemIcon>
                                         <ListItemText
-                                            primary={<Stack direction="row" spacing={1} alignItems="center"><Chip size="small" color={presentation.color} label={presentation.label} /><span>{change.identifier}</span></Stack>}
+                                            primary={<Stack direction="row" spacing={1} sx={{
+                                                alignItems: 'center'
+                                            }}><Chip size="small" color={presentation.color} label={presentation.label} /><span>{change.identifier}</span></Stack>}
                                             secondary={change.before || change.after
                                                 ? `${change.before ?? '없음'} → ${change.after ?? '없음'}`
                                                 : undefined}

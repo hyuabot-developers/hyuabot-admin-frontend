@@ -55,7 +55,9 @@ export function OperationalAlerts() {
     return (
         <SettingsCard icon={<NotificationsActiveOutlinedIcon />} title='운영 알림'>
             <Stack spacing={2}>
-                <Typography variant='body2' color='text.secondary'>
+                <Typography variant='body2' sx={{
+                    color: 'text.secondary'
+                }}>
                     백엔드 또는 수집 작업에 장애가 발생하거나 복구되면 이 기기로 알려드립니다. 상태가 바뀔 때만 전송합니다.
                 </Typography>
                 <Alert severity={guidance.severity} icon={state === 'checking' ? <CircularProgress size={20} /> : undefined}>
@@ -80,7 +82,9 @@ export function OperationalAlerts() {
                         </Button>
                     )}
                 </Box>
-                <Typography variant='caption' color='text.secondary'>
+                <Typography variant='caption' sx={{
+                    color: 'text.secondary'
+                }}>
                     macOS Safari 16.1 이상 또는 홈 화면에 설치한 iOS·iPadOS 16.4 이상에서 사용할 수 있습니다.
                 </Typography>
             </Stack>

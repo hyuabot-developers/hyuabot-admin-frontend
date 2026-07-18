@@ -310,16 +310,23 @@ export default function AdminUsers() {
                     ))}
                 </Box>
             )}
-
             <Dialog fullScreen={fullScreenDialog} open={createOpen} onClose={() => !creating && setCreateOpen(false)} fullWidth maxWidth='sm'>
                 <DialogTitle>새 사용자 초대</DialogTitle>
                 <DialogContent dividers>
                     <Stack spacing={2.5} sx={{ pt: 0.5 }}>
                         <Alert severity='info'>비밀번호는 사용자가 초대 링크에서 직접 설정합니다.</Alert>
-                        <TextField label='아이디' required value={newUser.userID} inputProps={{ maxLength: 20 }} onChange={(e) => setNewUser({ ...newUser, userID: e.target.value })} />
-                        <TextField label='이름' required value={newUser.nickname} inputProps={{ maxLength: 20 }} onChange={(e) => setNewUser({ ...newUser, nickname: e.target.value })} />
-                        <TextField label='이메일' required type='email' value={newUser.email} inputProps={{ maxLength: 50 }} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} />
-                        <TextField label='전화번호' value={newUser.phone} inputProps={{ maxLength: 15 }} onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })} />
+                        <TextField label='아이디' required value={newUser.userID} onChange={(e) => setNewUser({ ...newUser, userID: e.target.value })} slotProps={{
+                            htmlInput: { maxLength: 20 }
+                        }} />
+                        <TextField label='이름' required value={newUser.nickname} onChange={(e) => setNewUser({ ...newUser, nickname: e.target.value })} slotProps={{
+                            htmlInput: { maxLength: 20 }
+                        }} />
+                        <TextField label='이메일' required type='email' value={newUser.email} onChange={(e) => setNewUser({ ...newUser, email: e.target.value })} slotProps={{
+                            htmlInput: { maxLength: 50 }
+                        }} />
+                        <TextField label='전화번호' value={newUser.phone} onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })} slotProps={{
+                            htmlInput: { maxLength: 15 }
+                        }} />
                         <PermissionFields permissions={newUser.permissions} onToggle={toggleNewUserPermission} />
                     </Stack>
                 </DialogContent>
@@ -330,7 +337,6 @@ export default function AdminUsers() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog fullScreen={fullScreenDialog} open={invitation !== null} onClose={() => setInvitation(null)} fullWidth maxWidth='sm'>
                 <DialogTitle>초대 링크가 준비되었습니다</DialogTitle>
                 <DialogContent dividers>
@@ -351,7 +357,6 @@ export default function AdminUsers() {
                     <Button variant='contained' startIcon={<ContentCopyOutlinedIcon />} onClick={copyInvitation}>링크 복사</Button>
                 </DialogActions>
             </Dialog>
-
             <Dialog
                 fullScreen={fullScreenDialog}
                 open={deleteTarget !== null}
@@ -363,10 +368,16 @@ export default function AdminUsers() {
                     <Stack spacing={2}>
                         <Alert severity='error'>이 계정은 다시 활성화할 수 없으며 같은 아이디를 재사용할 수 없습니다.</Alert>
                         <Box>
-                            <Typography fontWeight={750}>{deleteTarget?.nickname}</Typography>
-                            <Typography color='text.secondary'>{deleteTarget?.username}</Typography>
+                            <Typography sx={{
+                                fontWeight: 750
+                            }}>{deleteTarget?.nickname}</Typography>
+                            <Typography sx={{
+                                color: 'text.secondary'
+                            }}>{deleteTarget?.username}</Typography>
                         </Box>
-                        <Typography variant='body2' color='text.secondary'>
+                        <Typography variant='body2' sx={{
+                            color: 'text.secondary'
+                        }}>
                             로그인 정보, 권한과 개인정보는 제거됩니다. 이 사용자가 작성한 공지 등 기존 데이터의 작성자 기록은 유지됩니다.
                         </Typography>
                     </Stack>
@@ -383,7 +394,6 @@ export default function AdminUsers() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
             <AppSnackbar message={notice} onClose={() => setNotice('')} />
         </PageLayout>
     )
@@ -426,7 +436,9 @@ function AdminUserCard({
     } else if (pendingSetup) {
         accountControl = (
             <Stack spacing={1.5} sx={{ mb: 2 }}>
-                <Typography variant='body2' color='text.secondary'>
+                <Typography variant='body2' sx={{
+                    color: 'text.secondary'
+                }}>
                     비밀번호 설정 전에는 로그인하거나 계정을 활성화할 수 없습니다.
                 </Typography>
                 <Button
@@ -504,7 +516,13 @@ function EditableUserControls({
         <Box>
             <Divider sx={{ my: 2 }} />
             <PermissionFields permissions={draft.permissions} onToggle={onPermissionToggle} />
-            <Stack direction={{ xs: 'column-reverse', sm: 'row' }} justifyContent='space-between' gap={1.5} sx={{ mt: 2 }}>
+            <Stack
+                direction={{ xs: 'column-reverse', sm: 'row' }}
+                sx={{
+                    justifyContent: 'space-between',
+                    gap: 1.5,
+                    mt: 2
+                }}>
                 <Button
                     color='error'
                     variant='outlined'

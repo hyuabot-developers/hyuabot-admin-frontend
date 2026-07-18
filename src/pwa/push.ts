@@ -53,10 +53,10 @@ export const enableOperationalPush = async () => {
 
     const registration = await navigator.serviceWorker.ready
     const existing = await registration.pushManager.getSubscription()
-    const subscription = existing ?? await registration.pushManager.subscribe({
+    const subscription = existing ?? (await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: decodeBase64Url((await getPushPublicKey()).data.publicKey),
-    })
+    }))
     const serialized = subscription.toJSON()
     if (!serialized.endpoint || !serialized.keys?.p256dh || !serialized.keys.auth) {
         throw new PushSetupError('invalid-subscription')

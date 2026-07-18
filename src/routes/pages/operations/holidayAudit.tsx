@@ -84,20 +84,24 @@ function SummaryCard({
         <Paper variant="outlined" sx={{ p: 2.25, minWidth: 0 }}>
             <Stack
                 direction="row"
-                justifyContent="space-between"
-                alignItems="flex-start"
-                gap={1}
-            >
+                sx={{
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    gap: 1
+                }}>
                 <Box>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" sx={{
+                        color: 'text.secondary'
+                    }}>
                         {label}
                     </Typography>
                     <Typography
                         variant="h4"
                         component="p"
-                        fontWeight={750}
-                        sx={{ mt: 0.5 }}
-                    >
+                        sx={{
+                            fontWeight: 750,
+                            mt: 0.5
+                        }}>
                         {value}
                     </Typography>
                 </Box>
@@ -129,16 +133,18 @@ function IssueCard({ issue }: { issue: HolidayAuditIssue }) {
             >
                 <Stack
                     direction={{ xs: 'column', sm: 'row' }}
-                    justifyContent="space-between"
-                    gap={2}
-                >
+                    sx={{
+                        justifyContent: 'space-between',
+                        gap: 2
+                    }}>
                     <Stack spacing={1.25} sx={{ minWidth: 0 }}>
                         <Stack
                             direction="row"
-                            flexWrap="wrap"
-                            gap={1}
-                            alignItems="center"
-                        >
+                            sx={{
+                                flexWrap: 'wrap',
+                                gap: 1,
+                                alignItems: 'center'
+                            }}>
                             <Chip
                                 size="small"
                                 color={error ? 'error' : 'warning'}
@@ -156,7 +162,9 @@ function IssueCard({ issue }: { issue: HolidayAuditIssue }) {
                                 variant="outlined"
                                 label={serviceLabels[issue.service]}
                             />
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" sx={{
+                                color: 'text.secondary'
+                            }}>
                                 {formatDate(issue.date)}
                             </Typography>
                         </Stack>
@@ -264,7 +272,11 @@ function IssueResults({
                 <Typography variant="h6" sx={{ mt: 1 }}>
                     향후 90일의 휴일 시간표 설정이 정상입니다.
                 </Typography>
-                <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+                <Typography
+                    sx={{
+                        color: 'text.secondary',
+                        mt: 0.5
+                    }}>
                     공휴일 동기화와 교통수단별 시간표 보유 여부를 확인했습니다.
                 </Typography>
             </Paper>
@@ -374,35 +386,40 @@ export default function HolidayAuditPage() {
                 <Box component="section" aria-labelledby="holiday-issues-title">
                     <Stack
                         direction={{ xs: 'column', sm: 'row' }}
-                        justifyContent="space-between"
-                        alignItems={{ xs: 'stretch', sm: 'center' }}
-                        gap={1.5}
-                        sx={{ mb: 1.5 }}
-                    >
+                        sx={{
+                            justifyContent: 'space-between',
+                            alignItems: { xs: 'stretch', sm: 'center' },
+                            gap: 1.5,
+                            mb: 1.5
+                        }}>
                         <Box>
                             <Typography
                                 id="holiday-issues-title"
                                 variant="h5"
                                 component="h2"
-                                fontWeight={700}
+                                sx={{
+                                    fontWeight: 700
+                                }}
                             >
                                 점검 항목
                             </Typography>
                             <Typography
                                 variant="body2"
-                                color="text.secondary"
-                                sx={{ mt: 0.5 }}
-                            >
+                                sx={{
+                                    color: 'text.secondary',
+                                    mt: 0.5
+                                }}>
                                 운행일 3일 이내 문제는 즉시 확인으로 표시됩니다.
                             </Typography>
                         </Box>
                         <Stack
                             direction="row"
-                            flexWrap="wrap"
-                            gap={1}
                             role="group"
                             aria-label="심각도 필터"
-                        >
+                            sx={{
+                                flexWrap: 'wrap',
+                                gap: 1
+                            }}>
                             {(
                                 [
                                     [
@@ -439,9 +456,10 @@ export default function HolidayAuditPage() {
                 {audit && (
                     <Typography
                         variant="caption"
-                        color="text.secondary"
-                        textAlign="right"
-                    >
+                        sx={{
+                            color: 'text.secondary',
+                            textAlign: 'right'
+                        }}>
                         마지막 점검 {formatDateTime(audit.checkedAt)}
                     </Typography>
                 )}

@@ -37,11 +37,17 @@ export function PageLayout({
                         </Avatar>
                     )}
                     <Box sx={{ minWidth: 0 }}>
-                        <Typography variant='h4' component='h1' fontWeight={750}>
+                        <Typography variant='h4' component='h1' sx={{
+                            fontWeight: 750
+                        }}>
                             {title}
                         </Typography>
                         {description && (
-                            <Typography color='text.secondary' sx={{ mt: 0.5 }}>
+                            <Typography
+                                sx={{
+                                    color: 'text.secondary',
+                                    mt: 0.5
+                                }}>
                                 {description}
                             </Typography>
                         )}

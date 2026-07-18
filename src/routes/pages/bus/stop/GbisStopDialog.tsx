@@ -146,7 +146,13 @@ export const GbisStopDialog = ({ open, onClose, onSuccess, existingStopIDs }: Gb
                                                 <Typography variant='body2'>
                                                     {stop.stationName}
                                                     {alreadyExists && (
-                                                        <Typography component='span' variant='caption' color='text.secondary' sx={{ ml: 1 }}>
+                                                        <Typography
+                                                            component='span'
+                                                            variant='caption'
+                                                            sx={{
+                                                                color: 'text.secondary',
+                                                                ml: 1
+                                                            }}>
                                                             (이미 추가됨)
                                                         </Typography>
                                                     )}
