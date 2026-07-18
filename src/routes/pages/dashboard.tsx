@@ -53,20 +53,41 @@ function ServiceCard({ service }: { service: AdminServiceStatus }) {
         <Card variant="outlined" sx={{ height: '100%', bgcolor: 'background.paper' }}>
             <CardActionArea onClick={() => navigate(service.managementPath)} sx={{ height: '100%', alignItems: 'stretch' }}>
                 <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                        <Stack direction="row" alignItems="center" spacing={1}>
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        sx={{
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                        <Stack direction="row" spacing={1} sx={{
+                            alignItems: 'center'
+                        }}>
                             {presentation.icon}
                             <Typography variant="h6" component="h2">{service.title}</Typography>
                         </Stack>
                         <Chip size="small" color={presentation.color} label={presentation.label} />
                     </Stack>
-                    <Typography color="text.secondary" sx={{ flex: 1 }}>{service.message}</Typography>
+                    <Typography
+                        sx={{
+                            color: 'text.secondary',
+                            flex: 1
+                        }}>{service.message}</Typography>
                     {service.lastSuccessAt && (
-                        <Typography variant="caption" color="text.secondary">
+                        <Typography variant="caption" sx={{
+                            color: 'text.secondary'
+                        }}>
                             마지막 정상 갱신 {formatDateTime(service.lastSuccessAt)}
                         </Typography>
                     )}
-                    <Stack direction="row" justifyContent="flex-end" alignItems="center" spacing={0.5} color="primary.main">
+                    <Stack
+                        direction="row"
+                        spacing={0.5}
+                        sx={{
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                            color: 'primary.main'
+                        }}>
                         <Typography variant="button">관리 화면</Typography>
                         <ArrowForwardRoundedIcon fontSize="small" />
                     </Stack>
@@ -116,17 +137,33 @@ export default function Dashboard() {
                         }),
                     }}
                 >
-                    <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={2}>
+                    <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        sx={{
+                            justifyContent: 'space-between',
+                            gap: 2
+                        }}>
                         <Box>
-                            <Typography variant="overline" color="primary.main" fontWeight={700}>운영 요약</Typography>
+                            <Typography
+                                variant="overline"
+                                sx={{
+                                    color: 'primary.main',
+                                    fontWeight: 700
+                                }}>운영 요약</Typography>
                             <Typography variant="h4" component="h1" sx={{ mt: 0.5, fontWeight: 750 }}>
                                 {attentionCount > 0 ? `${attentionCount}개 항목을 확인해주세요` : '현재 운영 상태가 정상입니다'}
                             </Typography>
-                            <Typography color="text.secondary" sx={{ mt: 1 }}>
+                            <Typography
+                                sx={{
+                                    color: 'text.secondary',
+                                    mt: 1
+                                }}>
                                 자동 수집 상태와 오늘 적용되는 셔틀 운행 정보를 한눈에 확인할 수 있습니다.
                             </Typography>
                         </Box>
-                        <Stack direction="row" alignItems="flex-start" spacing={1}>
+                        <Stack direction="row" spacing={1} sx={{
+                            alignItems: 'flex-start'
+                        }}>
                             {overview && (
                                 <Button
                                     variant="outlined"
@@ -153,7 +190,13 @@ export default function Dashboard() {
                 )}
 
                 <Box>
-                    <Typography variant="h5" component="h2" fontWeight={700} sx={{ mb: 1.5 }}>서비스 상태</Typography>
+                    <Typography
+                        variant="h5"
+                        component="h2"
+                        sx={{
+                            fontWeight: 700,
+                            mb: 1.5
+                        }}>서비스 상태</Typography>
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }, gap: 2 }}>
                         {loading
                             ? Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} variant="rounded" height={190} />)
@@ -166,8 +209,19 @@ export default function Dashboard() {
 
                 {quickActions.length > 0 && (
                     <Box>
-                        <Typography variant="h5" component="h2" fontWeight={700} sx={{ mb: 1.5 }}>빠른 작업</Typography>
-                        <Stack direction="row" flexWrap="wrap" gap={1}>
+                        <Typography
+                            variant="h5"
+                            component="h2"
+                            sx={{
+                                fontWeight: 700,
+                                mb: 1.5
+                            }}>빠른 작업</Typography>
+                        <Stack
+                            direction="row"
+                            sx={{
+                                flexWrap: 'wrap',
+                                gap: 1
+                            }}>
                             {quickActions.map((section) => (
                                 <Button
                                     key={section.path}
@@ -183,7 +237,12 @@ export default function Dashboard() {
                 )}
 
                 {overview && (
-                    <Typography variant="caption" color="text.secondary" textAlign="right">
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            color: 'text.secondary',
+                            textAlign: 'right'
+                        }}>
                         마지막 확인 {formatDateTime(overview.checkedAt)}
                     </Typography>
                 )}

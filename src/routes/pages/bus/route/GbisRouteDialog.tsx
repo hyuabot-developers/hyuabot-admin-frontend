@@ -182,7 +182,9 @@ export const GbisRouteDialog = ({ open, onClose, onSuccess, existingStopIDs }: G
                 {loadingDetail && <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}><CircularProgress /></Box>}
                 {!loadingDetail && selectedDetail && (
                     <Box sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
-                        <Typography variant='subtitle1' fontWeight='bold' gutterBottom>
+                        <Typography variant='subtitle1' gutterBottom sx={{
+                            fontWeight: 'bold'
+                        }}>
                             선택된 노선 정보
                         </Typography>
                         <Divider sx={{ mb: 1 }} />

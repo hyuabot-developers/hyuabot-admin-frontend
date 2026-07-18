@@ -118,7 +118,9 @@ export function ShuttleTimetableImportDialog({ open, file, onClose, onSuccess }:
                                 첫 행에 <strong>routeName, period, weekday, departureTime</strong> 열을 입력해주세요.
                                 한글 열 이름인 노선명, 운행 종류, 평일 여부, 출발 시각도 사용할 수 있습니다.
                             </Alert>
-                            <Typography color="text.secondary">
+                            <Typography sx={{
+                                color: 'text.secondary'
+                            }}>
                                 {entries.length > 0 ? `${entries.length}건을 읽었습니다.` : '파일에서 읽은 시간표가 없습니다.'}
                             </Typography>
                             {parseErrors.map((error) => <Alert key={error} severity="error">{error}</Alert>)}

@@ -148,12 +148,24 @@ export const GbisRouteStopDialog = ({ open, onClose, onSuccess, routeID }: GbisR
                                                 <Typography variant='body2'>
                                                     {station.stationName}
                                                     {alreadyInRoute && (
-                                                        <Typography component='span' variant='caption' color='text.secondary' sx={{ ml: 1 }}>
+                                                        <Typography
+                                                            component='span'
+                                                            variant='caption'
+                                                            sx={{
+                                                                color: 'text.secondary',
+                                                                ml: 1
+                                                            }}>
                                                             (이미 추가됨)
                                                         </Typography>
                                                     )}
                                                     {!alreadyInRoute && isNewStop && (
-                                                        <Typography component='span' variant='caption' color='warning.main' sx={{ ml: 1 }}>
+                                                        <Typography
+                                                            component='span'
+                                                            variant='caption'
+                                                            sx={{
+                                                                color: 'warning.main',
+                                                                ml: 1
+                                                            }}>
                                                             (신규 정류장)
                                                         </Typography>
                                                     )}
@@ -168,7 +180,13 @@ export const GbisRouteStopDialog = ({ open, onClose, onSuccess, routeID }: GbisR
                     </List>
                 )}
                 {!loading && stations.length === 0 && !error && (
-                    <Typography variant='body2' color='text.secondary' sx={{ textAlign: 'center', py: 2 }}>
+                    <Typography
+                        variant='body2'
+                        sx={{
+                            color: 'text.secondary',
+                            textAlign: 'center',
+                            py: 2
+                        }}>
                         노선을 선택하면 정류장 목록이 표시됩니다.
                     </Typography>
                 )}

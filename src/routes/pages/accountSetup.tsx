@@ -1,4 +1,4 @@
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlineOutlined'
 import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined'
 import Visibility from '@mui/icons-material/Visibility'
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
@@ -61,15 +61,26 @@ export default function AccountSetup() {
     return (
         <Box sx={{ minHeight: '100dvh', display: 'grid', placeItems: 'center', bgcolor: 'background.default', p: 2 }}>
             <Paper variant='outlined' sx={{ width: '100%', maxWidth: 480, p: { xs: 3, sm: 4 }, borderRadius: 4 }}>
-                <Stack spacing={3} alignItems='stretch'>
-                    <Stack spacing={1.5} alignItems='center' textAlign='center'>
+                <Stack spacing={3} sx={{
+                    alignItems: 'stretch'
+                }}>
+                    <Stack
+                        spacing={1.5}
+                        sx={{
+                            alignItems: 'center',
+                            textAlign: 'center'
+                        }}>
                         <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
                             {state === 'complete' ? <CheckCircleOutlineIcon /> : <LockResetOutlinedIcon />}
                         </Avatar>
-                        <Typography variant='h4' component='h1' fontWeight={750}>
+                        <Typography variant='h4' component='h1' sx={{
+                            fontWeight: 750
+                        }}>
                             {state === 'complete' ? '계정 설정 완료' : '관리자 계정 시작하기'}
                         </Typography>
-                        <Typography color='text.secondary'>
+                        <Typography sx={{
+                            color: 'text.secondary'
+                        }}>
                             {state === 'complete'
                                 ? '새 비밀번호로 로그인할 수 있습니다.'
                                 : '본인만 사용할 안전한 비밀번호를 만들어 주세요.'}
@@ -77,9 +88,16 @@ export default function AccountSetup() {
                     </Stack>
 
                     {state === 'validating' && (
-                        <Stack alignItems='center' spacing={1.5} sx={{ py: 3 }}>
+                        <Stack
+                            spacing={1.5}
+                            sx={{
+                                alignItems: 'center',
+                                py: 3
+                            }}>
                             <CircularProgress size={32} />
-                            <Typography color='text.secondary'>초대 링크 확인 중</Typography>
+                            <Typography sx={{
+                                color: 'text.secondary'
+                            }}>초대 링크 확인 중</Typography>
                         </Stack>
                     )}
 
@@ -125,7 +143,9 @@ export default function AccountSetup() {
                     {state === 'invalid' && (
                         <Stack spacing={2}>
                             <Alert severity='error'>{error || '유효하지 않거나 만료된 초대 링크입니다.'}</Alert>
-                            <Typography variant='body2' color='text.secondary'>관리자에게 새 초대 링크를 요청하세요.</Typography>
+                            <Typography variant='body2' sx={{
+                                color: 'text.secondary'
+                            }}>관리자에게 새 초대 링크를 요청하세요.</Typography>
                         </Stack>
                     )}
 

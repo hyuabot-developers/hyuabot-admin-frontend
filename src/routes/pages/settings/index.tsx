@@ -104,17 +104,21 @@ export default function Settings() {
             icon={<SettingsOutlinedIcon />}
             maxWidth={760}>
             {error && <Alert severity='error' sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
-
             <SettingsCard icon={<AccountCircleOutlinedIcon />} title='내 정보'>
                 <Stack spacing={2}>
                     <TextField label='아이디' value={userInfo.username ?? ''} disabled fullWidth />
-                    <TextField label='이름' required value={nickname} inputProps={{ maxLength: 20 }} onChange={(event) => setNickname(event.target.value)} fullWidth />
-                    <TextField label='이메일' required type='email' value={email} inputProps={{ maxLength: 50 }} onChange={(event) => setEmail(event.target.value)} fullWidth />
-                    <TextField label='전화번호' value={phone} inputProps={{ maxLength: 15 }} onChange={(event) => setPhone(event.target.value)} fullWidth />
+                    <TextField label='이름' required value={nickname} onChange={(event) => setNickname(event.target.value)} fullWidth slotProps={{
+                        htmlInput: { maxLength: 20 }
+                    }} />
+                    <TextField label='이메일' required type='email' value={email} onChange={(event) => setEmail(event.target.value)} fullWidth slotProps={{
+                        htmlInput: { maxLength: 50 }
+                    }} />
+                    <TextField label='전화번호' value={phone} onChange={(event) => setPhone(event.target.value)} fullWidth slotProps={{
+                        htmlInput: { maxLength: 15 }
+                    }} />
                     <Box><Button variant='contained' disabled={profileSaving || !nickname.trim() || !email.trim()} onClick={handleProfileSave}>{profileSaving ? '저장 중' : '내 정보 저장'}</Button></Box>
                 </Stack>
             </SettingsCard>
-
             <SettingsCard icon={<LockResetOutlinedIcon />} title='비밀번호 변경'>
                 <Stack spacing={2}>
                     <Alert severity='info'>변경 후 모든 기기에서 로그아웃됩니다. {PASSWORD_REQUIREMENTS}</Alert>
@@ -154,9 +158,13 @@ export default function Settings() {
                     </Box>
                 </Stack>
             </SettingsCard>
-
             <SettingsCard title='화면 테마'>
-                <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                <Typography
+                    variant='body2'
+                    sx={{
+                        color: 'text.secondary',
+                        mb: 2
+                    }}>
                     시스템 설정을 선택하면 기기의 화면 모드 변경을 자동으로 따릅니다.
                 </Typography>
                 <ToggleButtonGroup value={mode ?? 'system'} onChange={handleThemeChange} exclusive fullWidth aria-label='화면 테마'>
@@ -165,11 +173,14 @@ export default function Settings() {
                     <ToggleButton value='system' aria-label='시스템 설정 테마'><SettingsBrightnessOutlinedIcon sx={{ mr: 1 }} />시스템</ToggleButton>
                 </ToggleButtonGroup>
             </SettingsCard>
-
             {userInfo.permissions.includes('SUPER_ADMIN') && <OperationalAlerts />}
-
             <SettingsCard title='GBIS API 키'>
-                <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
+                <Typography
+                    variant='body2'
+                    sx={{
+                        color: 'text.secondary',
+                        mb: 2
+                    }}>
                     키는 브라우저 로컬 스토리지에만 저장되며 서버로 전송되지 않습니다.
                 </Typography>
                 <TextField
@@ -183,7 +194,6 @@ export default function Settings() {
                 />
                 <Button variant='contained' onClick={handleApiKeySave}>API 키 저장</Button>
             </SettingsCard>
-
             <AppSnackbar message={notice} onClose={() => setNotice('')} />
         </PageLayout>
     )
