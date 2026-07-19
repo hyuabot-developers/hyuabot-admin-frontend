@@ -7,10 +7,15 @@ on:
     types:
       - closed
 
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
 jobs:
-  deploy:
-    name: Deploy to server
-    runs-on: ['self-hosted', 'ARM64', '1st']
+  build:
+    name: Build admin page
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -22,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install --global yarn@1.22.22
-          yarn install
+          yarn install --frozen-lockfile
       - name: Generate .env file
         run: |
           echo "VITE_APP_API_URL=$VITE_APP_API_URL">>.env
@@ -30,6 +35,24 @@ jobs:
           VITE_APP_API_URL: ${{ secrets.VITE_APP_API_URL }}
       - name: Build
         run: yarn build
+      - name: Upload built files
+        uses: actions/upload-artifact@v7
+        with:
+          name: admin-dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    name: Deploy to server
+    needs: build
+    runs-on: ['self-hosted', 'ARM64', '1st']
+    steps:
+      - name: Download built files
+        uses: actions/download-artifact@v8
+        with:
+          name: admin-dist
+          path: dist
       - name: Copy built files to server
         run: |
           cp -r dist/* /home/ubuntu/hyuabot-admin-frontend/
