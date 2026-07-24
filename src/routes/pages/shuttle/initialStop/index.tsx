@@ -29,7 +29,6 @@ import {
     TextField,
     Typography,
 } from '@mui/material'
-import 'leaflet/dist/leaflet.css'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { GeofenceMap } from './GeofenceMap.tsx'

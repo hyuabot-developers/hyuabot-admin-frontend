@@ -169,11 +169,16 @@ Create a `.env` file in the project root:
 
 ```env
 VITE_APP_API_URL=https://your-api-server.example.com
+VITE_NAVER_MAP_CLIENT_ID=your-naver-maps-client-id
 ```
 
-| Variable           | Description                                             |
-|--------------------|---------------------------------------------------------|
-| `VITE_APP_API_URL` | Base URL of the HYUabot backend API (no trailing slash) |
+| Variable                     | Description                                             |
+|------------------------------|---------------------------------------------------------|
+| `VITE_APP_API_URL`           | Base URL of the HYUabot backend API (no trailing slash) |
+| `VITE_NAVER_MAP_CLIENT_ID`   | NAVER Maps application Client ID for Web Dynamic Map    |
+
+The NAVER Maps application must enable **Dynamic Map** and register the local
+host and production host (`https://admin.hyuabot.app`) as Web service URLs.
 
 ### Running Locally
 
@@ -289,7 +294,7 @@ Runs on self-hosted runners.
 Triggered on manual dispatch or when a PR is merged to `main`.
 
 1. Checkout → Node 22 → `yarn install`
-2. Generate `.env` with `VITE_APP_API_URL` from GitHub secrets
+2. Generate `.env` with `VITE_APP_API_URL` and `VITE_NAVER_MAP_CLIENT_ID` from GitHub secrets
 3. `yarn build` → `dist/`
 4. Copy `dist/*` to `/home/ubuntu/hyuabot-admin-frontend/` on the Oracle server
 
