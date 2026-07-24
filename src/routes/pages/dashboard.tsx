@@ -24,7 +24,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { hasPermission } from '../../security/permissions.ts'
-import { AdminOverview, AdminServiceStatus, getAdminOverview } from '../../service/network/overview.ts'
+import {
+    AdminOverview,
+    AdminServiceStatus,
+    AdminWeatherForecastStatus,
+    getAdminOverview,
+} from '../../service/network/overview.ts'
 import { useUserInfoStore } from '../../stores/auth.ts'
 import { PageLayout } from '../components/PageLayout.tsx'
 import { managementSections } from '../navigation.tsx'
@@ -46,7 +51,73 @@ const formatDateTime = (value: string | null) => {
     return Number.isFinite(timestamp) ? dateTimeFormatter.format(timestamp) : '시각 확인 불가'
 }
 
-function ServiceCard({ service }: { service: AdminServiceStatus }) {
+const weatherSourceLabels: Record<string, string> = {
+    JMA_MSM: 'JMA',
+    ECMWF_IFS: 'ECMWF',
+    GFS_GLOBAL: 'GFS',
+}
+
+const confidenceLabels: Record<string, string> = {
+    HIGH: '높음',
+    MEDIUM: '보통',
+    LOW: '낮음',
+}
+
+function WeatherDiagnostics({ forecast }: { forecast: AdminWeatherForecastStatus }) {
+    const availableSources = forecast.sources.filter((source) => source.status === 'AVAILABLE').length
+    const agreement = forecast.agreeingModelCount > 0
+        ? `강수 합의 ${forecast.agreeingModelCount}/${forecast.availableModelCount}`
+        : '합의된 강수 없음'
+    return (
+        <Stack
+            spacing={1}
+            sx={{
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'action.hover',
+            }}
+            aria-label="날씨 예보 모델 상태"
+        >
+            <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={0.5}
+                sx={{ justifyContent: 'space-between' }}
+            >
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                    모델 {availableSources}/{forecast.sources.length || forecast.availableModelCount} 정상
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    {agreement}
+                    {forecast.precipitationConfidence
+                        ? ` · 신뢰도 ${confidenceLabels[forecast.precipitationConfidence] ?? forecast.precipitationConfidence}`
+                        : ''}
+                </Typography>
+            </Stack>
+            <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 0.75 }}>
+                {forecast.sources.map((source) => (
+                    <Chip
+                        key={source.source}
+                        size="small"
+                        variant="outlined"
+                        color={source.status === 'AVAILABLE' ? 'success' : 'error'}
+                        label={`${weatherSourceLabels[source.source] ?? source.source} ${source.status === 'AVAILABLE' ? '정상' : '실패'}`}
+                    />
+                ))}
+            </Stack>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                실황 {formatDateTime(forecast.observedAt)} · 예보 {formatDateTime(forecast.generatedAt)}
+            </Typography>
+        </Stack>
+    )
+}
+
+function ServiceCard({
+    service,
+    weatherForecast,
+}: {
+    service: AdminServiceStatus
+    weatherForecast?: AdminWeatherForecastStatus | null
+}) {
     const navigate = useNavigate()
     const presentation = statusPresentation[service.status]
     return (
@@ -79,6 +150,9 @@ function ServiceCard({ service }: { service: AdminServiceStatus }) {
                         }}>
                             마지막 정상 갱신 {formatDateTime(service.lastSuccessAt)}
                         </Typography>
+                    )}
+                    {service.id === 'weather' && weatherForecast && (
+                        <WeatherDiagnostics forecast={weatherForecast} />
                     )}
                     <Stack
                         direction="row"
@@ -200,7 +274,13 @@ export default function Dashboard() {
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))', xl: 'repeat(4, minmax(0, 1fr))' }, gap: 2 }}>
                         {loading
                             ? Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} variant="rounded" height={190} />)
-                            : overview?.services.map((service) => <ServiceCard key={service.id} service={service} />)}
+                            : overview?.services.map((service) => (
+                                <ServiceCard
+                                    key={service.id}
+                                    service={service}
+                                    weatherForecast={overview.weatherForecast}
+                                />
+                            ))}
                     </Box>
                     {!loading && overview?.services.length === 0 && (
                         <Alert severity="info">자동 상태를 제공하는 관리 영역이 없습니다. 아래 바로가기를 이용해주세요.</Alert>

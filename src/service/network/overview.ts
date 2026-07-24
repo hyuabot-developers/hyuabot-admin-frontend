@@ -13,8 +13,23 @@ export type AdminServiceStatus = {
 export type AdminOverview = {
     checkedAt: string
     services: AdminServiceStatus[]
+    weatherForecast?: AdminWeatherForecastStatus | null
     expiringInvitationCount: number | null
     grafanaURL: string
+}
+
+export type AdminWeatherForecastStatus = {
+    generatedAt: string
+    observedAt: string | null
+    availableModelCount: number
+    agreeingModelCount: number
+    precipitationConfidence: 'HIGH' | 'MEDIUM' | 'LOW' | null
+    sources: AdminWeatherSourceStatus[]
+}
+
+export type AdminWeatherSourceStatus = {
+    source: string
+    status: 'AVAILABLE' | 'FAILED'
 }
 
 export const getAdminOverview = async () =>
