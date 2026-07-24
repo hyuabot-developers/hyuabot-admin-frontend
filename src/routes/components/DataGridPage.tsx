@@ -21,8 +21,7 @@ export function DataGridPage({ children }: DataGridPageProps) {
                     minHeight: 0,
                 },
                 '& .MuiDataGrid-root': {
-                    borderBottomLeftRadius: 0,
-                    borderBottomRightRadius: 0,
+                    borderRadius: 0,
                 },
             }}>
             {children}

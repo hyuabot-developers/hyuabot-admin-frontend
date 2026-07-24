@@ -47,6 +47,10 @@ const appRouter = createBrowserRouter([
                         </PermissionRoute>
                     ),
                     children: [
+                        {
+                            index: true,
+                            element: <Navigate replace to={defaultPath} />,
+                        },
                         ...children.map(({ path: childPath, load }) => ({
                             path: childPath,
                             element: lazyElement(load),
