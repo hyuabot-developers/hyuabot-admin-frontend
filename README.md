@@ -178,7 +178,7 @@ VITE_NAVER_MAP_CLIENT_ID=your-naver-maps-client-id
 | `VITE_NAVER_MAP_CLIENT_ID`   | NAVER Maps application Client ID for Web Dynamic Map    |
 
 The NAVER Maps application must enable **Dynamic Map** and register the local
-host and production host (`https://admin.hyuabot.app`) as Web service URLs.
+host and production host (`https://dashboard.hyuabot.app`) as Web service URLs.
 
 ### Running Locally
 
