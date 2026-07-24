@@ -5,7 +5,7 @@ const apiProxy: ProxyOptions = {
     target: 'https://backend.hyuabot.app',
     changeOrigin: true,
     headers: {
-        Origin: 'https://admin.hyuabot.app',
+        Origin: 'https://dashboard.hyuabot.app',
     },
 }
 
