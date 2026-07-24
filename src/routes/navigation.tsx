@@ -71,6 +71,11 @@ export const managementSections: ManagementSection[] = [
                 load: () => import('./pages/shuttle/stop'),
             },
             {
+                label: '초기 정류장 규칙',
+                path: 'initialStop',
+                load: () => import('./pages/shuttle/initialStop'),
+            },
+            {
                 label: '노선별 정류장 관리',
                 path: 'routeStop',
                 load: () => import('./pages/shuttle/routeStop'),

@@ -58,6 +58,26 @@ export type ShuttleStopResponse = {
     longitude: number,
 }
 
+export type ShuttleGeoPoint = {
+    latitude: number,
+    longitude: number,
+}
+
+export type ShuttleInitialStopRule = {
+    seq: number,
+    name: string,
+    periodType: string,
+    weekday: boolean,
+    startTime: string | null,
+    endTime: string | null,
+    stopName: string,
+    priority: number,
+    enabled: boolean,
+    polygon: ShuttleGeoPoint[],
+}
+
+export type ShuttleInitialStopRuleRequest = Omit<ShuttleInitialStopRule, 'seq'>
+
 export type CreateShuttleStopRequest = {
     name: string,
     latitude: number,
@@ -180,6 +200,22 @@ export const updateShuttleStop = async (name: string, data: UpdateShuttleStopReq
 
 export const deleteShuttleStop = async (name: string) => {
     return await client.delete(`/api/v1/shuttle/stop/${name}`)
+}
+
+export const getShuttleInitialStopRules = async () => {
+    return await client.get('/api/v1/shuttle/initial-stop-rule')
+}
+
+export const createShuttleInitialStopRule = async (data: ShuttleInitialStopRuleRequest) => {
+    return await client.post('/api/v1/shuttle/initial-stop-rule', data)
+}
+
+export const updateShuttleInitialStopRule = async (seq: number, data: ShuttleInitialStopRuleRequest) => {
+    return await client.put(`/api/v1/shuttle/initial-stop-rule/${seq}`, data)
+}
+
+export const deleteShuttleInitialStopRule = async (seq: number) => {
+    return await client.delete(`/api/v1/shuttle/initial-stop-rule/${seq}`)
 }
 
 export const getShuttleRouteStop = async (routeName: string) => {
