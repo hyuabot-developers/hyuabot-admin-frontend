@@ -20,15 +20,18 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
+import { HolidayAuditPanel } from './dashboard/HolidayAuditPanel.tsx'
 import { hasPermission } from '../../security/permissions.ts'
 import {
     AdminOverview,
     AdminServiceStatus,
     AdminWeatherForecastStatus,
     getAdminOverview,
+    getHolidayAudit,
+    HolidayAudit,
 } from '../../service/network/overview.ts'
 import { useUserInfoStore } from '../../stores/auth.ts'
 import { PageLayout } from '../components/PageLayout.tsx'
@@ -114,15 +117,17 @@ function WeatherDiagnostics({ forecast }: { forecast: AdminWeatherForecastStatus
 function ServiceCard({
     service,
     weatherForecast,
+    onOpen,
 }: {
     service: AdminServiceStatus
     weatherForecast?: AdminWeatherForecastStatus | null
+    onOpen?: () => void
 }) {
     const navigate = useNavigate()
     const presentation = statusPresentation[service.status]
     return (
         <Card variant="outlined" sx={{ height: '100%', bgcolor: 'background.paper' }}>
-            <CardActionArea onClick={() => navigate(service.managementPath)} sx={{ height: '100%', alignItems: 'stretch' }}>
+            <CardActionArea onClick={onOpen ?? (() => navigate(service.managementPath))} sx={{ height: '100%', alignItems: 'stretch' }}>
                 <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     <Stack
                         direction="row"
@@ -162,7 +167,9 @@ function ServiceCard({
                             alignItems: 'center',
                             color: 'primary.main'
                         }}>
-                        <Typography variant="button">관리 화면</Typography>
+                        <Typography variant="button">
+                            {service.id === 'holiday-configuration' ? '점검 항목 보기' : '관리 화면'}
+                        </Typography>
                         <ArrowForwardRoundedIcon fontSize="small" />
                     </Stack>
                 </CardContent>
@@ -175,23 +182,54 @@ export default function Dashboard() {
     const permissions = useUserInfoStore((state) => state.permissions)
     const navigate = useNavigate()
     const [overview, setOverview] = useState<AdminOverview | null>(null)
+    const [holidayAudit, setHolidayAudit] = useState<HolidayAudit | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [holidayAuditLoading, setHolidayAuditLoading] = useState(true)
+    const [holidayAuditError, setHolidayAuditError] = useState('')
+    const holidayAuditRef = useRef<HTMLDivElement>(null)
+    const canManageShuttle = hasPermission(permissions, 'SHUTTLE')
 
     const load = async () => {
         setLoading(true)
+        setHolidayAuditLoading(true)
         setError('')
-        try {
-            const response = await getAdminOverview()
-            setOverview(response.data)
-        } catch (requestError) {
-            setError(requestError instanceof Error ? requestError.message : String(requestError))
-        } finally {
-            setLoading(false)
+        setHolidayAuditError('')
+        const [overviewResult, auditResult] = await Promise.allSettled([
+            getAdminOverview(),
+            getHolidayAudit(),
+        ])
+        if (overviewResult.status === 'fulfilled') {
+            setOverview(overviewResult.value.data)
+        } else {
+            setError(overviewResult.reason instanceof Error ? overviewResult.reason.message : String(overviewResult.reason))
         }
+        if (auditResult.status === 'fulfilled') {
+            setHolidayAudit(auditResult.value.data)
+        } else {
+            setHolidayAuditError('휴일 시간표 점검 결과를 불러오지 못했습니다.')
+        }
+        setLoading(false)
+        setHolidayAuditLoading(false)
     }
 
     useEffect(() => { load() }, [])
+
+    const refreshAfterHolidayDecision = async () => {
+        const [overviewResult, auditResult] = await Promise.allSettled([
+            getAdminOverview(),
+            getHolidayAudit(),
+        ])
+        if (overviewResult.status === 'fulfilled') {
+            setOverview(overviewResult.value.data)
+        }
+        if (auditResult.status === 'fulfilled') {
+            setHolidayAudit(auditResult.value.data)
+            setHolidayAuditError('')
+        } else {
+            setHolidayAuditError('저장은 완료됐지만 최신 점검 결과를 불러오지 못했습니다. 새로고침해 주세요.')
+        }
+    }
 
     const attentionCount = overview?.services.filter((service) => service.status !== 'NORMAL').length ?? 0
     const quickActions = useMemo(
@@ -263,6 +301,18 @@ export default function Dashboard() {
                     </Alert>
                 )}
 
+                {canManageShuttle && (
+                    <Box ref={holidayAuditRef} sx={{ scrollMarginTop: 24 }}>
+                        <HolidayAuditPanel
+                            audit={holidayAudit}
+                            loading={holidayAuditLoading}
+                            error={holidayAuditError}
+                            onRetry={load}
+                            onResolved={refreshAfterHolidayDecision}
+                        />
+                    </Box>
+                )}
+
                 <Box>
                     <Typography
                         variant="h5"
@@ -279,6 +329,9 @@ export default function Dashboard() {
                                     key={service.id}
                                     service={service}
                                     weatherForecast={overview.weatherForecast}
+                                    onOpen={service.id === 'holiday-configuration' && canManageShuttle
+                                        ? () => holidayAuditRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                                        : undefined}
                                 />
                             ))}
                     </Box>
