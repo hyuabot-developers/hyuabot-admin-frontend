@@ -253,3 +253,18 @@ export const updateShuttleTimetable = async (routeName: string, seq: number, dat
 export const deleteShuttleTimetable = async (routeName: string, seq: number) => {
     return await client.delete(`/api/v1/shuttle/route/${routeName}/timetable/${seq}`)
 }
+
+export type ShuttlePresenceStopCount = {
+    stopId: string,
+    viewerCount: number,
+}
+
+export type ShuttlePresenceResponse = {
+    stops: ShuttlePresenceStopCount[],
+    updatedAt: string,
+    activeWindowSeconds: number,
+}
+
+export const getShuttleStopPresence = async () => {
+    return await client.get('/api/v1/admin/shuttle-presence')
+}
