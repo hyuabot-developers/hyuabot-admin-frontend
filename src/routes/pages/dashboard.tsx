@@ -24,6 +24,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { HolidayAuditPanel } from './dashboard/HolidayAuditPanel.tsx'
+import { ShuttlePresencePanel } from './dashboard/ShuttlePresencePanel.tsx'
 import { hasPermission } from '../../security/permissions.ts'
 import {
     AdminOverview,
@@ -189,6 +190,7 @@ export default function Dashboard() {
     const [holidayAuditError, setHolidayAuditError] = useState('')
     const holidayAuditRef = useRef<HTMLDivElement>(null)
     const canManageShuttle = hasPermission(permissions, 'SHUTTLE')
+    const isSuperAdmin = permissions.includes('SUPER_ADMIN')
 
     const load = async () => {
         setLoading(true)
@@ -312,6 +314,8 @@ export default function Dashboard() {
                         />
                     </Box>
                 )}
+
+                {isSuperAdmin && <ShuttlePresencePanel />}
 
                 <Box>
                     <Typography
