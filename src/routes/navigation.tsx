@@ -8,6 +8,7 @@ import DepartureBoardIcon from '@mui/icons-material/DepartureBoard'
 import DiningIcon from '@mui/icons-material/Dining'
 import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'
 import DirectionsSubwayIcon from '@mui/icons-material/DirectionsSubway'
+import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined'
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks'
 import RuleRoundedIcon from '@mui/icons-material/RuleRounded'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -280,6 +281,13 @@ export const standaloneRoutes: StandaloneRoute[] = [
         anyPermissions: ['SHUTTLE', 'BUS', 'SUBWAY'],
         icon: RuleRoundedIcon,
         load: () => import('./pages/operations/holidayAudit.tsx'),
+    },
+    {
+        label: '문의',
+        path: '/inquiry',
+        permission: 'INQUIRY',
+        icon: ForumOutlinedIcon,
+        load: () => import('./pages/inquiry'),
     },
     {
         label: '설정',
