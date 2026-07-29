@@ -8,6 +8,7 @@ export const ADMIN_PERMISSIONS = [
     'CONTACT',
     'CALENDAR',
     'NOTICE',
+    'INQUIRY',
 ] as const
 
 export type AdminPermission = typeof ADMIN_PERMISSIONS[number]
@@ -24,6 +25,7 @@ export const MANAGEMENT_PERMISSIONS: ReadonlyArray<{
     { value: 'CONTACT', label: '연락처' },
     { value: 'CALENDAR', label: '학사일정' },
     { value: 'NOTICE', label: '공지사항' },
+    { value: 'INQUIRY', label: '문의' },
 ]
 
 export const hasPermission = (
