@@ -33,7 +33,9 @@ import {
 } from '../../../service/network/inquiry.ts'
 import { PageLayout } from '../../components/PageLayout.tsx'
 
-const POLL_INTERVAL_MS = 8000
+const POLL_INTERVAL_MS = 30000
+
+const STREAM_URL = `${import.meta.env.VITE_APP_API_URL}/api/v1/inquiry/admin/stream`
 
 const dateTimeFormatter = new Intl.DateTimeFormat('ko-KR', {
     month: 'short',
@@ -69,6 +71,7 @@ export default function InquiryPage() {
     const [sending, setSending] = useState(false)
     const mountedRef = useRef(true)
     const selectedIdRef = useRef<string | null>(null)
+    const assignedOnlyRef = useRef(assignedOnly)
 
     const loadThreads = async (assigned: boolean) => {
         try {
@@ -118,6 +121,28 @@ export default function InquiryPage() {
             clearInterval(intervalId)
         }
     }, [assignedOnly])
+
+    useEffect(() => {
+        assignedOnlyRef.current = assignedOnly
+    }, [assignedOnly])
+
+    // 실시간 갱신: 서버 SSE 이벤트 수신 시 목록/대화를 즉시 새로고침한다.
+    // (연결이 끊겨도 EventSource가 자동 재연결하며, 위 폴링이 폴백 역할을 한다.)
+    useEffect(() => {
+        const source = new EventSource(STREAM_URL, { withCredentials: true })
+        const handleEvent = () => {
+            void loadThreads(assignedOnlyRef.current)
+            if (selectedIdRef.current) {
+                void loadMessages(selectedIdRef.current)
+            }
+        }
+        source.addEventListener('message', handleEvent)
+        source.addEventListener('read', handleEvent)
+        source.addEventListener('thread', handleEvent)
+        return () => {
+            source.close()
+        }
+    }, [])
 
     const handleSelect = async (id: string) => {
         setSelectedId(id)
