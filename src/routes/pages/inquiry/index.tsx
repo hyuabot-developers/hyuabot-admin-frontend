@@ -494,7 +494,7 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
     }
     const isAdmin = message.senderType === 'ADMIN'
     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', justifyContent: isAdmin ? 'flex-end' : 'flex-start' }}>
             <Box sx={{ width: 'fit-content', maxWidth: 'min(80%, 520px)' }}>
                 <Paper
                     variant={isAdmin ? 'elevation' : 'outlined'}
@@ -511,7 +511,7 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
                         sx={{
                             whiteSpace: 'pre-wrap',
                             overflowWrap: 'anywhere',
-                            textAlign: 'center',
+                            textAlign: isAdmin ? 'right' : 'left',
                         }}
                     >
                         {message.body}
@@ -522,7 +522,7 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
                     spacing={0.5}
                     sx={{
                         mt: 0.25,
-                        justifyContent: 'center',
+                        justifyContent: isAdmin ? 'flex-end' : 'flex-start',
                         alignItems: 'center',
                     }}
                 >
