@@ -343,7 +343,10 @@ export default function InquiryPage() {
                                 )}
                             </Stack>
                         </Box>
-                        <Stack direction="row" sx={{ gap: 1, flexShrink: 0, alignItems: 'flex-start' }}>
+                        <Stack
+                            direction="row"
+                            sx={{ gap: 1, flexShrink: 0, alignItems: 'center', minHeight: 32 }}
+                        >
                             <Button
                                 size="small"
                                 variant="outlined"
@@ -385,7 +388,7 @@ export default function InquiryPage() {
                     )}
                 </Box>
                 <Divider />
-                <Stack direction="row" spacing={1} sx={{ p: 2, alignItems: 'flex-end' }}>
+                <Stack direction="row" spacing={1} sx={{ p: 2, alignItems: 'center' }}>
                     <TextField
                         fullWidth
                         multiline
@@ -491,19 +494,26 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
     }
     const isAdmin = message.senderType === 'ADMIN'
     return (
-        <Box sx={{ display: 'flex', justifyContent: isAdmin ? 'flex-end' : 'flex-start' }}>
-            <Box sx={{ maxWidth: '80%' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ width: 'fit-content', maxWidth: 'min(80%, 520px)' }}>
                 <Paper
                     variant={isAdmin ? 'elevation' : 'outlined'}
                     elevation={0}
                     sx={{
                         p: 1.25,
-                        borderRadius: 2,
+                        borderRadius: isAdmin ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                         bgcolor: isAdmin ? 'primary.main' : 'background.paper',
                         color: isAdmin ? 'primary.contrastText' : 'text.primary',
                     }}
                 >
-                    <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            whiteSpace: 'pre-wrap',
+                            overflowWrap: 'anywhere',
+                            textAlign: 'center',
+                        }}
+                    >
                         {message.body}
                     </Typography>
                 </Paper>
@@ -512,7 +522,7 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
                     spacing={0.5}
                     sx={{
                         mt: 0.25,
-                        justifyContent: isAdmin ? 'flex-end' : 'flex-start',
+                        justifyContent: 'center',
                         alignItems: 'center',
                     }}
                 >
