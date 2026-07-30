@@ -18,7 +18,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import {
     AdminInquiryThread,
@@ -308,7 +308,7 @@ export default function InquiryPage() {
                 <Box sx={{ p: 2 }}>
                     <Stack
                         direction={{ xs: 'column', sm: 'row' }}
-                        sx={{ justifyContent: 'space-between', gap: 1.5 }}
+                        sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 1.5 }}
                     >
                         <Box sx={{ minWidth: 0 }}>
                             <Typography variant="h6" component="h2" sx={{ overflowWrap: 'anywhere' }}>
@@ -345,7 +345,7 @@ export default function InquiryPage() {
                         </Box>
                         <Stack
                             direction="row"
-                            sx={{ gap: 1, flexShrink: 0, alignItems: 'center', minHeight: 32 }}
+                            sx={{ gap: 1, flexShrink: 0, alignItems: 'center', minHeight: 32, flexWrap: 'wrap' }}
                         >
                             <Button
                                 size="small"
@@ -368,7 +368,7 @@ export default function InquiryPage() {
                 <Divider />
                 <Box sx={{ flex: 1, overflowY: 'auto', p: 2, minHeight: 240 }}>
                     {messagesLoading && messages.length === 0 ? (
-                        <Stack spacing={1.5}>
+                        <Stack spacing={1}>
                             {Array.from({ length: 4 }).map((_, index) => (
                                 <Skeleton key={index} variant="rounded" height={56} />
                             ))}
@@ -380,7 +380,7 @@ export default function InquiryPage() {
                             </Typography>
                         </Box>
                     ) : (
-                        <Stack spacing={1.5}>
+                        <Stack spacing={1}>
                             {messages.map((message) => (
                                 <MessageBubble key={message.id} message={message} />
                             ))}
@@ -480,6 +480,26 @@ export default function InquiryPage() {
 }
 
 function MessageBubble({ message }: { message: InquiryMessage }) {
+    const messageTextRef = useRef<HTMLElement>(null)
+    const [isMultiline, setIsMultiline] = useState(false)
+
+    useLayoutEffect(() => {
+        const element = messageTextRef.current
+        if (!element) return
+
+        const updateLineCount = () => {
+            const style = window.getComputedStyle(element)
+            const lineHeight = Number.parseFloat(style.lineHeight)
+            const hasMultipleLines = element.scrollHeight > lineHeight + 1
+            setIsMultiline((current) => (current === hasMultipleLines ? current : hasMultipleLines))
+        }
+
+        updateLineCount()
+        const observer = new ResizeObserver(updateLineCount)
+        observer.observe(element)
+        return () => observer.disconnect()
+    }, [message.body])
+
     if (message.senderType === 'SYSTEM') {
         return (
             <Box sx={{ textAlign: 'center' }}>
@@ -495,23 +515,36 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
     const isAdmin = message.senderType === 'ADMIN'
     return (
         <Box sx={{ display: 'flex', justifyContent: isAdmin ? 'flex-end' : 'flex-start' }}>
-            <Box sx={{ width: 'fit-content', maxWidth: 'min(80%, 520px)' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: isAdmin ? 'flex-end' : 'flex-start',
+                    maxWidth: 'min(80%, 520px)',
+                    minWidth: 0,
+                }}
+            >
                 <Paper
                     variant={isAdmin ? 'elevation' : 'outlined'}
                     elevation={0}
                     sx={{
                         p: 1.25,
+                        display: 'inline-block',
+                        width: 'fit-content',
+                        maxWidth: '100%',
                         borderRadius: isAdmin ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
                         bgcolor: isAdmin ? 'primary.main' : 'background.paper',
                         color: isAdmin ? 'primary.contrastText' : 'text.primary',
                     }}
                 >
                     <Typography
+                        ref={messageTextRef}
                         variant="body2"
                         sx={{
+                            lineHeight: 1.45,
                             whiteSpace: 'pre-wrap',
                             overflowWrap: 'anywhere',
-                            textAlign: isAdmin ? 'right' : 'left',
+                            textAlign: isMultiline ? (isAdmin ? 'right' : 'left') : 'center',
                         }}
                     >
                         {message.body}
@@ -521,7 +554,11 @@ function MessageBubble({ message }: { message: InquiryMessage }) {
                     direction="row"
                     spacing={0.5}
                     sx={{
-                        mt: 0.25,
+                        mt: 0.5,
+                        minHeight: 18,
+                        lineHeight: 1,
+                        width: 'fit-content',
+                        maxWidth: '100%',
                         justifyContent: isAdmin ? 'flex-end' : 'flex-start',
                         alignItems: 'center',
                     }}
