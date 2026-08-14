@@ -58,7 +58,7 @@ export function OperationalAlerts() {
                 <Typography variant='body2' sx={{
                     color: 'text.secondary'
                 }}>
-                    백엔드 또는 수집 작업에 장애가 발생하거나 복구되면 이 기기로 알려드립니다. 상태가 바뀔 때만 전송합니다.
+                    백엔드 또는 수집 작업의 장애·복구와 새 문의가 발생하면 이 기기로 알려드립니다.
                 </Typography>
                 <Alert severity={guidance.severity} icon={state === 'checking' ? <CircularProgress size={20} /> : undefined}>
                     {guidance.message}

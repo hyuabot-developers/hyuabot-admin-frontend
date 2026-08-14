@@ -6,7 +6,7 @@ self.addEventListener('push', (event) => {
         payload = { body: event.data?.text() }
     }
 
-    event.waitUntil(self.registration.showNotification(payload.title ?? '휴아봇 운영 알림', {
+        event.waitUntil(self.registration.showNotification(payload.title ?? '휴아봇 알림', {
         body: payload.body ?? '새로운 운영 상태를 확인해주세요.',
         icon: '/images/hanyangCharacter.png',
         badge: '/images/hanyangCharacter.png',
